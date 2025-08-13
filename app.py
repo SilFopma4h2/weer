@@ -321,13 +321,14 @@ async def get_weather_forecast(lat: Optional[float] = None, lon: Optional[float]
 
 @app.get("/alerts")
 async def get_weather_alerts(lat: Optional[float] = None, lon: Optional[float] = None):
-    """Get weather alerts (KNMI warnings - simplified implementation)"""
-    # Note: OpenWeatherMap free tier doesn't include alerts
-    # In a real implementation, you would integrate with KNMI API
+    """Get weather alerts (simplified implementation using Open-Meteo)"""
+    # Note: Open-Meteo API doesn't provide weather alerts in the free tier
+    # This is a placeholder that maintains the existing interface
+    log_event("Weather alerts requested - not available in Open-Meteo free tier")
     return {
         "timestamp": datetime.now().isoformat(),
         "alerts": [],
-        "message": "Geen waarschuwingen beschikbaar in MVP versie"
+        "message": "Geen waarschuwingen beschikbaar - Open-Meteo ondersteunt geen alerts in gratis versie"
     }
 
 @app.get("/health")
