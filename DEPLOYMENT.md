@@ -11,9 +11,9 @@ cd weer
 # Install dependencies
 pip install -r requirements.txt
 
-# Configure environment
+# Configure environment (optional)
 cp .env.example .env
-# Edit .env and add your OpenWeatherMap API key
+# Edit .env to customize location settings if needed
 
 # Start production server
 uvicorn app:app --host 0.0.0.0 --port 8000
@@ -26,18 +26,21 @@ python demo.py
 
 ## Environment Configuration
 
-### Required Environment Variables
-- `OPENWEATHER_API_KEY`: Get from https://openweathermap.org/api
+### Optional Environment Variables
+- `DEFAULT_LAT`: Default latitude (default: 52.3676 for Amsterdam)
+- `DEFAULT_LON`: Default longitude (default: 4.9041 for Amsterdam)
+- `CACHE_DURATION`: Cache duration in seconds (default: 600)
 - `DEFAULT_LAT`: Default latitude (52.3676 for Amsterdam)  
 - `DEFAULT_LON`: Default longitude (4.9041 for Amsterdam)
 - `CACHE_DURATION`: Cache duration in seconds (600 = 10 minutes)
 
-### Getting OpenWeatherMap API Key
-1. Go to https://openweathermap.org/api
-2. Sign up for free account
-3. Navigate to "API Keys" section
-4. Copy your API key
-5. Add to `.env` file: `OPENWEATHER_API_KEY=your_key_here`
+## Open-Meteo API
+
+This application uses the free Open-Meteo API (https://open-meteo.com/):
+- **No API key required**: Completely free
+- **High reliability**: Data from national weather services
+- **Global coverage**: Worldwide weather data
+- **Real-time updates**: Current weather information
 
 ## Performance Verification
 
@@ -155,7 +158,6 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - OPENWEATHER_API_KEY=${OPENWEATHER_API_KEY}
       - DEFAULT_LAT=52.3676
       - DEFAULT_LON=4.9041
       - CACHE_DURATION=600
@@ -301,6 +303,6 @@ curl http://localhost:8000/alerts
 
 For issues and support:
 1. Check logs: `journalctl -u weer-app -f`
-2. Verify API connectivity: `curl -s https://api.openweathermap.org/data/2.5/weather?q=Amsterdam&appid=YOUR_KEY`
+2. Verify API connectivity: `curl -s "https://api.open-meteo.com/v1/forecast?latitude=52.37&longitude=4.90&current_weather=true"`
 3. Test endpoints: `python test_performance.py`
 4. Review configuration: Environment variables and file permissions
