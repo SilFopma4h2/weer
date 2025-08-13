@@ -3,6 +3,7 @@ class WeatherApp {
     constructor() {
         this.init();
         this.bindEvents();
+        this.userLocation = null; // Store GPS coordinates
         
         // Only load weather data if user is authenticated
         // Check if we're logged in by looking for user email in the header
@@ -12,7 +13,9 @@ class WeatherApp {
             
             // Auto-refresh every 10 minutes
             setInterval(() => {
-                this.loadWeatherData(false);
+                const lat = this.userLocation ? this.userLocation.lat : null;
+                const lon = this.userLocation ? this.userLocation.lon : null;
+                this.loadWeatherData(false, lat, lon);
             }, 10 * 60 * 1000);
         } else {
             // Hide weather sections and show authentication message
@@ -49,17 +52,22 @@ class WeatherApp {
         });
     }
 
-    async loadWeatherData(showLoading = true) {
+    async loadWeatherData(showLoading = true, lat = null, lon = null) {
         if (showLoading) {
             this.showLoading();
         }
 
         try {
+            // Build URLs with coordinates if provided
+            const currentUrl = lat && lon ? `/current?lat=${lat}&lon=${lon}` : '/current';
+            const forecastUrl = lat && lon ? `/forecast?lat=${lat}&lon=${lon}` : '/forecast';
+            const alertsUrl = lat && lon ? `/alerts?lat=${lat}&lon=${lon}` : '/alerts';
+
             // Load all data in parallel for better performance
             const [currentResponse, forecastResponse, alertsResponse] = await Promise.all([
-                fetch('/current'),
-                fetch('/forecast'),
-                fetch('/alerts')
+                fetch(currentUrl),
+                fetch(forecastUrl),
+                fetch(alertsUrl)
             ]);
 
             if (!currentResponse.ok || !forecastResponse.ok || !alertsResponse.ok) {
@@ -232,7 +240,11 @@ class WeatherApp {
         this.refreshBtn.disabled = true;
         this.refreshBtn.innerHTML = '🔄 Laden...';
         
-        this.loadWeatherData(true).finally(() => {
+        // Use stored GPS coordinates if available
+        const lat = this.userLocation ? this.userLocation.lat : null;
+        const lon = this.userLocation ? this.userLocation.lon : null;
+        
+        this.loadWeatherData(true, lat, lon).finally(() => {
             setTimeout(() => {
                 this.refreshBtn.disabled = false;
                 this.refreshBtn.innerHTML = '🔄 Vernieuwen';
@@ -354,10 +366,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 const location = await window.weatherApp.getUserLocation();
                 
-                // Update API endpoints to use user location
-                // This would require modifying the API calls to include lat/lon parameters
+                // Store GPS coordinates in the app instance
+                window.weatherApp.userLocation = location;
                 
-                window.weatherApp.refreshWeatherData();
+                // Load weather data with GPS coordinates
+                window.weatherApp.loadWeatherData(true, location.lat, location.lon);
                 
             } catch (error) {
                 console.error('Geolocation error:', error);
