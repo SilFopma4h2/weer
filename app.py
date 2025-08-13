@@ -99,7 +99,74 @@ def get_weather_icon(weather_code: int, is_day: bool = True) -> str:
 async def get_location_name(lat: float, lon: float) -> str:
     """Get location name from coordinates using OpenStreetMap Nominatim API"""
     try:
-        # For testing purposes, provide a known mapping for the example coordinates
+        # European capitals and major cities mapping for better recognition
+        major_cities = {
+            # Netherlands
+            (52.3676, 4.9041): "Amsterdam",
+            (52.0907, 5.1214): "Utrecht", 
+            (51.9225, 4.4792): "Rotterdam",
+            (52.1601, 4.4970): "Den Haag",
+            (51.4416, 5.4697): "Eindhoven",
+            
+            # European Capitals
+            (51.5074, -0.1278): "London",          # UK
+            (48.8566, 2.3522): "Parijs",           # France
+            (52.5200, 13.4050): "Berlijn",         # Germany
+            (41.9028, 12.4964): "Rome",            # Italy
+            (40.4168, -3.7038): "Madrid",          # Spain
+            (38.7223, -9.1393): "Lissabon",        # Portugal
+            (47.4979, 19.0402): "Boedapest",       # Hungary
+            (50.0755, 14.4378): "Praag",           # Czech Republic
+            (59.3293, 18.0686): "Stockholm",       # Sweden
+            (60.1699, 24.9384): "Helsinki",        # Finland
+            (55.6761, 12.5683): "Kopenhagen",      # Denmark
+            (59.9139, 10.7522): "Oslo",            # Norway
+            (64.1466, -21.9426): "Reykjavik",      # Iceland
+            (50.8503, 4.3517): "Brussel",          # Belgium
+            (49.6116, 6.1319): "Luxemburg",        # Luxembourg
+            (46.9481, 7.4474): "Bern",             # Switzerland
+            (48.2082, 16.3738): "Wenen",           # Austria
+            (45.8150, 15.9819): "Zagreb",          # Croatia
+            (46.0569, 14.5058): "Ljubljana",       # Slovenia
+            (44.4268, 26.1025): "Boekarest",       # Romania
+            (42.6977, 23.3219): "Sofia",           # Bulgaria
+            (37.9755, 23.7348): "Athene",          # Greece
+            (35.1856, 33.3823): "Nicosia",         # Cyprus
+            (56.9496, 24.1052): "Riga",            # Latvia
+            (54.6872, 25.2797): "Vilnius",         # Lithuania
+            (59.4370, 24.7536): "Tallinn",         # Estonia
+            (52.2297, 21.0122): "Warschau",        # Poland
+            (48.1486, 17.1077): "Bratislava",      # Slovakia
+            (53.9006, 27.5590): "Minsk",           # Belarus
+            (50.4501, 30.5234): "Kiev",            # Ukraine
+            (47.0379, 28.8414): "Chisinau",        # Moldova
+            (44.7866, 20.4489): "Belgrado",        # Serbia
+            (43.8563, 18.4131): "Sarajevo",        # Bosnia
+            (42.0042, 21.4540): "Skopje",          # North Macedonia
+            (41.3275, 19.8187): "Tirana",          # Albania
+            (42.4304, 19.2594): "Podgorica",       # Montenegro
+            
+            # Major European cities
+            (53.3498, -6.2603): "Dublin",          # Ireland
+            (45.4642, 9.1900): "Milaan",           # Italy
+            (41.3851, 2.1734): "Barcelona",        # Spain
+            (43.2965, -2.2900): "Bilbao",          # Spain
+            (50.1109, 8.6821): "Frankfurt",        # Germany
+            (48.1351, 11.5820): "München",         # Germany
+            (53.5511, 9.9937): "Hamburg",          # Germany
+            (51.0504, 13.7373): "Dresden",         # Germany
+            (49.4521, 11.0767): "Neurenberg",      # Germany
+            (45.0703, 7.6869): "Turijn",           # Italy
+            (44.4949, 11.3426): "Bologna",         # Italy
+            (40.8518, 14.2681): "Napels",          # Italy
+        }
+        
+        # Check if coordinates match any major city (within 0.05 degrees ~5km)
+        for (city_lat, city_lon), city_name in major_cities.items():
+            if abs(lat - city_lat) < 0.05 and abs(lon - city_lon) < 0.05:
+                return city_name
+        
+        # Special case for testing
         if abs(lat - 51.9858013) < 0.001 and abs(lon - 4.9041) < 0.001:
             return "Oosterbeek"
         
