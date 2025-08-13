@@ -1,4 +1,4 @@
-# 🌤️ Weer App - MVP Lokale Weer-Applicatie
+# 🌤️ Weer App - Lokale Weer-Applicatie
 
 Een moderne, responsieve weer-applicatie die actuele lokale weersinformatie toont voor Nederland.
 
