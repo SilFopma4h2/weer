@@ -9,9 +9,141 @@
 <body>
     <div class="container">
         <header>
-            <h1>🌤️ Weer App</h1>
-            <p>Actueel lokaal weer voor Nederland</p>
+            <div class="header-content">
+                <div class="header-main">
+                    <h1>🌤️ Weer App</h1>
+                    <p>Actueel lokaal weer voor Nederland</p>
+                </div>
+                
+                <div class="header-auth">
+                    {% if user %}
+                        <div class="user-info">
+                            <span class="user-email">👋 {{ user.email }}</span>
+                            <div class="user-menu">
+                                <button onclick="showSettings()" class="btn-link">⚙️ Instellingen</button>
+                                <form method="post" action="/logout" class="inline-form">
+                                    <button type="submit" class="btn-link">🚪 Uitloggen</button>
+                                </form>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="auth-buttons">
+                            <button onclick="showLogin()" class="btn-primary">🔑 Inloggen</button>
+                            <button onclick="showRegister()" class="btn-secondary">📝 Registreren</button>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
         </header>
+
+        <!-- Auth Modals -->
+        {% if not user %}
+        <!-- Login Modal -->
+        <div id="login-modal" class="modal" style="display: {% if show_login %}block{% else %}none{% endif %};">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>🔑 Inloggen</h3>
+                    <button onclick="closeAuth()" class="close-btn">&times;</button>
+                </div>
+                
+                {% if error and show_login %}
+                    <div class="error-message">⚠️ {{ error }}</div>
+                {% endif %}
+                
+                <form method="post" action="/login" class="auth-form">
+                    <div class="form-group">
+                        <label for="email">E-mailadres:</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="password">Wachtwoord:</label>
+                        <input type="password" id="password" name="password" required>
+                    </div>
+                    
+                    <div class="form-buttons">
+                        <button type="submit" class="btn-primary">Inloggen</button>
+                        <button type="button" onclick="showRegister(); closeLogin();" class="btn-link">Nog geen account? Registreren</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Register Modal -->
+        <div id="register-modal" class="modal" style="display: {% if show_register %}block{% else %}none{% endif %};">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>📝 Registreren</h3>
+                    <button onclick="closeAuth()" class="close-btn">&times;</button>
+                </div>
+                
+                {% if error and show_register %}
+                    <div class="error-message">⚠️ {{ error }}</div>
+                {% endif %}
+                
+                <form method="post" action="/register" class="auth-form">
+                    <div class="form-group">
+                        <label for="reg_email">E-mailadres:</label>
+                        <input type="email" id="reg_email" name="email" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="reg_password">Wachtwoord:</label>
+                        <input type="password" id="reg_password" name="password" required>
+                        <small>Minimaal 8 tekens, met letter en cijfer</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="confirm_password">Bevestig wachtwoord:</label>
+                        <input type="password" id="confirm_password" name="confirm_password" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="reg_location">Standaardlocatie (optioneel):</label>
+                        <input type="text" id="reg_location" name="location" placeholder="bijv. 52.3676,4.9041 (Amsterdam)">
+                        <small>Formaat: breedtegraad,lengtegraad</small>
+                    </div>
+                    
+                    <div class="form-buttons">
+                        <button type="submit" class="btn-primary">Registreren</button>
+                        <button type="button" onclick="showLogin(); closeRegister();" class="btn-link">Al een account? Inloggen</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Settings Modal (for logged in users) -->
+        {% if user %}
+        <div id="settings-modal" class="modal" style="display: {% if show_settings %}block{% else %}none{% endif %};">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>⚙️ Instellingen</h3>
+                    <button onclick="closeSettings()" class="close-btn">&times;</button>
+                </div>
+                
+                {% if error and show_settings %}
+                    <div class="error-message">⚠️ {{ error }}</div>
+                {% endif %}
+                
+                {% if success and show_settings %}
+                    <div class="success-message">✅ {{ success }}</div>
+                {% endif %}
+                
+                <form method="post" action="/settings" class="auth-form">
+                    <div class="form-group">
+                        <label for="location">Standaardlocatie:</label>
+                        <input type="text" id="location" name="location" value="{{ user.location or '' }}" placeholder="bijv. 52.3676,4.9041 (Amsterdam)">
+                        <small>Formaat: breedtegraad,lengtegraad - laat leeg voor Amsterdam</small>
+                    </div>
+                    
+                    <div class="form-buttons">
+                        <button type="submit" class="btn-primary">Opslaan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        {% endif %}
 
         <main>
             <!-- Current Weather Section -->
@@ -120,5 +252,61 @@
     </div>
 
     <script src="/static/script.js"></script>
+    
+    <!-- Auth JavaScript -->
+    <script>
+        // Auth modal functions
+        function showLogin() {
+            document.getElementById('login-modal').style.display = 'block';
+            document.getElementById('register-modal').style.display = 'none';
+        }
+        
+        function showRegister() {
+            document.getElementById('register-modal').style.display = 'block';
+            document.getElementById('login-modal').style.display = 'none';
+        }
+        
+        function showSettings() {
+            document.getElementById('settings-modal').style.display = 'block';
+        }
+        
+        function closeAuth() {
+            document.getElementById('login-modal').style.display = 'none';
+            document.getElementById('register-modal').style.display = 'none';
+        }
+        
+        function closeLogin() {
+            document.getElementById('login-modal').style.display = 'none';
+        }
+        
+        function closeRegister() {
+            document.getElementById('register-modal').style.display = 'none';
+        }
+        
+        function closeSettings() {
+            document.getElementById('settings-modal').style.display = 'none';
+        }
+        
+        // Close modals when clicking outside
+        window.onclick = function(event) {
+            const loginModal = document.getElementById('login-modal');
+            const registerModal = document.getElementById('register-modal');
+            const settingsModal = document.getElementById('settings-modal');
+            const errorModal = document.getElementById('error-modal');
+            
+            if (event.target === loginModal) {
+                loginModal.style.display = 'none';
+            }
+            if (event.target === registerModal) {
+                registerModal.style.display = 'none';
+            }
+            if (event.target === settingsModal) {
+                settingsModal.style.display = 'none';
+            }
+            if (event.target === errorModal) {
+                errorModal.style.display = 'none';
+            }
+        }
+    </script>
 </body>
 </html>

@@ -3,18 +3,26 @@ import asyncio
 from datetime import datetime, timedelta
 from typing import Optional, Dict, Any
 import requests
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, HTTPException, Request, Form, status
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 from cachetools import TTLCache
 import uvicorn
 
+# Import our authentication modules
+from database import init_database, UserManager, SessionManager
+from auth import get_current_user, validate_email, validate_password, sanitize_input
+
 # Load environment variables
 load_dotenv()
 
-app = FastAPI(title="Weer App", description="Local Weather Application MVP")
+app = FastAPI(title="Weer App", description="Local Weather Application with User Authentication")
+
+# Initialize database
+init_database()
 
 # Mount static files and templates
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -176,11 +184,207 @@ async def get_weather_data(lat: float, lon: float, endpoint: str) -> Dict[str, A
 @app.get("/", response_class=HTMLResponse)
 async def read_root(request: Request):
     """Serve the main page"""
-    return templates.TemplateResponse("index.html", {"request": request})
+    user = get_current_user(request)
+    return templates.TemplateResponse("index.html", {"request": request, "user": user})
+
+
+# Authentication Routes
+@app.get("/login", response_class=HTMLResponse)
+async def login_page(request: Request):
+    """Serve the login page"""
+    user = get_current_user(request)
+    if user:
+        return RedirectResponse(url="/", status_code=status.HTTP_302_FOUND)
+    
+    return templates.TemplateResponse("index.html", {"request": request, "show_login": True})
+
+
+@app.post("/login")
+async def login(request: Request, email: str = Form(...), password: str = Form(...)):
+    """Handle user login"""
+    # Sanitize inputs
+    email = sanitize_input(email)
+    
+    # Validate inputs
+    if not validate_email(email):
+        return templates.TemplateResponse("index.html", {
+            "request": request, 
+            "show_login": True,
+            "error": "Invalid email address"
+        })
+    
+    # Authenticate user
+    user = UserManager.authenticate_user(email, password)
+    if not user:
+        return templates.TemplateResponse("index.html", {
+            "request": request,
+            "show_login": True, 
+            "error": "Invalid email or password"
+        })
+    
+    # Create session
+    session_id = SessionManager.create_session(user['id'])
+    if not session_id:
+        return templates.TemplateResponse("index.html", {
+            "request": request,
+            "show_login": True,
+            "error": "Failed to create session. Please try again."
+        })
+    
+    # Set session cookie and redirect
+    response = RedirectResponse(url="/", status_code=status.HTTP_302_FOUND)
+    response.set_cookie(
+        key="session_id", 
+        value=session_id, 
+        max_age=30*24*60*60,  # 30 days
+        httponly=True,
+        samesite="lax"
+    )
+    return response
+
+
+@app.get("/register", response_class=HTMLResponse)
+async def register_page(request: Request):
+    """Serve the register page"""
+    user = get_current_user(request)
+    if user:
+        return RedirectResponse(url="/", status_code=status.HTTP_302_FOUND)
+    
+    return templates.TemplateResponse("index.html", {"request": request, "show_register": True})
+
+
+@app.post("/register")
+async def register(
+    request: Request, 
+    email: str = Form(...), 
+    password: str = Form(...), 
+    confirm_password: str = Form(...),
+    location: str = Form(default="")
+):
+    """Handle user registration"""
+    # Sanitize inputs
+    email = sanitize_input(email)
+    location = sanitize_input(location)
+    
+    # Validate inputs
+    if not validate_email(email):
+        return templates.TemplateResponse("index.html", {
+            "request": request,
+            "show_register": True,
+            "error": "Invalid email address"
+        })
+    
+    if password != confirm_password:
+        return templates.TemplateResponse("index.html", {
+            "request": request,
+            "show_register": True,
+            "error": "Passwords do not match"
+        })
+    
+    is_valid, password_message = validate_password(password)
+    if not is_valid:
+        return templates.TemplateResponse("index.html", {
+            "request": request,
+            "show_register": True,
+            "error": password_message
+        })
+    
+    # Create user
+    user_id = UserManager.create_user(email, password, location or None)
+    if not user_id:
+        return templates.TemplateResponse("index.html", {
+            "request": request,
+            "show_register": True,
+            "error": "Email already exists or registration failed"
+        })
+    
+    # Create session for new user
+    session_id = SessionManager.create_session(user_id)
+    if not session_id:
+        return templates.TemplateResponse("index.html", {
+            "request": request,
+            "show_register": True,
+            "error": "Registration successful but failed to log in. Please try logging in."
+        })
+    
+    # Set session cookie and redirect
+    response = RedirectResponse(url="/", status_code=status.HTTP_302_FOUND)
+    response.set_cookie(
+        key="session_id",
+        value=session_id,
+        max_age=30*24*60*60,  # 30 days
+        httponly=True,
+        samesite="lax"
+    )
+    return response
+
+
+@app.post("/logout")
+async def logout(request: Request):
+    """Handle user logout"""
+    session_id = request.cookies.get('session_id')
+    if session_id:
+        SessionManager.delete_session(session_id)
+    
+    response = RedirectResponse(url="/", status_code=status.HTTP_302_FOUND)
+    response.delete_cookie("session_id")
+    return response
+
+
+@app.get("/settings", response_class=HTMLResponse)
+async def settings_page(request: Request):
+    """Serve the user settings page"""
+    user = get_current_user(request)
+    if not user:
+        return RedirectResponse(url="/login", status_code=status.HTTP_302_FOUND)
+    
+    return templates.TemplateResponse("index.html", {"request": request, "user": user, "show_settings": True})
+
+
+@app.post("/settings")
+async def update_settings(request: Request, location: str = Form(...)):
+    """Update user settings"""
+    user = get_current_user(request)
+    if not user:
+        return RedirectResponse(url="/login", status_code=status.HTTP_302_FOUND)
+    
+    # Sanitize location input
+    location = sanitize_input(location)
+    
+    # Update user location
+    success = UserManager.update_user_location(user['id'], location)
+    if success:
+        return templates.TemplateResponse("index.html", {
+            "request": request,
+            "user": {**user, "location": location},
+            "show_settings": True,
+            "success": "Location updated successfully!"
+        })
+    else:
+        return templates.TemplateResponse("index.html", {
+            "request": request,
+            "user": user,
+            "show_settings": True,
+            "error": "Failed to update location"
+        })
 
 @app.get("/current")
-async def get_current_weather(lat: Optional[float] = None, lon: Optional[float] = None):
+async def get_current_weather(request: Request, lat: Optional[float] = None, lon: Optional[float] = None):
     """Get current weather data"""
+    user = get_current_user(request)
+    
+    # Use user's saved location if available and no coordinates provided
+    if not lat and not lon and user and user.get('location'):
+        try:
+            # Try to parse location as "lat,lon" format
+            if ',' in user['location']:
+                lat_str, lon_str = user['location'].split(',', 1)
+                lat = float(lat_str.strip())
+                lon = float(lon_str.strip())
+        except (ValueError, AttributeError):
+            pass  # Fall back to default location
+    
+    # Use default location if still no coordinates
     if lat is None:
         lat = DEFAULT_LAT
     if lon is None:
@@ -229,8 +433,22 @@ async def get_current_weather(lat: Optional[float] = None, lon: Optional[float] 
         raise HTTPException(status_code=500, detail=f"Error fetching current weather: {str(e)}")
 
 @app.get("/forecast")
-async def get_weather_forecast(lat: Optional[float] = None, lon: Optional[float] = None):
+async def get_weather_forecast(request: Request, lat: Optional[float] = None, lon: Optional[float] = None):
     """Get weather forecast (24h and 7 days)"""
+    user = get_current_user(request)
+    
+    # Use user's saved location if available and no coordinates provided
+    if not lat and not lon and user and user.get('location'):
+        try:
+            # Try to parse location as "lat,lon" format
+            if ',' in user['location']:
+                lat_str, lon_str = user['location'].split(',', 1)
+                lat = float(lat_str.strip())
+                lon = float(lon_str.strip())
+        except (ValueError, AttributeError):
+            pass  # Fall back to default location
+    
+    # Use default location if still no coordinates
     if lat is None:
         lat = DEFAULT_LAT
     if lon is None:
@@ -331,8 +549,21 @@ async def get_weather_forecast(lat: Optional[float] = None, lon: Optional[float]
         raise HTTPException(status_code=500, detail=f"Error fetching forecast: {str(e)}")
 
 @app.get("/alerts")
-async def get_weather_alerts(lat: Optional[float] = None, lon: Optional[float] = None):
+async def get_weather_alerts(request: Request, lat: Optional[float] = None, lon: Optional[float] = None):
     """Get weather alerts (KNMI warnings - simplified implementation)"""
+    user = get_current_user(request)
+    
+    # Use user's saved location if available and no coordinates provided  
+    if not lat and not lon and user and user.get('location'):
+        try:
+            # Try to parse location as "lat,lon" format
+            if ',' in user['location']:
+                lat_str, lon_str = user['location'].split(',', 1)
+                lat = float(lat_str.strip())
+                lon = float(lon_str.strip())
+        except (ValueError, AttributeError):
+            pass  # Fall back to default location
+    
     # Note: OpenWeatherMap free tier doesn't include alerts
     # In a real implementation, you would integrate with KNMI API
     return {
