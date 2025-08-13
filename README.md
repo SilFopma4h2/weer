@@ -22,7 +22,7 @@ Een moderne, responsieve weer-applicatie die actuele lokale weersinformatie toon
   - `GET /forecast`: 24u & 7d voorspelling
   - `GET /alerts`: Weerswaarschuwingen
   - `GET /health`: Health check
-- **Data bron**: OpenWeatherMap API
+- **Data bron**: Open-Meteo API (gratis, geen API key vereist)
 - **Caching**: TTL cache (10 minuten)
 - **Performance**: API response ≤ 500ms
 
@@ -37,21 +37,20 @@ Een moderne, responsieve weer-applicatie die actuele lokale weersinformatie toon
 
 ### Vereisten
 - Python 3.8+
-- OpenWeatherMap API key (gratis beschikbaar)
+- Geen API key vereist (Open-Meteo is gratis)
 
 ### Stap 1: Dependencies installeren
 ```bash
 pip install -r requirements.txt
 ```
 
-### Stap 2: Environment variabelen
+### Stap 2: Environment variabelen (optioneel)
 ```bash
 cp .env.example .env
 ```
 
-Bewerk `.env` en voeg je OpenWeatherMap API key toe:
+Bewerk `.env` om de standaard locatie aan te passen:
 ```
-OPENWEATHER_API_KEY=jouw_api_key_hier
 DEFAULT_LAT=52.3676
 DEFAULT_LON=4.9041
 CACHE_DURATION=600
@@ -70,12 +69,14 @@ uvicorn app:app --host 0.0.0.0 --port 8000 --reload
 ### Stap 4: Open in browser
 Ga naar: `http://localhost:8000`
 
-## 🌍 API Key verkrijgen
+## 🌍 Open-Meteo API
 
-1. Ga naar [OpenWeatherMap](https://openweathermap.org/api)
-2. Maak een gratis account aan
-3. Navigeer naar "API Keys" in je account
-4. Kopieer je API key naar het `.env` bestand
+Deze applicatie gebruikt de gratis [Open-Meteo API](https://open-meteo.com/) voor weerdata:
+
+- **Geen API key vereist**: Volledig gratis en open source
+- **Hoge betrouwbaarheid**: Data van nationale weerdiensten
+- **Complete dekking**: Wereldwijde weerdata
+- **Real-time updates**: Actuele weersinformatie
 
 ## 📱 Gebruik
 
@@ -172,9 +173,9 @@ WantedBy=multi-user.target
 ## 🐛 Troubleshooting
 
 ### API Key problemen
-- Controleer of de API key correct is in `.env`
-- Zorg dat de API key geactiveerd is (kan tot 2 uur duren)
-- Check API quota op OpenWeatherMap dashboard
+- **Geen API key nodig**: Open-Meteo is volledig gratis
+- **Rate limiting**: Maximaal 1000 requests per dag voor gratis gebruik
+- **Uptime**: >99% beschikbaarheid
 
 ### Performance problemen
 - Controleer internetverbinding

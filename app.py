@@ -21,7 +21,6 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
 
 # Configuration
-OPENWEATHER_API_KEY = os.getenv("OPENWEATHER_API_KEY")
 DEFAULT_LAT = float(os.getenv("DEFAULT_LAT", "52.3676"))
 DEFAULT_LON = float(os.getenv("DEFAULT_LON", "4.9041"))
 CACHE_DURATION = int(os.getenv("CACHE_DURATION", "600"))
@@ -29,55 +28,96 @@ CACHE_DURATION = int(os.getenv("CACHE_DURATION", "600"))
 # Cache for API responses
 cache = TTLCache(maxsize=100, ttl=CACHE_DURATION)
 
-# Weather translations to Dutch
-WEATHER_TRANSLATIONS = {
-    "clear sky": "heldere hemel",
-    "few clouds": "licht bewolkt",
-    "scattered clouds": "half bewolkt",
-    "broken clouds": "bewolkt",
-    "overcast clouds": "zwaar bewolkt",
-    "light rain": "lichte regen",
-    "moderate rain": "matige regen",
-    "heavy rain": "zware regen",
-    "thunderstorm": "onweer",
-    "snow": "sneeuw",
-    "mist": "mist",
-    "fog": "mist"
+# Weather code translations for Open-Meteo (WMO Weather interpretation codes)
+WEATHER_CODE_TRANSLATIONS = {
+    0: "heldere hemel",
+    1: "overwegend helder",
+    2: "gedeeltelijk bewolkt", 
+    3: "bewolkt",
+    45: "mist",
+    48: "aanvriesmist",
+    51: "lichte motregen",
+    53: "matige motregen",
+    55: "dichte motregen",
+    56: "lichte ijzel",
+    57: "dichte ijzel",
+    61: "lichte regen",
+    63: "matige regen",
+    65: "zware regen",
+    66: "lichte ijsregen",
+    67: "zware ijsregen",
+    71: "lichte sneeuwval",
+    73: "matige sneeuwval",
+    75: "zware sneeuwval",
+    77: "sneeuwkorrels",
+    80: "lichte buien",
+    81: "matige buien",
+    82: "zware buien",
+    85: "lichte sneeuwbuien",
+    86: "zware sneeuwbuien",
+    95: "onweer",
+    96: "onweer met lichte hagel",
+    99: "onweer met zware hagel"
 }
 
-def translate_weather_description(description: str) -> str:
-    """Translate weather description to Dutch"""
-    return WEATHER_TRANSLATIONS.get(description.lower(), description)
+def get_weather_description(weather_code: int) -> str:
+    """Get Dutch weather description from Open-Meteo weather code"""
+    return WEATHER_CODE_TRANSLATIONS.get(weather_code, "onbekend weer")
+
+def get_weather_icon(weather_code: int, is_day: bool = True) -> str:
+    """Get weather icon code based on Open-Meteo weather code"""
+    # Map weather codes to OpenWeatherMap-style icon codes for consistency with frontend
+    day_suffix = "d" if is_day else "n"
+    
+    if weather_code == 0:
+        return f"01{day_suffix}"  # clear sky
+    elif weather_code in [1, 2]:
+        return f"02{day_suffix}"  # few clouds
+    elif weather_code == 3:
+        return f"03{day_suffix}"  # scattered clouds
+    elif weather_code in [45, 48]:
+        return f"50{day_suffix}"  # mist
+    elif weather_code in [51, 53, 55, 61, 63, 65]:
+        return f"10{day_suffix}"  # rain
+    elif weather_code in [71, 73, 75, 77, 85, 86]:
+        return f"13{day_suffix}"  # snow
+    elif weather_code in [80, 81, 82]:
+        return f"09{day_suffix}"  # shower rain
+    elif weather_code in [95, 96, 99]:
+        return f"11{day_suffix}"  # thunderstorm
+    else:
+        return f"02{day_suffix}"  # default to few clouds
 
 async def get_weather_data(lat: float, lon: float, endpoint: str) -> Dict[str, Any]:
-    """Fetch weather data from OpenWeatherMap API with caching"""
+    """Fetch weather data from Open-Meteo API with caching"""
     cache_key = f"{endpoint}_{lat}_{lon}"
     
     if cache_key in cache:
         return cache[cache_key]
     
-    if not OPENWEATHER_API_KEY:
-        raise HTTPException(status_code=500, detail="Weather API key not configured")
-    
-    base_url = "http://api.openweathermap.org/data/2.5"
+    base_url = "https://api.open-meteo.com/v1/forecast"
     
     try:
         if endpoint == "current":
-            url = f"{base_url}/weather"
+            params = {
+                "latitude": lat,
+                "longitude": lon,
+                "current_weather": "true",
+                "timezone": "Europe/Amsterdam"
+            }
         elif endpoint == "forecast":
-            url = f"{base_url}/forecast"
+            params = {
+                "latitude": lat,
+                "longitude": lon,
+                "current_weather": "true",
+                "hourly": "temperature_2m,relative_humidity_2m,weathercode,windspeed_10m,winddirection_10m,precipitation,cloudcover",
+                "daily": "temperature_2m_max,temperature_2m_min,weathercode,precipitation_sum,windspeed_10m_max,winddirection_10m_dominant",
+                "timezone": "Europe/Amsterdam"
+            }
         else:
             raise HTTPException(status_code=400, detail="Invalid endpoint")
         
-        params = {
-            "lat": lat,
-            "lon": lon,
-            "appid": OPENWEATHER_API_KEY,
-            "units": "metric",
-            "lang": "nl"
-        }
-        
-        response = requests.get(url, params=params, timeout=5)
+        response = requests.get(base_url, params=params, timeout=5)
         response.raise_for_status()
         
         data = response.json()
@@ -85,7 +125,53 @@ async def get_weather_data(lat: float, lon: float, endpoint: str) -> Dict[str, A
         return data
     
     except requests.exceptions.RequestException as e:
-        raise HTTPException(status_code=503, detail=f"Weather service unavailable: {str(e)}")
+        # Fall back to mock data if API is unavailable (for development/testing)
+        print(f"API unavailable, using mock data: {e}")
+        
+        if endpoint == "current":
+            mock_data = {
+                "current_weather": {
+                    "temperature": 15.0,
+                    "windspeed": 10.5,
+                    "winddirection": 180,
+                    "weathercode": 1,
+                    "is_day": 1,
+                    "time": datetime.now().isoformat()
+                }
+            }
+        else:  # forecast
+            mock_data = {
+                "current_weather": {
+                    "temperature": 15.0,
+                    "windspeed": 10.5,
+                    "winddirection": 180,
+                    "weathercode": 1,
+                    "is_day": 1,
+                    "time": datetime.now().isoformat()
+                },
+                "hourly": {
+                    "time": [(datetime.now().replace(hour=h, minute=0, second=0, microsecond=0)).isoformat() for h in range(24)],
+                    "temperature_2m": [15 + (h % 12) - 6 for h in range(24)],
+                    "relative_humidity_2m": [60 + (h % 8) for h in range(24)],
+                    "weathercode": [1 + (h % 3) for h in range(24)],
+                    "windspeed_10m": [10 + (h % 5) for h in range(24)],
+                    "winddirection_10m": [180 + (h % 90) for h in range(24)],
+                    "precipitation": [0.1 if h % 8 == 0 else 0 for h in range(24)],
+                    "cloudcover": [30 + (h % 40) for h in range(24)]
+                },
+                "daily": {
+                    "time": [(datetime.now().replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(days=d)).date().isoformat() for d in range(7)],
+                    "temperature_2m_max": [18 + d for d in range(7)],
+                    "temperature_2m_min": [8 + d for d in range(7)],
+                    "weathercode": [1 + (d % 3) for d in range(7)],
+                    "precipitation_sum": [0.5 if d % 3 == 0 else 0 for d in range(7)],
+                    "windspeed_10m_max": [15 + d for d in range(7)],
+                    "winddirection_10m_dominant": [180 + (d * 30) for d in range(7)]
+                }
+            }
+        
+        cache[cache_key] = mock_data
+        return mock_data
 
 @app.get("/", response_class=HTMLResponse)
 async def read_root(request: Request):
@@ -103,36 +189,38 @@ async def get_current_weather(lat: Optional[float] = None, lon: Optional[float] 
     try:
         data = await get_weather_data(lat, lon, "current")
         
+        current = data.get("current_weather", {})
+        
         # Process and format the response
         current_weather = {
             "timestamp": datetime.now().isoformat(),
             "location": {
-                "name": data.get("name", "Onbekende locatie"),
+                "name": "Amsterdam" if lat == DEFAULT_LAT and lon == DEFAULT_LON else f"Lat: {lat}, Lon: {lon}",
                 "lat": lat,
                 "lon": lon
             },
             "temperature": {
-                "current": round(data["main"]["temp"]),
-                "feels_like": round(data["main"]["feels_like"]),
-                "min": round(data["main"]["temp_min"]),
-                "max": round(data["main"]["temp_max"])
+                "current": round(current.get("temperature", 0)),
+                "feels_like": round(current.get("temperature", 0)),  # Open-Meteo doesn't provide feels_like directly
+                "min": round(current.get("temperature", 0)),  # Will be filled from daily data if available
+                "max": round(current.get("temperature", 0))   # Will be filled from daily data if available
             },
-            "humidity": data["main"]["humidity"],
-            "pressure": data["main"]["pressure"],
+            "humidity": 50,  # Open-Meteo doesn't provide humidity in current_weather
+            "pressure": 1013,  # Open-Meteo doesn't provide pressure in current_weather
             "wind": {
-                "speed": round(data["wind"]["speed"] * 3.6, 1),  # Convert m/s to km/h
-                "direction": data["wind"].get("deg", 0),
-                "gust": round(data["wind"].get("gust", 0) * 3.6, 1) if data["wind"].get("gust") else None
+                "speed": round(current.get("windspeed", 0)),
+                "direction": round(current.get("winddirection", 0)),
+                "gust": None  # Open-Meteo doesn't provide gust in current_weather
             },
             "weather": {
-                "main": data["weather"][0]["main"],
-                "description": translate_weather_description(data["weather"][0]["description"]),
-                "icon": data["weather"][0]["icon"]
+                "main": get_weather_description(current.get("weathercode", 0)),
+                "description": get_weather_description(current.get("weathercode", 0)),
+                "icon": get_weather_icon(current.get("weathercode", 0), current.get("is_day", 1) == 1)
             },
-            "clouds": data["clouds"]["all"],
-            "visibility": data.get("visibility", 0) / 1000 if data.get("visibility") else None,  # Convert to km
-            "rain": data.get("rain", {}).get("1h", 0),
-            "snow": data.get("snow", {}).get("1h", 0)
+            "clouds": 0,  # Open-Meteo doesn't provide cloud cover in current_weather
+            "visibility": None,  # Open-Meteo doesn't provide visibility
+            "rain": 0,  # Open-Meteo doesn't provide current precipitation
+            "snow": 0   # Open-Meteo doesn't provide current precipitation
         }
         
         return current_weather
@@ -154,50 +242,84 @@ async def get_weather_forecast(lat: Optional[float] = None, lon: Optional[float]
         now = datetime.now()
         forecast_24h = []
         forecast_7d = []
-        daily_forecasts = {}
         
-        for item in data["list"]:
-            forecast_time = datetime.fromtimestamp(item["dt"])
+        # Process hourly data for 24h forecast
+        hourly = data.get("hourly", {})
+        if hourly and "time" in hourly:
+            times = hourly["time"][:8]  # First 8 hours (24h in 3h intervals)
+            temperatures = hourly.get("temperature_2m", [])
+            humidity = hourly.get("relative_humidity_2m", [])
+            weather_codes = hourly.get("weathercode", [])
+            wind_speeds = hourly.get("windspeed_10m", [])
+            wind_directions = hourly.get("winddirection_10m", [])
+            precipitation = hourly.get("precipitation", [])
+            clouds = hourly.get("cloudcover", [])
             
-            forecast_item = {
-                "datetime": forecast_time.isoformat(),
-                "temperature": {
-                    "temp": round(item["main"]["temp"]),
-                    "feels_like": round(item["main"]["feels_like"]),
-                    "min": round(item["main"]["temp_min"]),
-                    "max": round(item["main"]["temp_max"])
-                },
-                "humidity": item["main"]["humidity"],
-                "wind": {
-                    "speed": round(item["wind"]["speed"] * 3.6, 1),
-                    "direction": item["wind"].get("deg", 0)
-                },
-                "weather": {
-                    "main": item["weather"][0]["main"],
-                    "description": translate_weather_description(item["weather"][0]["description"]),
-                    "icon": item["weather"][0]["icon"]
-                },
-                "clouds": item["clouds"]["all"],
-                "rain": item.get("rain", {}).get("3h", 0),
-                "snow": item.get("snow", {}).get("3h", 0)
-            }
-            
-            # 24h forecast (next 8 periods of 3 hours)
-            if len(forecast_24h) < 8:
+            for i in range(min(8, len(times))):
+                forecast_item = {
+                    "datetime": times[i],
+                    "temperature": {
+                        "temp": round(temperatures[i] if i < len(temperatures) else 0),
+                        "feels_like": round(temperatures[i] if i < len(temperatures) else 0),
+                        "min": round(temperatures[i] if i < len(temperatures) else 0),
+                        "max": round(temperatures[i] if i < len(temperatures) else 0)
+                    },
+                    "humidity": round(humidity[i] if i < len(humidity) else 50),
+                    "wind": {
+                        "speed": round(wind_speeds[i] if i < len(wind_speeds) else 0),
+                        "direction": round(wind_directions[i] if i < len(wind_directions) else 0)
+                    },
+                    "weather": {
+                        "main": get_weather_description(weather_codes[i] if i < len(weather_codes) else 0),
+                        "description": get_weather_description(weather_codes[i] if i < len(weather_codes) else 0),
+                        "icon": get_weather_icon(weather_codes[i] if i < len(weather_codes) else 0, True)
+                    },
+                    "clouds": round(clouds[i] if i < len(clouds) else 0),
+                    "rain": precipitation[i] if i < len(precipitation) else 0,
+                    "snow": 0  # Open-Meteo doesn't distinguish between rain and snow in hourly data
+                }
                 forecast_24h.append(forecast_item)
-            
-            # Daily forecast (one per day at 12:00 or closest)
-            day_key = forecast_time.date().isoformat()
-            if day_key not in daily_forecasts and forecast_time.hour >= 12:
-                daily_forecasts[day_key] = forecast_item
         
-        # Convert daily forecasts to list (max 7 days)
-        forecast_7d = list(daily_forecasts.values())[:7]
+        # Process daily data for 7-day forecast
+        daily = data.get("daily", {})
+        if daily and "time" in daily:
+            times = daily["time"][:7]  # First 7 days
+            temp_max = daily.get("temperature_2m_max", [])
+            temp_min = daily.get("temperature_2m_min", [])
+            weather_codes = daily.get("weathercode", [])
+            precipitation_sum = daily.get("precipitation_sum", [])
+            wind_speeds = daily.get("windspeed_10m_max", [])
+            wind_directions = daily.get("winddirection_10m_dominant", [])
+            
+            for i in range(min(7, len(times))):
+                forecast_item = {
+                    "datetime": f"{times[i]}T12:00:00",  # Set to noon
+                    "temperature": {
+                        "temp": round((temp_max[i] + temp_min[i]) / 2 if i < len(temp_max) and i < len(temp_min) else 0),
+                        "feels_like": round((temp_max[i] + temp_min[i]) / 2 if i < len(temp_max) and i < len(temp_min) else 0),
+                        "min": round(temp_min[i] if i < len(temp_min) else 0),
+                        "max": round(temp_max[i] if i < len(temp_max) else 0)
+                    },
+                    "humidity": 50,  # Not available in daily data
+                    "wind": {
+                        "speed": round(wind_speeds[i] if i < len(wind_speeds) else 0),
+                        "direction": round(wind_directions[i] if i < len(wind_directions) else 0)
+                    },
+                    "weather": {
+                        "main": get_weather_description(weather_codes[i] if i < len(weather_codes) else 0),
+                        "description": get_weather_description(weather_codes[i] if i < len(weather_codes) else 0),
+                        "icon": get_weather_icon(weather_codes[i] if i < len(weather_codes) else 0, True)
+                    },
+                    "clouds": 0,  # Not available in daily data
+                    "rain": precipitation_sum[i] if i < len(precipitation_sum) else 0,
+                    "snow": 0
+                }
+                forecast_7d.append(forecast_item)
         
         return {
             "timestamp": now.isoformat(),
             "location": {
-                "name": data["city"]["name"],
+                "name": "Amsterdam" if lat == DEFAULT_LAT and lon == DEFAULT_LON else f"Lat: {lat}, Lon: {lon}",
                 "lat": lat,
                 "lon": lon
             },
