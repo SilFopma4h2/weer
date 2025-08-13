@@ -446,3 +446,336 @@ footer {
         border-left: 4px solid #000;
     }
 }
+
+/* Authentication Styles */
+
+/* Header Authentication */
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.header-main {
+    text-align: left;
+}
+
+.header-auth {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.user-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 5px;
+}
+
+.user-email {
+    font-size: 1em;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.user-menu {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.auth-buttons {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+/* Button Styles */
+.btn-primary {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.9em;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.btn-primary:hover {
+    background: rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.6);
+    transform: translateY(-1px);
+}
+
+.btn-secondary {
+    background: transparent;
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.9em;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.6);
+    transform: translateY(-1px);
+}
+
+.btn-link {
+    background: none;
+    color: white;
+    border: none;
+    padding: 4px 8px;
+    cursor: pointer;
+    font-size: 0.8em;
+    text-decoration: underline;
+    opacity: 0.8;
+    transition: opacity 0.3s ease;
+}
+
+.btn-link:hover {
+    opacity: 1;
+}
+
+.inline-form {
+    display: inline;
+}
+
+/* Modal Styles - Enhanced */
+.modal {
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.6);
+    backdrop-filter: blur(5px);
+}
+
+.modal-content {
+    background: white;
+    margin: 5% auto;
+    padding: 0;
+    border-radius: 15px;
+    max-width: 450px;
+    width: 90%;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    overflow: hidden;
+    animation: modalFadeIn 0.3s ease;
+}
+
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.8) translateY(-50px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 25px;
+    background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+    color: white;
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 1.3em;
+    font-weight: 600;
+}
+
+.close-btn {
+    background: none;
+    color: white;
+    border: none;
+    font-size: 1.5em;
+    cursor: pointer;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.3s ease;
+}
+
+.close-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* Form Styles */
+.auth-form {
+    padding: 25px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+    color: #2d3436;
+    font-size: 0.9em;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-size: 1em;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    box-sizing: border-box;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #74b9ff;
+    box-shadow: 0 0 0 3px rgba(116, 185, 255, 0.1);
+}
+
+.form-group small {
+    display: block;
+    margin-top: 5px;
+    font-size: 0.8em;
+    color: #636e72;
+}
+
+.form-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 25px;
+}
+
+.form-buttons .btn-primary {
+    background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-size: 1em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.3s ease;
+}
+
+.form-buttons .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(116, 185, 255, 0.4);
+}
+
+.form-buttons .btn-link {
+    color: #74b9ff;
+    background: none;
+    border: none;
+    padding: 8px;
+    font-size: 0.9em;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.form-buttons .btn-link:hover {
+    color: #0984e3;
+}
+
+/* Message Styles */
+.error-message {
+    background: rgba(231, 76, 60, 0.1);
+    color: #e74c3c;
+    padding: 12px 15px;
+    margin: 0 25px 15px 25px;
+    border-radius: 8px;
+    border: 1px solid rgba(231, 76, 60, 0.3);
+    font-size: 0.9em;
+}
+
+.success-message {
+    background: rgba(39, 174, 96, 0.1);
+    color: #27ae60;
+    padding: 12px 15px;
+    margin: 0 25px 15px 25px;
+    border-radius: 8px;
+    border: 1px solid rgba(39, 174, 96, 0.3);
+    font-size: 0.9em;
+}
+
+/* Responsive Authentication */
+@media (max-width: 768px) {
+    .header-content {
+        flex-direction: column;
+        text-align: center;
+        gap: 15px;
+    }
+    
+    .header-main {
+        text-align: center;
+    }
+    
+    .user-info {
+        align-items: center;
+    }
+    
+    .user-menu {
+        flex-direction: column;
+        gap: 5px;
+    }
+    
+    .auth-buttons {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .btn-primary, .btn-secondary {
+        width: 100%;
+        text-align: center;
+    }
+    
+    .modal-content {
+        width: 95%;
+        margin: 10% auto;
+    }
+    
+    .auth-form {
+        padding: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .header-auth {
+        width: 100%;
+    }
+    
+    .auth-buttons {
+        width: 100%;
+    }
+    
+    .modal-header {
+        padding: 15px 20px;
+    }
+    
+    .modal-header h3 {
+        font-size: 1.1em;
+    }
+}
+}
