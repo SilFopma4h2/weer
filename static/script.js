@@ -3,12 +3,21 @@ class WeatherApp {
     constructor() {
         this.init();
         this.bindEvents();
-        this.loadWeatherData();
         
-        // Auto-refresh every 10 minutes
-        setInterval(() => {
-            this.loadWeatherData(false);
-        }, 10 * 60 * 1000);
+        // Only load weather data if user is authenticated
+        // Check if we're logged in by looking for user email in the header
+        const userEmail = document.querySelector('.user-email');
+        if (userEmail) {
+            this.loadWeatherData();
+            
+            // Auto-refresh every 10 minutes
+            setInterval(() => {
+                this.loadWeatherData(false);
+            }, 10 * 60 * 1000);
+        } else {
+            // Hide weather sections and show authentication message
+            this.showAuthenticationRequired();
+        }
     }
 
     init() {
@@ -54,6 +63,12 @@ class WeatherApp {
             ]);
 
             if (!currentResponse.ok || !forecastResponse.ok || !alertsResponse.ok) {
+                // Check if any response is an authentication error
+                if (currentResponse.status === 401 || forecastResponse.status === 401 || alertsResponse.status === 401) {
+                    // Redirect to login page
+                    window.location.href = '/login';
+                    return;
+                }
                 throw new Error('Failed to fetch weather data');
             }
 
@@ -88,7 +103,17 @@ class WeatherApp {
         document.getElementById('feels-like').textContent = `${data.temperature.feels_like}°C`;
         document.getElementById('min-max').textContent = `${data.temperature.min}° / ${data.temperature.max}°`;
         document.getElementById('weather-description').textContent = data.weather.description;
-        document.getElementById('location-name').textContent = data.location.name;
+        
+        // Update location display - show place name and coordinates separately if available
+        const locationElement = document.getElementById('location-name');
+        if (data.location.coords) {
+            // Show place name above coordinates
+            locationElement.innerHTML = `<strong>${data.location.name}</strong><br><small>${data.location.coords}</small>`;
+        } else {
+            // Show just the name
+            locationElement.textContent = data.location.name;
+        }
+        
         document.getElementById('wind').textContent = `${data.wind.speed} km/h`;
         document.getElementById('humidity').textContent = `${data.humidity}%`;
         document.getElementById('clouds').textContent = `${data.clouds}%`;
@@ -226,6 +251,37 @@ class WeatherApp {
 
     capitalizeFirst(str) {
         return str.charAt(0).toUpperCase() + str.slice(1);
+    }
+
+    showAuthenticationRequired() {
+        // Hide loading spinner and show authentication message
+        this.hideLoading();
+        
+        // Replace weather data with authentication message
+        if (this.currentWeatherElement) {
+            this.currentWeatherElement.innerHTML = `
+                <div style="text-align: center; padding: 40px;">
+                    <h3>🔒 Inloggen vereist</h3>
+                    <p>Log in of registreer om het weer te bekijken</p>
+                    <div style="margin-top: 20px;">
+                        <button onclick="showLogin()" class="btn-primary">🔑 Inloggen</button>
+                        <button onclick="showRegister()" class="btn-secondary" style="margin-left: 10px;">📝 Registreren</button>
+                    </div>
+                </div>
+            `;
+            this.currentWeatherElement.style.display = 'block';
+        }
+        
+        // Hide forecast sections
+        if (this.forecast24hElement) {
+            this.forecast24hElement.innerHTML = '<p style="text-align: center;">Log in om voorspelling te zien</p>';
+        }
+        if (this.forecast7dElement) {
+            this.forecast7dElement.innerHTML = '<p style="text-align: center;">Log in om voorspelling te zien</p>';
+        }
+        if (this.alertsElement) {
+            this.alertsElement.innerHTML = '<p style="text-align: center;">Log in om waarschuwingen te zien</p>';
+        }
     }
 
     // Get user's location (with permission)
