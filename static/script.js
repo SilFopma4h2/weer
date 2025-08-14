@@ -5,22 +5,15 @@ class WeatherApp {
         this.bindEvents();
         this.userLocation = null; // Store GPS coordinates
         
-        // Only load weather data if user is authenticated
-        // Check if we're logged in by looking for user email in the header
-        const userEmail = document.querySelector('.user-email');
-        if (userEmail) {
-            this.loadWeatherData();
-            
-            // Auto-refresh every 10 minutes
-            setInterval(() => {
-                const lat = this.userLocation ? this.userLocation.lat : null;
-                const lon = this.userLocation ? this.userLocation.lon : null;
-                this.loadWeatherData(false, lat, lon);
-            }, 10 * 60 * 1000);
-        } else {
-            // Hide weather sections and show authentication message
-            this.showAuthenticationRequired();
-        }
+        // Load weather data immediately (no authentication required)
+        this.loadWeatherData();
+        
+        // Auto-refresh every 10 minutes
+        setInterval(() => {
+            const lat = this.userLocation ? this.userLocation.lat : null;
+            const lon = this.userLocation ? this.userLocation.lon : null;
+            this.loadWeatherData(false, lat, lon);
+        }, 10 * 60 * 1000);
     }
 
     init() {
@@ -265,36 +258,6 @@ class WeatherApp {
         return str.charAt(0).toUpperCase() + str.slice(1);
     }
 
-    showAuthenticationRequired() {
-        // Hide loading spinner and show authentication message
-        this.hideLoading();
-        
-        // Replace weather data with authentication message
-        if (this.currentWeatherElement) {
-            this.currentWeatherElement.innerHTML = `
-                <div style="text-align: center; padding: 40px;">
-                    <h3>🔒 Inloggen vereist</h3>
-                    <p>Log in of registreer om het weer te bekijken</p>
-                    <div style="margin-top: 20px;">
-                        <button onclick="showLogin()" class="btn-primary">🔑 Inloggen</button>
-                        <button onclick="showRegister()" class="btn-secondary" style="margin-left: 10px;">📝 Registreren</button>
-                    </div>
-                </div>
-            `;
-            this.currentWeatherElement.style.display = 'block';
-        }
-        
-        // Hide forecast sections
-        if (this.forecast24hElement) {
-            this.forecast24hElement.innerHTML = '<p style="text-align: center;">Log in om voorspelling te zien</p>';
-        }
-        if (this.forecast7dElement) {
-            this.forecast7dElement.innerHTML = '<p style="text-align: center;">Log in om voorspelling te zien</p>';
-        }
-        if (this.alertsElement) {
-            this.alertsElement.innerHTML = '<p style="text-align: center;">Log in om waarschuwingen te zien</p>';
-        }
-    }
 
     // Get user's location (with permission)
     async getUserLocation() {
@@ -312,7 +275,24 @@ class WeatherApp {
                     });
                 },
                 (error) => {
-                    reject(new Error('Kon locatie niet bepalen: ' + error.message));
+                    let errorMessage = 'Kon locatie niet bepalen';
+                    
+                    switch(error.code) {
+                        case error.PERMISSION_DENIED:
+                            errorMessage = 'Locatietoegang geweigerd. Geef toestemming voor locatie in uw browser.';
+                            break;
+                        case error.POSITION_UNAVAILABLE:
+                            errorMessage = 'Locatie niet beschikbaar. Controleer uw GPS-verbinding.';
+                            break;
+                        case error.TIMEOUT:
+                            errorMessage = 'Time-out bij bepalen van locatie. Probeer het opnieuw.';
+                            break;
+                        default:
+                            errorMessage = 'Onbekende fout bij bepalen van locatie: ' + error.message;
+                            break;
+                    }
+                    
+                    reject(new Error(errorMessage));
                 },
                 {
                     enableHighAccuracy: true,

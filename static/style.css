@@ -1,4 +1,46 @@
 /* Reset and base styles */
+:root {
+    /* Light theme (default) */
+    --bg-primary: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+    --bg-card: rgba(255, 255, 255, 0.95);
+    --text-primary: #333;
+    --text-secondary: rgba(0, 0, 0, 0.7);
+    --text-light: rgba(0, 0, 0, 0.6);
+    --header-text: white;
+    --border-color: rgba(255, 255, 255, 0.2);
+    --btn-bg: rgba(255, 255, 255, 0.2);
+    --btn-border: rgba(255, 255, 255, 0.4);
+    --btn-hover-bg: rgba(255, 255, 255, 0.3);
+    --btn-hover-border: rgba(255, 255, 255, 0.6);
+    --error-bg: rgba(231, 76, 60, 0.1);
+    --error-color: #e74c3c;
+    --error-border: rgba(231, 76, 60, 0.3);
+    --success-bg: rgba(39, 174, 96, 0.1);
+    --success-color: #27ae60;
+    --success-border: rgba(39, 174, 96, 0.3);
+}
+
+[data-theme="dark"] {
+    /* Dark theme */
+    --bg-primary: linear-gradient(135deg, #2d3436 0%, #636e72 100%);
+    --bg-card: rgba(45, 52, 54, 0.95);
+    --text-primary: #ddd;
+    --text-secondary: rgba(255, 255, 255, 0.8);
+    --text-light: rgba(255, 255, 255, 0.6);
+    --header-text: white;
+    --border-color: rgba(255, 255, 255, 0.1);
+    --btn-bg: rgba(255, 255, 255, 0.1);
+    --btn-border: rgba(255, 255, 255, 0.3);
+    --btn-hover-bg: rgba(255, 255, 255, 0.2);
+    --btn-hover-border: rgba(255, 255, 255, 0.4);
+    --error-bg: rgba(231, 76, 60, 0.2);
+    --error-color: #ff7675;
+    --error-border: rgba(231, 76, 60, 0.4);
+    --success-bg: rgba(39, 174, 96, 0.2);
+    --success-color: #00b894;
+    --success-border: rgba(39, 174, 96, 0.4);
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -8,9 +50,10 @@
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     line-height: 1.6;
-    color: #333;
-    background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+    color: var(--text-primary);
+    background: var(--bg-primary);
     min-height: 100vh;
+    transition: background 0.3s ease, color 0.3s ease;
 }
 
 .container {
@@ -19,11 +62,10 @@ body {
     padding: 20px;
 }
 
-/* Header */
 header {
     text-align: center;
     margin-bottom: 30px;
-    color: white;
+    color: var(--header-text);
 }
 
 header h1 {
@@ -37,23 +79,45 @@ header p {
     opacity: 0.9;
 }
 
+/* Theme toggle button */
+.theme-toggle {
+    background: var(--btn-bg);
+    color: var(--header-text);
+    border: 2px solid var(--btn-border);
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.9em;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.theme-toggle:hover {
+    background: var(--btn-hover-bg);
+    border-color: var(--btn-hover-border);
+    transform: translateY(-1px);
+}
+
 /* Weather Cards */
 .weather-card {
-    background: rgba(255, 255, 255, 0.95);
+    background: var(--bg-card);
     border-radius: 15px;
     padding: 25px;
     margin-bottom: 25px;
     box-shadow: 0 8px 32px rgba(0,0,0,0.1);
     backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid var(--border-color);
+    transition: background 0.3s ease;
 }
 
 .weather-card h2 {
-    color: #2d3436;
+    color: var(--text-primary);
     margin-bottom: 20px;
     font-size: 1.5em;
     border-bottom: 2px solid #74b9ff;
     padding-bottom: 10px;
+    transition: color 0.3s ease;
 }
 
 /* Loading Animation */
@@ -89,8 +153,9 @@ header p {
 .temperature {
     font-size: 4em;
     font-weight: bold;
-    color: #2d3436;
+    color: var(--text-primary);
     text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+    transition: color 0.3s ease;
 }
 
 .weather-info {
@@ -108,14 +173,16 @@ header p {
 #weather-description {
     font-size: 1.3em;
     font-weight: 500;
-    color: #2d3436;
+    color: var(--text-primary);
     text-transform: capitalize;
+    transition: color 0.3s ease;
 }
 
 #location-name {
     font-size: 1.1em;
-    color: #636e72;
+    color: var(--text-secondary);
     margin-top: 5px;
+    transition: color 0.3s ease;
 }
 
 /* Weather Details */
@@ -132,6 +199,7 @@ header p {
     background: rgba(116, 185, 255, 0.1);
     border-radius: 8px;
     border-left: 4px solid #74b9ff;
+    transition: background 0.3s ease;
 }
 
 .detail-item .label {
@@ -297,23 +365,26 @@ footer {
 }
 
 .modal-content {
-    background: white;
+    background: var(--bg-card);
     padding: 30px;
     border-radius: 15px;
     text-align: center;
     max-width: 400px;
     margin: 20px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    transition: background 0.3s ease;
 }
 
 .modal-content h3 {
-    color: #e74c3c;
+    color: var(--error-color);
     margin-bottom: 15px;
+    transition: color 0.3s ease;
 }
 
 .modal-content p {
     margin-bottom: 20px;
-    color: #2d3436;
+    color: var(--text-primary);
+    transition: color 0.3s ease;
 }
 
 .modal-content button {
@@ -330,6 +401,7 @@ footer {
 
 .modal-content button:hover {
     background: #0984e3;
+}
 }
 
 /* Alerts */
@@ -495,9 +567,9 @@ footer {
 
 /* Button Styles */
 .btn-primary {
-    background: rgba(255, 255, 255, 0.2);
-    color: white;
-    border: 2px solid rgba(255, 255, 255, 0.4);
+    background: var(--btn-bg);
+    color: var(--header-text);
+    border: 2px solid var(--btn-border);
     padding: 8px 16px;
     border-radius: 20px;
     cursor: pointer;
@@ -508,15 +580,15 @@ footer {
 }
 
 .btn-primary:hover {
-    background: rgba(255, 255, 255, 0.3);
-    border-color: rgba(255, 255, 255, 0.6);
+    background: var(--btn-hover-bg);
+    border-color: var(--btn-hover-border);
     transform: translateY(-1px);
 }
 
 .btn-secondary {
     background: transparent;
-    color: white;
-    border: 2px solid rgba(255, 255, 255, 0.4);
+    color: var(--header-text);
+    border: 2px solid var(--btn-border);
     padding: 8px 16px;
     border-radius: 20px;
     cursor: pointer;
@@ -526,8 +598,8 @@ footer {
 }
 
 .btn-secondary:hover {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.6);
+    background: var(--btn-bg);
+    border-color: var(--btn-hover-border);
     transform: translateY(-1px);
 }
 
