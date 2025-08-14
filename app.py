@@ -484,8 +484,6 @@ async def update_settings(request: Request, location: str = Form(...)):
 async def get_current_weather(request: Request, lat: Optional[float] = None, lon: Optional[float] = None):
     """Get current weather data"""
     user = get_current_user(request)
-    if not user:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Authentication required")
     
     # Use user's saved location if available and no coordinates provided
     if not lat and not lon and user and user.get('location'):
@@ -567,8 +565,6 @@ async def get_current_weather(request: Request, lat: Optional[float] = None, lon
 async def get_weather_forecast(request: Request, lat: Optional[float] = None, lon: Optional[float] = None):
     """Get weather forecast (24h and 7 days)"""
     user = get_current_user(request)
-    if not user:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Authentication required")
     
     # Use user's saved location if available and no coordinates provided
     if not lat and not lon and user and user.get('location'):
@@ -702,8 +698,6 @@ async def get_weather_forecast(request: Request, lat: Optional[float] = None, lo
 async def get_weather_alerts(request: Request, lat: Optional[float] = None, lon: Optional[float] = None):
     """Get weather alerts (KNMI warnings - simplified implementation)"""
     user = get_current_user(request)
-    if not user:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Authentication required")
     
     # Use user's saved location if available and no coordinates provided  
     if not lat and not lon and user and user.get('location'):
