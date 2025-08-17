@@ -361,23 +361,7 @@ header p {
         text-align: left;
         width: 100%;
     }
-}
-    background: var(--btn-bg);
-    color: var(--header-text);
-    border: 2px solid var(--btn-border);
-    padding: 8px 16px;
-    border-radius: 20px;
-    cursor: pointer;
-    font-size: 0.9em;
-    font-weight: 500;
-    transition: all 0.3s ease;
-    text-decoration: none;
-}
-
-.theme-toggle:hover {
-    background: var(--btn-hover-bg);
-    border-color: var(--btn-hover-border);
-    transform: translateY(-1px);
+    /* (Removed duplicate misplaced .theme-toggle styles that caused syntax errors) */
 }
 
 /* Weather Cards */
@@ -682,7 +666,6 @@ footer {
 
 .modal-content button:hover {
     background: #0984e3;
-}
 }
 
 /* Alerts */
@@ -1130,5 +1113,4 @@ footer {
     .modal-header h3 {
         font-size: 1.1em;
     }
-}
 }
