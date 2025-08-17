@@ -22,88 +22,126 @@
         </header>
 
         <main>
-            <!-- Current Weather Section -->
-            <section id="current-weather" class="weather-card">
-                <h2>Huidig Weer</h2>
-                <div id="loading" class="loading">
-                    <div class="spinner"></div>
-                    <p>Weerdata laden...</p>
+            <!-- Navigation Menu -->
+            <nav class="weather-nav">
+                <div class="nav-buttons">
+                    <button class="nav-btn active" data-tab="today">🌤️ Vandaag</button>
+                    <button class="nav-btn" data-tab="week">📅 Week</button>
+                    <button class="nav-btn" data-tab="radar">🌧️ Radar</button>
+                    <button class="nav-btn" data-tab="fishing">🎣 Vissen</button>
                 </div>
-                <div id="current-data" class="weather-data" style="display: none;">
-                    <div class="weather-main">
-                        <div class="temperature">
-                            <span id="current-temp">--</span>°C
+            </nav>
+
+            <!-- Today Tab -->
+            <div id="tab-today" class="tab-content active">
+                <!-- Current Weather Section -->
+                <section id="current-weather" class="weather-card">
+                    <h2>Huidig Weer</h2>
+                    <div id="loading" class="loading">
+                        <div class="spinner"></div>
+                        <p>Weerdata laden...</p>
+                    </div>
+                    <div id="current-data" class="weather-data" style="display: none;">
+                        <div class="weather-main">
+                            <div class="temperature">
+                                <span id="current-temp">--</span>°C
+                            </div>
+                            <div class="weather-info">
+                                <img id="weather-icon" src="" alt="" class="weather-icon">
+                                <p id="weather-description">--</p>
+                                <p id="location-name">--</p>
+                            </div>
                         </div>
-                        <div class="weather-info">
-                            <img id="weather-icon" src="" alt="" class="weather-icon">
-                            <p id="weather-description">--</p>
-                            <p id="location-name">--</p>
+                        <div class="weather-details">
+                            <div class="detail-item">
+                                <span class="label">Gevoelstemperatuur:</span>
+                                <span id="feels-like">--°C</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="label">Min/Max:</span>
+                                <span id="min-max">--° / --°</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="label">Wind:</span>
+                                <span id="wind">-- km/h</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="label">Luchtvochtigheid:</span>
+                                <span id="humidity">--%</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="label">Bewolking:</span>
+                                <span id="clouds">--%</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="label">Neerslag:</span>
+                                <span id="precipitation">-- mm</span>
+                            </div>
                         </div>
                     </div>
-                    <div class="weather-details">
-                        <div class="detail-item">
-                            <span class="label">Gevoelstemperatuur:</span>
-                            <span id="feels-like">--°C</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="label">Min/Max:</span>
-                            <span id="min-max">--° / --°</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="label">Wind:</span>
-                            <span id="wind">-- km/h</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="label">Luchtvochtigheid:</span>
-                            <span id="humidity">--%</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="label">Bewolking:</span>
-                            <span id="clouds">--%</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="label">Neerslag:</span>
-                            <span id="precipitation">-- mm</span>
-                        </div>
+                </section>
+
+                <!-- 24h Forecast Section -->
+                <section id="forecast-24h" class="weather-card">
+                    <h2>24 Uur Voorspelling</h2>
+                    <div id="forecast-24h-data" class="forecast-grid">
+                        <!-- Will be populated by JavaScript -->
                     </div>
-                </div>
-            </section>
+                </section>
+            </div>
 
-            <!-- 24h Forecast Section -->
-            <section id="forecast-24h" class="weather-card">
-                <h2>24 Uur Voorspelling</h2>
-                <div id="forecast-24h-data" class="forecast-grid">
-                    <!-- Will be populated by JavaScript -->
-                </div>
-            </section>
+            <!-- Week Tab -->
+            <div id="tab-week" class="tab-content">
+                <!-- 7 Day Forecast Section -->
+                <section id="forecast-7d" class="weather-card">
+                    <h2>7 Dagen Voorspelling</h2>
+                    <div id="forecast-7d-data" class="forecast-list">
+                        <!-- Will be populated by JavaScript -->
+                    </div>
+                </section>
+            </div>
 
-            <!-- 7 Day Forecast Section -->
-            <section id="forecast-7d" class="weather-card">
-                <h2>7 Dagen Voorspelling</h2>
-                <div id="forecast-7d-data" class="forecast-list">
-                    <!-- Will be populated by JavaScript -->
-                </div>
-            </section>
+            <!-- Radar Tab -->
+            <div id="tab-radar" class="tab-content">
+                <!-- Rain Radar Section -->
+                <section id="rain-radar" class="weather-card">
+                    <h2>Regenradar</h2>
+                    <div class="radar-container">
+                        <iframe 
+                            src="https://embed.windy.com/embed2.html?lat=52.367&lon=4.904&detailLat=52.367&detailLon=4.904&width=650&height=450&zoom=7&level=surface&overlay=rain&product=ecmwf&menu=&message=&marker=&calendar=now&pressure=&type=map&location=coordinates&detail=&metricWind=km%2Fh&metricTemp=%C2%B0C&radarRange=-1"
+                            frameborder="0"
+                            class="radar-iframe">
+                        </iframe>
+                    </div>
+                </section>
 
-            <!-- Rain Radar Section -->
-            <section id="rain-radar" class="weather-card">
-                <h2>Regenradar</h2>
-                <div class="radar-container">
-                    <iframe 
-                        src="https://embed.windy.com/embed2.html?lat=52.367&lon=4.904&detailLat=52.367&detailLon=4.904&width=650&height=450&zoom=7&level=surface&overlay=rain&product=ecmwf&menu=&message=&marker=&calendar=now&pressure=&type=map&location=coordinates&detail=&metricWind=km%2Fh&metricTemp=%C2%B0C&radarRange=-1"
-                        frameborder="0"
-                        class="radar-iframe">
-                    </iframe>
-                </div>
-            </section>
+                <!-- Alerts Section -->
+                <section id="alerts" class="weather-card">
+                    <h2>Weerswaarschuwingen</h2>
+                    <div id="alerts-data">
+                        <p class="no-alerts">Geen actuele waarschuwingen</p>
+                    </div>
+                </section>
+            </div>
 
-            <!-- Alerts Section -->
-            <section id="alerts" class="weather-card">
-                <h2>Weerswaarschuwingen</h2>
-                <div id="alerts-data">
-                    <p class="no-alerts">Geen actuele waarschuwingen</p>
-                </div>
-            </section>
+            <!-- Fishing Tab -->
+            <div id="tab-fishing" class="tab-content">
+                <!-- Fishing Conditions Section -->
+                <section id="fishing-conditions" class="weather-card">
+                    <h2>🎣 Visomstandigheden</h2>
+                    <div id="fishing-data">
+                        <!-- Will be populated by JavaScript -->
+                    </div>
+                </section>
+
+                <!-- Fishing Forecast Section -->
+                <section id="fishing-forecast" class="weather-card">
+                    <h2>📊 Visvoorspelling Komende Dagen</h2>
+                    <div id="fishing-forecast-data" class="fishing-forecast-list">
+                        <!-- Will be populated by JavaScript -->
+                    </div>
+                </section>
+            </div>
         </main>
 
         <footer>

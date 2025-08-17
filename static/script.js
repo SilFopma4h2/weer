@@ -33,6 +33,14 @@ class WeatherApp {
             this.refreshWeatherData();
         });
 
+        // Tab navigation
+        const navButtons = document.querySelectorAll('.nav-btn');
+        navButtons.forEach(button => {
+            button.addEventListener('click', (e) => {
+                this.switchTab(e.target.dataset.tab);
+            });
+        });
+
         // Keyboard accessibility
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
@@ -43,6 +51,25 @@ class WeatherApp {
                 this.refreshWeatherData();
             }
         });
+    }
+
+    switchTab(tabName) {
+        // Update active button
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        document.querySelector(`.nav-btn[data-tab="${tabName}"]`).classList.add('active');
+
+        // Update active tab content
+        document.querySelectorAll('.tab-content').forEach(tab => {
+            tab.classList.remove('active');
+        });
+        document.getElementById(`tab-${tabName}`).classList.add('active');
+
+        // Load fishing data when switching to fishing tab
+        if (tabName === 'fishing') {
+            this.updateFishingConditions();
+        }
     }
 
     async loadWeatherData(showLoading = true, lat = null, lon = null) {
@@ -137,9 +164,10 @@ class WeatherApp {
             forecastItem.className = 'forecast-item';
             
             const time = new Date(item.datetime);
-            const timeString = time.toLocaleTimeString('nl-NL', { 
-                hour: '2-digit', 
-                minute: '2-digit' 
+            const timeString = time.toLocaleTimeString('en-US', { 
+                hour: 'numeric', 
+                minute: '2-digit',
+                hour12: true
             });
             
             forecastItem.innerHTML = `
@@ -256,6 +284,314 @@ class WeatherApp {
 
     capitalizeFirst(str) {
         return str.charAt(0).toUpperCase() + str.slice(1);
+    }
+
+    // Fishing conditions logic
+    updateFishingConditions() {
+        // Try to get weather data for fishing analysis
+        const currentTemp = document.getElementById('current-temp')?.textContent || '15';
+        const windSpeed = document.getElementById('wind')?.textContent?.replace(' km/h', '') || '10';
+        const clouds = document.getElementById('clouds')?.textContent?.replace('%', '') || '50';
+        const humidity = document.getElementById('humidity')?.textContent?.replace('%', '') || '60';
+        const precipitation = document.getElementById('precipitation')?.textContent?.replace(' mm', '') || '0';
+
+        const fishingData = this.calculateFishingConditions({
+            temperature: parseInt(currentTemp),
+            windSpeed: parseInt(windSpeed),
+            clouds: parseInt(clouds),
+            humidity: parseInt(humidity),
+            precipitation: parseFloat(precipitation)
+        });
+
+        this.displayFishingConditions(fishingData);
+        this.displayFishingForecast();
+    }
+
+    calculateFishingConditions(weather) {
+        let score = 0;
+        let factors = [];
+
+        // Temperature factor (ideal: 15-25°C)
+        const temp = weather.temperature;
+        let tempScore = 0;
+        let tempStatus = '';
+        if (temp >= 15 && temp <= 25) {
+            tempScore = 25;
+            tempStatus = 'Ideaal voor vissen';
+        } else if (temp >= 10 && temp < 15 || temp > 25 && temp <= 30) {
+            tempScore = 15;
+            tempStatus = 'Goed voor vissen';
+        } else if (temp >= 5 && temp < 10 || temp > 30 && temp <= 35) {
+            tempScore = 10;
+            tempStatus = 'Matig voor vissen';
+        } else {
+            tempScore = 5;
+            tempStatus = 'Moeilijke omstandigheden';
+        }
+        
+        factors.push({
+            icon: '🌡️',
+            name: 'Temperatuur',
+            value: `${temp}°C`,
+            status: tempStatus
+        });
+
+        // Wind factor (ideal: 5-15 km/h)
+        const wind = weather.windSpeed;
+        let windScore = 0;
+        let windStatus = '';
+        if (wind >= 5 && wind <= 15) {
+            windScore = 25;
+            windStatus = 'Perfect voor vissen';
+        } else if (wind >= 0 && wind < 5 || wind > 15 && wind <= 25) {
+            windScore = 15;
+            windStatus = 'Acceptabel';
+        } else if (wind > 25 && wind <= 35) {
+            windScore = 10;
+            windStatus = 'Te winderig';
+        } else {
+            windScore = 5;
+            windStatus = 'Zeer moeilijk';
+        }
+        
+        factors.push({
+            icon: '💨',
+            name: 'Wind',
+            value: `${wind} km/h`,
+            status: windStatus
+        });
+
+        // Cloud cover factor (ideal: 50-80% overcast)
+        const cloudCover = weather.clouds;
+        let cloudScore = 0;
+        let cloudStatus = '';
+        if (cloudCover >= 50 && cloudCover <= 80) {
+            cloudScore = 20;
+            cloudStatus = 'Ideaal bewolkt';
+        } else if (cloudCover >= 30 && cloudCover < 50 || cloudCover > 80 && cloudCover <= 95) {
+            cloudScore = 15;
+            cloudStatus = 'Goed';
+        } else if (cloudCover < 30) {
+            cloudScore = 10;
+            cloudStatus = 'Te zonnig';
+        } else {
+            cloudScore = 8;
+            cloudStatus = 'Te bewolkt';
+        }
+        
+        factors.push({
+            icon: '☁️',
+            name: 'Bewolking',
+            value: `${cloudCover}%`,
+            status: cloudStatus
+        });
+
+        // Precipitation factor (light rain can be good)
+        const rain = weather.precipitation;
+        let rainScore = 0;
+        let rainStatus = '';
+        if (rain === 0) {
+            rainScore = 15;
+            rainStatus = 'Droog weer';
+        } else if (rain > 0 && rain <= 2) {
+            rainScore = 20;
+            rainStatus = 'Lichte regen - goed!';
+        } else if (rain > 2 && rain <= 5) {
+            rainScore = 10;
+            rainStatus = 'Matige regen';
+        } else {
+            rainScore = 5;
+            rainStatus = 'Teveel regen';
+        }
+        
+        factors.push({
+            icon: '🌧️',
+            name: 'Neerslag',
+            value: rain > 0 ? `${rain} mm` : 'Geen',
+            status: rainStatus
+        });
+
+        // Humidity factor
+        const humid = weather.humidity;
+        let humidScore = 0;
+        let humidStatus = '';
+        if (humid >= 60 && humid <= 80) {
+            humidScore = 10;
+            humidStatus = 'Ideaal vochtig';
+        } else if (humid >= 50 && humid < 60 || humid > 80 && humid <= 90) {
+            humidScore = 8;
+            humidStatus = 'Acceptabel';
+        } else {
+            humidScore = 5;
+            humidStatus = humid < 50 ? 'Te droog' : 'Te vochtig';
+        }
+        
+        factors.push({
+            icon: '💧',
+            name: 'Luchtvochtigheid',
+            value: `${humid}%`,
+            status: humidStatus
+        });
+
+        score = tempScore + windScore + cloudScore + rainScore + humidScore;
+        
+        let rating = '';
+        let description = '';
+        if (score >= 80) {
+            rating = 'Uitstekend';
+            description = 'Perfect weer om te gaan vissen! Alle omstandigheden zijn ideaal.';
+        } else if (score >= 60) {
+            rating = 'Goed';
+            description = 'Goede omstandigheden voor het vissen. Succes verwacht!';
+        } else if (score >= 40) {
+            rating = 'Matig';
+            description = 'Redelijke omstandigheden. Met de juiste techniek nog steeds kansrijk.';
+        } else {
+            rating = 'Slecht';
+            description = 'Moeilijke omstandigheden voor het vissen. Overweeg een andere dag.';
+        }
+
+        return {
+            score: score,
+            rating: rating,
+            description: description,
+            factors: factors
+        };
+    }
+
+    displayFishingConditions(fishingData) {
+        const fishingDataElement = document.getElementById('fishing-data');
+        if (!fishingDataElement) return;
+
+        let scoreColor = '';
+        if (fishingData.score >= 80) scoreColor = '#00b894';
+        else if (fishingData.score >= 60) scoreColor = '#74b9ff';
+        else if (fishingData.score >= 40) scoreColor = '#fdcb6e';
+        else scoreColor = '#e17055';
+
+        fishingDataElement.innerHTML = `
+            <div class="fishing-overview">
+                <div class="fishing-score" style="background: linear-gradient(135deg, ${scoreColor}, ${scoreColor}aa);">
+                    <div class="score-value">${fishingData.score}</div>
+                    <div class="score-label">${fishingData.rating}</div>
+                    <div class="score-description">${fishingData.description}</div>
+                </div>
+            </div>
+            
+            <div class="fishing-factors">
+                ${fishingData.factors.map(factor => `
+                    <div class="fishing-factor">
+                        <div class="factor-icon">${factor.icon}</div>
+                        <div class="factor-info">
+                            <h4>${factor.name}</h4>
+                            <p class="factor-value">${factor.value}</p>
+                            <p class="factor-status">${factor.status}</p>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+            
+            <div style="margin-top: 25px; padding: 20px; background: rgba(116, 185, 255, 0.1); border-radius: 12px; border-left: 4px solid #74b9ff;">
+                <h4 style="margin: 0 0 10px 0; color: var(--text-primary);">🎯 Vis Tips voor Vandaag</h4>
+                <ul style="margin: 0; padding-left: 20px; color: var(--text-secondary); line-height: 1.6;">
+                    ${this.getFishingTips(fishingData).map(tip => `<li>${tip}</li>`).join('')}
+                </ul>
+            </div>
+        `;
+    }
+
+    getFishingTips(fishingData) {
+        const tips = [];
+        const temp = parseInt(document.getElementById('current-temp')?.textContent || '15');
+        const wind = parseInt(document.getElementById('wind')?.textContent?.replace(' km/h', '') || '10');
+        
+        // Temperature-based tips
+        if (temp < 10) {
+            tips.push('Gebruik langzaam bewegende aas bij koude temperaturen');
+            tips.push('Vis dieper waar het water warmer is');
+        } else if (temp > 25) {
+            tips.push('Vroeg in de ochtend of laat in de avond vissen');
+            tips.push('Zoek schaduwrijke plekken op');
+        } else {
+            tips.push('Ideale temperatuur - probeer verschillende dieptes');
+        }
+
+        // Wind-based tips
+        if (wind < 5) {
+            tips.push('Bij weinig wind: probeer oppervlakte lokken');
+        } else if (wind > 20) {
+            tips.push('Gebruik zwaardere gewichten vanwege de wind');
+            tips.push('Zoek luwe plekken achter obstakels');
+        } else {
+            tips.push('Perfecte wind - probeer de lijzijde van het water');
+        }
+
+        // Weather-based tips
+        const rain = parseFloat(document.getElementById('precipitation')?.textContent?.replace(' mm', '') || '0');
+        if (rain > 0 && rain <= 2) {
+            tips.push('Lichte regen activeert vissen - goede kans!');
+        } else if (rain > 2) {
+            tips.push('Zoek beschutting en vis dicht bij oevers');
+        }
+
+        // Ensure we have at least 3 tips
+        if (tips.length < 3) {
+            tips.push('Houd uw aas in beweging voor betere resultaten');
+            tips.push('Let op vogels - zij wijzen vaak naar vis');
+            tips.push('Wees geduldig en wissel van techniek als het niet werkt');
+        }
+
+        return tips.slice(0, 4); // Maximum 4 tips
+    }
+
+    displayFishingForecast() {
+        // Generate forecast for upcoming days based on 7-day weather data
+        const forecastElement = document.getElementById('fishing-forecast-data');
+        if (!forecastElement) return;
+
+        // Mock forecast data - in real app would use actual forecast data
+        const days = [
+            { name: 'Morgen', temp: 18, wind: 12, rain: 0, clouds: 60 },
+            { name: 'Overmorgen', temp: 22, wind: 8, rain: 1, clouds: 40 },
+            { name: 'Woensdag', temp: 16, wind: 15, rain: 3, clouds: 80 },
+            { name: 'Donderdag', temp: 20, wind: 6, rain: 0, clouds: 30 },
+            { name: 'Vrijdag', temp: 24, wind: 18, rain: 0, clouds: 20 }
+        ];
+
+        const forecastHTML = days.map(day => {
+            const conditions = this.calculateFishingConditions({
+                temperature: day.temp,
+                windSpeed: day.wind,
+                clouds: day.clouds,
+                humidity: 65,
+                precipitation: day.rain
+            });
+
+            let ratingClass = '';
+            if (conditions.score >= 80) ratingClass = 'excellent';
+            else if (conditions.score >= 60) ratingClass = 'good';
+            else if (conditions.score >= 40) ratingClass = 'fair';
+            else ratingClass = 'poor';
+
+            return `
+                <div class="fishing-forecast-day ${ratingClass}">
+                    <div class="fishing-day-info">
+                        <div class="fishing-day-name">${day.name}</div>
+                        <div class="fishing-score-badge ${ratingClass}">${conditions.score}</div>
+                        <div class="fishing-conditions-summary">
+                            ${day.wind} km/h wind, ${day.clouds}% bewolkt
+                            ${day.rain > 0 ? `, ${day.rain}mm regen` : ''}
+                        </div>
+                    </div>
+                    <div class="fishing-weather-summary">
+                        <div class="fishing-temp">${day.temp}°C</div>
+                        <div class="fishing-weather-desc">${conditions.rating}</div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        forecastElement.innerHTML = forecastHTML;
     }
 
 
