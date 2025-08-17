@@ -37,7 +37,11 @@ class WeatherApp {
         const navButtons = document.querySelectorAll('.nav-btn');
         navButtons.forEach(button => {
             button.addEventListener('click', (e) => {
-                this.switchTab(e.target.dataset.tab);
+                e.preventDefault();
+                const tabName = e.target.dataset.tab;
+                if (tabName) {
+                    this.switchTab(tabName);
+                }
             });
         });
 
@@ -58,13 +62,21 @@ class WeatherApp {
         document.querySelectorAll('.nav-btn').forEach(btn => {
             btn.classList.remove('active');
         });
-        document.querySelector(`.nav-btn[data-tab="${tabName}"]`).classList.add('active');
+        
+        const targetButton = document.querySelector(`.nav-btn[data-tab="${tabName}"]`);
+        if (targetButton) {
+            targetButton.classList.add('active');
+        }
 
         // Update active tab content
         document.querySelectorAll('.tab-content').forEach(tab => {
             tab.classList.remove('active');
         });
-        document.getElementById(`tab-${tabName}`).classList.add('active');
+        
+        const targetContent = document.getElementById(`tab-${tabName}`);
+        if (targetContent) {
+            targetContent.classList.add('active');
+        }
 
         // Load fishing data when switching to fishing tab
         if (tabName === 'fishing') {
