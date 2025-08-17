@@ -11,24 +11,32 @@
         <header>
             <div class="header-content">
                 <div class="header-main">
-                    <h1>🌤️ Weer App</h1>
-                    <p>Actueel lokaal weer voor Nederland</p>
+                    <h1 data-translate="app_title">🌤️ Weer App</h1>
+                    <p data-translate="app_subtitle">Actueel lokaal weer voor Nederland</p>
                 </div>
                 
                 <div class="header-controls">
-                    <button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()">🌙 Dark</button>
+                    <select id="language-selector" class="language-selector">
+                        <option value="nl">🇳🇱 Nederlands</option>
+                        <option value="en">🇬🇧 English</option>
+                        <option value="de">🇩🇪 Deutsch</option>
+                        <option value="it">🇮🇹 Italiano</option>
+                        <option value="fr">🇫🇷 Français</option>
+                    </select>
+                    <button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()">
+                        <span data-translate="theme_dark">🌙 Dark</span>
+                    </button>
                 </div>
             </div>
         </header>
 
         <main>
-            <!-- Navigation Menu -->
             <nav class="weather-nav">
                 <div class="nav-buttons">
-                    <button class="nav-btn active" data-tab="today">🌤️ Vandaag</button>
-                    <button class="nav-btn" data-tab="week">📅 Week</button>
-                    <button class="nav-btn" data-tab="radar">🌧️ Radar</button>
-                    <button class="nav-btn" data-tab="fishing">🎣 Vissen</button>
+                    <button class="nav-btn active" data-tab="today" data-translate="nav_today">🌤️ Vandaag</button>
+                    <button class="nav-btn" data-tab="week" data-translate="nav_week">📅 Week</button>
+                    <button class="nav-btn" data-tab="radar" data-translate="nav_radar">🌧️ Radar</button>
+                    <button class="nav-btn" data-tab="fishing" data-translate="nav_fishing">🎣 Vissen</button>
                 </div>
             </nav>
 
@@ -36,10 +44,10 @@
             <div id="tab-today" class="tab-content active">
                 <!-- Current Weather Section -->
                 <section id="current-weather" class="weather-card">
-                    <h2>Huidig Weer</h2>
+                    <h2 data-translate="current_weather">Huidig Weer</h2>
                     <div id="loading" class="loading">
                         <div class="spinner"></div>
-                        <p>Weerdata laden...</p>
+                        <p data-translate="loading">Weerdata laden...</p>
                     </div>
                     <div id="current-data" class="weather-data" style="display: none;">
                         <div class="weather-main">
@@ -54,27 +62,27 @@
                         </div>
                         <div class="weather-details">
                             <div class="detail-item">
-                                <span class="label">Gevoelstemperatuur:</span>
+                                <span class="label" data-translate="feels_like">Gevoelstemperatuur:</span>
                                 <span id="feels-like">--°C</span>
                             </div>
                             <div class="detail-item">
-                                <span class="label">Min/Max:</span>
+                                <span class="label" data-translate="min_max">Min/Max:</span>
                                 <span id="min-max">--° / --°</span>
                             </div>
                             <div class="detail-item">
-                                <span class="label">Wind:</span>
+                                <span class="label" data-translate="wind">Wind:</span>
                                 <span id="wind">-- km/h</span>
                             </div>
                             <div class="detail-item">
-                                <span class="label">Luchtvochtigheid:</span>
+                                <span class="label" data-translate="humidity">Luchtvochtigheid:</span>
                                 <span id="humidity">--%</span>
                             </div>
                             <div class="detail-item">
-                                <span class="label">Bewolking:</span>
+                                <span class="label" data-translate="clouds">Bewolking:</span>
                                 <span id="clouds">--%</span>
                             </div>
                             <div class="detail-item">
-                                <span class="label">Neerslag:</span>
+                                <span class="label" data-translate="precipitation">Neerslag:</span>
                                 <span id="precipitation">-- mm</span>
                             </div>
                         </div>
@@ -83,7 +91,7 @@
 
                 <!-- 24h Forecast Section -->
                 <section id="forecast-24h" class="weather-card">
-                    <h2>24 Uur Voorspelling</h2>
+                    <h2 data-translate="forecast_24h">24 Uur Voorspelling</h2>
                     <div id="forecast-24h-data" class="forecast-grid">
                         <!-- Will be populated by JavaScript -->
                     </div>
@@ -94,7 +102,7 @@
             <div id="tab-week" class="tab-content">
                 <!-- 7 Day Forecast Section -->
                 <section id="forecast-7d" class="weather-card">
-                    <h2>7 Dagen Voorspelling</h2>
+                    <h2 data-translate="forecast_7d">7 Dagen Voorspelling</h2>
                     <div id="forecast-7d-data" class="forecast-list">
                         <!-- Will be populated by JavaScript -->
                     </div>
@@ -105,7 +113,7 @@
             <div id="tab-radar" class="tab-content">
                 <!-- Rain Radar Section -->
                 <section id="rain-radar" class="weather-card">
-                    <h2>Regenradar</h2>
+                    <h2 data-translate="rain_radar">Regenradar</h2>
                     <div class="radar-container">
                         <iframe 
                             src="https://embed.windy.com/embed2.html?lat=52.367&lon=4.904&detailLat=52.367&detailLon=4.904&width=650&height=450&zoom=7&level=surface&overlay=rain&product=ecmwf&menu=&message=&marker=&calendar=now&pressure=&type=map&location=coordinates&detail=&metricWind=km%2Fh&metricTemp=%C2%B0C&radarRange=-1"
@@ -117,9 +125,9 @@
 
                 <!-- Alerts Section -->
                 <section id="alerts" class="weather-card">
-                    <h2>Weerswaarschuwingen</h2>
+                    <h2 data-translate="weather_alerts">Weerswaarschuwingen</h2>
                     <div id="alerts-data">
-                        <p class="no-alerts">Geen actuele waarschuwingen</p>
+                        <p class="no-alerts" data-translate="no_alerts">Geen actuele waarschuwingen</p>
                     </div>
                 </section>
             </div>
@@ -128,7 +136,7 @@
             <div id="tab-fishing" class="tab-content">
                 <!-- Fishing Conditions Section -->
                 <section id="fishing-conditions" class="weather-card">
-                    <h2>🎣 Visomstandigheden</h2>
+                    <h2 data-translate="fishing_conditions">🎣 Visomstandigheden</h2>
                     <div id="fishing-data">
                         <!-- Will be populated by JavaScript -->
                     </div>
@@ -136,7 +144,7 @@
 
                 <!-- Fishing Forecast Section -->
                 <section id="fishing-forecast" class="weather-card">
-                    <h2>📊 Visvoorspelling Komende Dagen</h2>
+                    <h2 data-translate="fishing_forecast">📊 Visvoorspelling Komende Dagen</h2>
                     <div id="fishing-forecast-data" class="fishing-forecast-list">
                         <!-- Will be populated by JavaScript -->
                     </div>
@@ -146,11 +154,11 @@
 
         <footer>
             <div class="update-info">
-                <p>Laatst bijgewerkt: <span id="last-update">--</span></p>
-                <button id="refresh-btn" class="refresh-btn">🔄 Vernieuwen</button>
+                <p><span data-translate="last_updated">Laatst bijgewerkt:</span> <span id="last-update">--</span></p>
+                <button id="refresh-btn" class="refresh-btn" data-translate="refresh">🔄 Vernieuwen</button>
             </div>
             <div class="app-info">
-                <p>Data: Open-Meteo | Radar: Windy.com</p>
+                <p data-translate="data_source">Data: Open-Meteo | Radar: Windy.com</p>
             </div>
         </footer>
     </div>
@@ -158,10 +166,10 @@
     <!-- Error Modal -->
     <div id="error-modal" class="modal" style="display: none;">
         <div class="modal-content">
-            <h3>⚠️ Fout opgetreden</h3>
-            <p id="error-message">Er is een fout opgetreden bij het laden van de weerdata.</p>
-            <button onclick="closeErrorModal()">Sluiten</button>
-            <button onclick="refreshWeatherData()">Opnieuw proberen</button>
+            <h3 data-translate="error_title">⚠️ Fout opgetreden</h3>
+            <p id="error-message" data-translate="error_message">Er is een fout opgetreden bij het laden van de weerdata.</p>
+            <button onclick="closeErrorModal()" data-translate="close">Sluiten</button>
+            <button onclick="refreshWeatherData()" data-translate="try_again">Opnieuw proberen</button>
         </div>
     </div>
 
@@ -176,26 +184,27 @@
             
             if (body.getAttribute('data-theme') === 'dark') {
                 body.removeAttribute('data-theme');
-                themeToggleBtn.innerHTML = '🌙 Dark';
                 localStorage.setItem('theme', 'light');
             } else {
                 body.setAttribute('data-theme', 'dark');
-                themeToggleBtn.innerHTML = '☀️ Light';
                 localStorage.setItem('theme', 'dark');
+            }
+            
+            // Update theme toggle text using translations
+            if (window.weatherApp) {
+                window.weatherApp.applyTranslations();
             }
         }
         
         // Load saved theme on page load
         document.addEventListener('DOMContentLoaded', function() {
             const savedTheme = localStorage.getItem('theme');
-            const themeToggleBtn = document.getElementById('theme-toggle');
             
             if (savedTheme === 'dark') {
                 document.documentElement.setAttribute('data-theme', 'dark');
-                themeToggleBtn.innerHTML = '☀️ Light';
-            } else {
-                themeToggleBtn.innerHTML = '🌙 Dark';
             }
+            
+            // Theme toggle text will be set by applyTranslations() when weather app initializes
         });
         
         // Close error modal when clicking outside

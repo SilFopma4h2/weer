@@ -14,6 +14,9 @@ from fastapi.responses import HTMLResponse
 from cachetools import TTLCache
 import uvicorn
 
+# Import translations
+from translations import get_weather_description, SUPPORTED_LANGUAGES
+
 app = FastAPI(title="Weer App - Demo", description="Local Weather Application MVP (Demo)")
 
 # Mount static files and templates
@@ -21,7 +24,7 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
 
 # Demo data
-def get_mock_current_weather():
+def get_mock_current_weather(language="nl"):
     return {
         "timestamp": datetime.now().isoformat(),
         "location": {
@@ -43,8 +46,8 @@ def get_mock_current_weather():
             "gust": 22.1
         },
         "weather": {
-            "main": "Clouds",
-            "description": "half bewolkt",
+            "main": get_weather_description(2, language),  # Weather code 2 = partly cloudy
+            "description": get_weather_description(2, language),
             "icon": "03d"
         },
         "clouds": 65,
@@ -53,15 +56,20 @@ def get_mock_current_weather():
         "snow": 0
     }
 
-def get_mock_forecast():
+def get_mock_forecast(language="nl"):
     forecast_24h = []
     forecast_7d = []
+    
+    # Weather codes to cycle through (clear, cloudy, rain)
+    weather_codes = [0, 3, 61]  # clear sky, overcast, slight rain
     
     # Generate 24h forecast (8 periods of 3 hours)
     base_time = datetime.now()
     for i in range(8):
         time_offset = base_time + timedelta(hours=i*3)
         temp = 18 + (i % 4) - 2  # Varying temperature
+        weather_code = weather_codes[i % 3]
+        
         forecast_24h.append({
             "datetime": time_offset.isoformat(),
             "temperature": {
@@ -76,8 +84,8 @@ def get_mock_forecast():
                 "direction": 200 + i * 10
             },
             "weather": {
-                "main": ["Clear", "Clouds", "Rain"][i % 3],
-                "description": ["heldere hemel", "bewolkt", "lichte regen"][i % 3],
+                "main": get_weather_description(weather_code, language),
+                "description": get_weather_description(weather_code, language),
                 "icon": ["01d", "03d", "10d"][i % 3]
             },
             "clouds": 20 + i * 8,
@@ -86,10 +94,13 @@ def get_mock_forecast():
         })
     
     # Generate 7-day forecast
+    daily_weather_codes = [0, 3, 61, 1, 2, 80, 0]  # Variety of weather conditions
     for i in range(7):
         day_offset = base_time + timedelta(days=i)
         temp_max = 20 + (i % 5) - 2
         temp_min = temp_max - 8
+        weather_code = daily_weather_codes[i]
+        
         forecast_7d.append({
             "datetime": day_offset.replace(hour=14).isoformat(),
             "temperature": {
@@ -104,8 +115,8 @@ def get_mock_forecast():
                 "direction": 180 + i * 15
             },
             "weather": {
-                "main": ["Clear", "Clouds", "Rain", "Clear", "Clouds", "Rain", "Clear"][i],
-                "description": ["heldere hemel", "bewolkt", "regen", "zonnig", "half bewolkt", "buien", "helder"][i],
+                "main": get_weather_description(weather_code, language),
+                "description": get_weather_description(weather_code, language),
                 "icon": ["01d", "03d", "10d", "01d", "02d", "09d", "01d"][i]
             },
             "clouds": 15 + i * 10,
@@ -130,29 +141,27 @@ async def read_root(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
 @app.get("/current")
-async def get_current_weather(lat: Optional[float] = None, lon: Optional[float] = None):
+async def get_current_weather(lat: Optional[float] = None, lon: Optional[float] = None, lang: str = "nl"):
     """Get current weather data (mock)"""
-    return get_mock_current_weather()
+    return get_mock_current_weather(lang)
 
 @app.get("/forecast")
-async def get_weather_forecast(lat: Optional[float] = None, lon: Optional[float] = None):
+async def get_weather_forecast(lat: Optional[float] = None, lon: Optional[float] = None, lang: str = "nl"):
     """Get weather forecast (mock)"""
-    return get_mock_forecast()
+    return get_mock_forecast(lang)
 
 @app.get("/alerts")
 async def get_weather_alerts(lat: Optional[float] = None, lon: Optional[float] = None):
     """Get weather alerts (mock)"""
     return {
         "timestamp": datetime.now().isoformat(),
-        "alerts": [
-            {
-                "severity": "Code Geel",
-                "description": "Wind: Zware windstoten uit het zuidwesten. Windkracht 7 à 8, in de kust- en wadgebieden windkracht 8 à 9.",
-                "start": (datetime.now() - timedelta(hours=2)).isoformat(),
-                "end": (datetime.now() + timedelta(hours=6)).isoformat()
-            }
-        ]
+        "alerts": []
     }
+
+@app.get("/languages")
+async def get_languages():
+    """Get supported languages"""
+    return {"languages": SUPPORTED_LANGUAGES}
 
 @app.get("/health")
 async def health_check():
