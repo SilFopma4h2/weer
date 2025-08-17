@@ -136,9 +136,12 @@ header p {
 }
 
 .nav-btn.active {
-    background: #74b9ff;
+    background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
     color: white;
     box-shadow: 0 4px 12px rgba(116, 185, 255, 0.4);
+    transform: translateY(-2px);
+    font-weight: 600;
+    border: 2px solid rgba(255, 255, 255, 0.2);
 }
 
 /* Tab Content */
