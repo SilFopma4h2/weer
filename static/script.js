@@ -1,9 +1,192 @@
 // Weather App JavaScript
+// Translation support
+const TRANSLATIONS = {
+    nl: {
+        "app_title": "🌤️ Weer App",
+        "app_subtitle": "Actueel lokaal weer voor Nederland",
+        "theme_dark": "🌙 Dark",
+        "theme_light": "☀️ Light",
+        "nav_today": "🌤️ Vandaag",
+        "nav_week": "📅 Week",
+        "nav_radar": "🌧️ Radar",
+        "nav_fishing": "🎣 Vissen",
+        "current_weather": "Huidig Weer",
+        "loading": "Weerdata laden...",
+        "feels_like": "Gevoelstemperatuur:",
+        "min_max": "Min/Max:",
+        "wind": "Wind:",
+        "humidity": "Luchtvochtigheid:",
+        "clouds": "Bewolking:",
+        "precipitation": "Neerslag:",
+        "forecast_24h": "24 Uur Voorspelling",
+        "forecast_7d": "7 Dagen Voorspelling",
+        "rain_radar": "Regenradar",
+        "weather_alerts": "Weerswaarschuwingen",
+        "no_alerts": "Geen actuele waarschuwingen",
+        "fishing_conditions": "🎣 Visomstandigheden",
+        "fishing_forecast": "📊 Visvoorspelling Komende Dagen",
+        "last_updated": "Laatst bijgewerkt:",
+        "refresh": "🔄 Vernieuwen",
+        "data_source": "Data: Open-Meteo | Radar: Windy.com",
+        "error_title": "⚠️ Fout opgetreden",
+        "error_message": "Er is een fout opgetreden bij het laden van de weerdata.",
+        "close": "Sluiten",
+        "try_again": "Opnieuw proberen",
+        "use_location": "📍 Gebruik mijn locatie",
+        "determining_location": "📍 Locatie bepalen...",
+        "unknown_weather": "onbekend weer"
+    },
+    en: {
+        "app_title": "🌤️ Weather App",
+        "app_subtitle": "Current local weather information",
+        "theme_dark": "🌙 Dark",
+        "theme_light": "☀️ Light",
+        "nav_today": "🌤️ Today",
+        "nav_week": "📅 Week",
+        "nav_radar": "🌧️ Radar",
+        "nav_fishing": "🎣 Fishing",
+        "current_weather": "Current Weather",
+        "loading": "Loading weather data...",
+        "feels_like": "Feels like:",
+        "min_max": "Min/Max:",
+        "wind": "Wind:",
+        "humidity": "Humidity:",
+        "clouds": "Clouds:",
+        "precipitation": "Precipitation:",
+        "forecast_24h": "24 Hour Forecast",
+        "forecast_7d": "7 Day Forecast",
+        "rain_radar": "Rain Radar",
+        "weather_alerts": "Weather Alerts",
+        "no_alerts": "No current alerts",
+        "fishing_conditions": "🎣 Fishing Conditions",
+        "fishing_forecast": "📊 Fishing Forecast Next Days",
+        "last_updated": "Last updated:",
+        "refresh": "🔄 Refresh",
+        "data_source": "Data: Open-Meteo | Radar: Windy.com",
+        "error_title": "⚠️ Error Occurred",
+        "error_message": "An error occurred while loading weather data.",
+        "close": "Close",
+        "try_again": "Try Again",
+        "use_location": "📍 Use my location",
+        "determining_location": "📍 Determining location...",
+        "unknown_weather": "unknown weather"
+    },
+    de: {
+        "app_title": "🌤️ Wetter App",
+        "app_subtitle": "Aktuelle lokale Wetterinformationen",
+        "theme_dark": "🌙 Dunkel",
+        "theme_light": "☀️ Hell",
+        "nav_today": "🌤️ Heute",
+        "nav_week": "📅 Woche",
+        "nav_radar": "🌧️ Radar",
+        "nav_fishing": "🎣 Angeln",
+        "current_weather": "Aktuelles Wetter",
+        "loading": "Wetterdaten laden...",
+        "feels_like": "Gefühlt wie:",
+        "min_max": "Min/Max:",
+        "wind": "Wind:",
+        "humidity": "Luftfeuchtigkeit:",
+        "clouds": "Bewölkung:",
+        "precipitation": "Niederschlag:",
+        "forecast_24h": "24 Stunden Vorhersage",
+        "forecast_7d": "7 Tage Vorhersage",
+        "rain_radar": "Regenradar",
+        "weather_alerts": "Wetterwarnungen",
+        "no_alerts": "Keine aktuellen Warnungen",
+        "fishing_conditions": "🎣 Angelbedingungen",
+        "fishing_forecast": "📊 Angelvorhersage Nächste Tage",
+        "last_updated": "Zuletzt aktualisiert:",
+        "refresh": "🔄 Aktualisieren",
+        "data_source": "Daten: Open-Meteo | Radar: Windy.com",
+        "error_title": "⚠️ Fehler aufgetreten",
+        "error_message": "Fehler beim Laden der Wetterdaten.",
+        "close": "Schließen",
+        "try_again": "Erneut versuchen",
+        "use_location": "📍 Mein Standort verwenden",
+        "determining_location": "📍 Standort bestimmen...",
+        "unknown_weather": "unbekanntes Wetter"
+    },
+    it: {
+        "app_title": "🌤️ App Meteo",
+        "app_subtitle": "Informazioni meteo locali attuali",
+        "theme_dark": "🌙 Scuro",
+        "theme_light": "☀️ Chiaro",
+        "nav_today": "🌤️ Oggi",
+        "nav_week": "📅 Settimana",
+        "nav_radar": "🌧️ Radar",
+        "nav_fishing": "🎣 Pesca",
+        "current_weather": "Meteo Attuale",
+        "loading": "Caricamento dati meteo...",
+        "feels_like": "Percepita:",
+        "min_max": "Min/Max:",
+        "wind": "Vento:",
+        "humidity": "Umidità:",
+        "clouds": "Nuvolosità:",
+        "precipitation": "Precipitazioni:",
+        "forecast_24h": "Previsioni 24 Ore",
+        "forecast_7d": "Previsioni 7 Giorni",
+        "rain_radar": "Radar Pioggia",
+        "weather_alerts": "Allerte Meteo",
+        "no_alerts": "Nessun allerta attuale",
+        "fishing_conditions": "🎣 Condizioni di Pesca",
+        "fishing_forecast": "📊 Previsioni Pesca Prossimi Giorni",
+        "last_updated": "Ultimo aggiornamento:",
+        "refresh": "🔄 Aggiorna",
+        "data_source": "Dati: Open-Meteo | Radar: Windy.com",
+        "error_title": "⚠️ Errore Verificato",
+        "error_message": "Si è verificato un errore nel caricamento dei dati meteo.",
+        "close": "Chiudi",
+        "try_again": "Riprova",
+        "use_location": "📍 Usa la mia posizione",
+        "determining_location": "📍 Determinazione posizione...",
+        "unknown_weather": "tempo sconosciuto"
+    },
+    fr: {
+        "app_title": "🌤️ App Météo",
+        "app_subtitle": "Informations météo locales actuelles",
+        "theme_dark": "🌙 Sombre",
+        "theme_light": "☀️ Clair",
+        "nav_today": "🌤️ Aujourd'hui",
+        "nav_week": "📅 Semaine",
+        "nav_radar": "🌧️ Radar",
+        "nav_fishing": "🎣 Pêche",
+        "current_weather": "Météo Actuelle",
+        "loading": "Chargement des données météo...",
+        "feels_like": "Ressenti:",
+        "min_max": "Min/Max:",
+        "wind": "Vent:",
+        "humidity": "Humidité:",
+        "clouds": "Nuages:",
+        "precipitation": "Précipitations:",
+        "forecast_24h": "Prévisions 24h",
+        "forecast_7d": "Prévisions 7 Jours",
+        "rain_radar": "Radar Pluie",
+        "weather_alerts": "Alertes Météo",
+        "no_alerts": "Aucune alerte actuelle",
+        "fishing_conditions": "🎣 Conditions de Pêche",
+        "fishing_forecast": "📊 Prévisions Pêche Prochains Jours",
+        "last_updated": "Dernière mise à jour:",
+        "refresh": "🔄 Actualiser",
+        "data_source": "Données: Open-Meteo | Radar: Windy.com",
+        "error_title": "⚠️ Erreur Survenue",
+        "error_message": "Une erreur s'est produite lors du chargement des données météo.",
+        "close": "Fermer",
+        "try_again": "Réessayer",
+        "use_location": "📍 Utiliser ma position",
+        "determining_location": "📍 Détermination de la position...",
+        "unknown_weather": "temps inconnu"
+    }
+};
+
 class WeatherApp {
     constructor() {
+        this.currentLanguage = localStorage.getItem('weatherAppLanguage') || 'nl';
         this.init();
         this.bindEvents();
         this.userLocation = null; // Store GPS coordinates
+        
+        // Initialize language system
+        this.initLanguageSystem();
         
         // Load weather data immediately (no authentication required)
         this.loadWeatherData();
@@ -26,6 +209,61 @@ class WeatherApp {
         this.refreshBtn = document.getElementById('refresh-btn');
         this.errorModal = document.getElementById('error-modal');
         this.errorMessage = document.getElementById('error-message');
+        this.languageSelector = document.getElementById('language-selector');
+        this.themeToggle = document.getElementById('theme-toggle');
+    }
+
+    // Language system methods
+    initLanguageSystem() {
+        // Set initial language
+        if (this.languageSelector) {
+            this.languageSelector.value = this.currentLanguage;
+            this.languageSelector.addEventListener('change', (e) => {
+                this.changeLanguage(e.target.value);
+            });
+        }
+        
+        // Apply translations
+        this.applyTranslations();
+    }
+
+    translate(key) {
+        return TRANSLATIONS[this.currentLanguage]?.[key] || TRANSLATIONS['nl'][key] || key;
+    }
+
+    changeLanguage(lang) {
+        if (TRANSLATIONS[lang]) {
+            this.currentLanguage = lang;
+            localStorage.setItem('weatherAppLanguage', lang);
+            this.applyTranslations();
+            
+            // Reload weather data with new language
+            const lat = this.userLocation ? this.userLocation.lat : null;
+            const lon = this.userLocation ? this.userLocation.lon : null;
+            this.loadWeatherData(true, lat, lon);
+        }
+    }
+
+    applyTranslations() {
+        // Apply translations to all elements with data-translate attribute
+        const elements = document.querySelectorAll('[data-translate]');
+        elements.forEach(element => {
+            const key = element.getAttribute('data-translate');
+            element.textContent = this.translate(key);
+        });
+
+        // Update theme toggle button text based on current theme
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        const themeText = this.translate(isDark ? 'theme_light' : 'theme_dark');
+        if (this.themeToggle && this.themeToggle.querySelector('span')) {
+            this.themeToggle.querySelector('span').textContent = themeText;
+        }
+        
+        // Update location button if it exists
+        const locationBtn = document.querySelector('.location-btn');
+        if (locationBtn && !locationBtn.disabled) {
+            locationBtn.innerHTML = this.translate('use_location');
+        }
     }
 
     bindEvents() {
@@ -90,9 +328,10 @@ class WeatherApp {
         }
 
         try {
-            // Build URLs with coordinates if provided
-            const currentUrl = lat && lon ? `/current?lat=${lat}&lon=${lon}` : '/current';
-            const forecastUrl = lat && lon ? `/forecast?lat=${lat}&lon=${lon}` : '/forecast';
+            // Build URLs with coordinates and language if provided
+            const langParam = `&lang=${this.currentLanguage}`;
+            const currentUrl = lat && lon ? `/current?lat=${lat}&lon=${lon}${langParam}` : `/current?lang=${this.currentLanguage}`;
+            const forecastUrl = lat && lon ? `/forecast?lat=${lat}&lon=${lon}${langParam}` : `/forecast?lang=${this.currentLanguage}`;
             const alertsUrl = lat && lon ? `/alerts?lat=${lat}&lon=${lon}` : '/alerts';
 
             // Load all data in parallel for better performance
@@ -704,7 +943,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (navigator.geolocation) {
         const header = document.querySelector('header p');
         const locationBtn = document.createElement('button');
-        locationBtn.innerHTML = '📍 Gebruik mijn locatie';
+        locationBtn.innerHTML = window.weatherApp ? window.weatherApp.translate('use_location') : '📍 Gebruik mijn locatie';
         locationBtn.className = 'location-btn';
         locationBtn.style.cssText = `
             background: rgba(255, 255, 255, 0.2);
@@ -721,7 +960,7 @@ document.addEventListener('DOMContentLoaded', () => {
         locationBtn.addEventListener('click', async () => {
             try {
                 locationBtn.disabled = true;
-                locationBtn.innerHTML = '📍 Locatie bepalen...';
+                locationBtn.innerHTML = window.weatherApp ? window.weatherApp.translate('determining_location') : '📍 Locatie bepalen...';
                 
                 const location = await window.weatherApp.getUserLocation();
                 
@@ -736,7 +975,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 window.weatherApp.showError(error.message);
             } finally {
                 locationBtn.disabled = false;
-                locationBtn.innerHTML = '📍 Gebruik mijn locatie';
+                locationBtn.innerHTML = window.weatherApp ? window.weatherApp.translate('use_location') : '📍 Gebruik mijn locatie';
             }
         });
         

@@ -15,6 +15,7 @@ import uvicorn
 # Import our authentication modules
 from database import init_database, UserManager, SessionManager
 from auth import get_current_user, validate_email, validate_password, sanitize_input
+from translations import get_weather_description as get_translated_weather_description, SUPPORTED_LANGUAGES
 
 # Load environment variables
 load_dotenv()
@@ -36,41 +37,9 @@ CACHE_DURATION = int(os.getenv("CACHE_DURATION", "600"))
 # Cache for API responses
 cache = TTLCache(maxsize=100, ttl=CACHE_DURATION)
 
-# Weather code translations for Open-Meteo (WMO Weather interpretation codes)
-WEATHER_CODE_TRANSLATIONS = {
-    0: "heldere hemel",
-    1: "overwegend helder",
-    2: "gedeeltelijk bewolkt", 
-    3: "bewolkt",
-    45: "mist",
-    48: "aanvriesmist",
-    51: "lichte motregen",
-    53: "matige motregen",
-    55: "dichte motregen",
-    56: "lichte ijzel",
-    57: "dichte ijzel",
-    61: "lichte regen",
-    63: "matige regen",
-    65: "zware regen",
-    66: "lichte ijsregen",
-    67: "zware ijsregen",
-    71: "lichte sneeuwval",
-    73: "matige sneeuwval",
-    75: "zware sneeuwval",
-    77: "sneeuwkorrels",
-    80: "lichte buien",
-    81: "matige buien",
-    82: "zware buien",
-    85: "lichte sneeuwbuien",
-    86: "zware sneeuwbuien",
-    95: "onweer",
-    96: "onweer met lichte hagel",
-    99: "onweer met zware hagel"
-}
-
-def get_weather_description(weather_code: int) -> str:
-    """Get Dutch weather description from Open-Meteo weather code"""
-    return WEATHER_CODE_TRANSLATIONS.get(weather_code, "onbekend weer")
+def get_weather_description(weather_code: int, language: str = "nl") -> str:
+    """Get weather description from Open-Meteo weather code in specified language"""
+    return get_translated_weather_description(weather_code, language)
 
 def get_weather_icon(weather_code: int, is_day: bool = True) -> str:
     """Get weather icon code based on Open-Meteo weather code"""
@@ -481,7 +450,7 @@ async def update_settings(request: Request, location: str = Form(...)):
         })
 
 @app.get("/current")
-async def get_current_weather(request: Request, lat: Optional[float] = None, lon: Optional[float] = None):
+async def get_current_weather(request: Request, lat: Optional[float] = None, lon: Optional[float] = None, lang: str = "nl"):
     """Get current weather data"""
     user = get_current_user(request)
     
@@ -546,8 +515,8 @@ async def get_current_weather(request: Request, lat: Optional[float] = None, lon
                 "gust": None  # Open-Meteo doesn't provide gust in current_weather
             },
             "weather": {
-                "main": get_weather_description(current.get("weathercode", 0)),
-                "description": get_weather_description(current.get("weathercode", 0)),
+                "main": get_weather_description(current.get("weathercode", 0), lang),
+                "description": get_weather_description(current.get("weathercode", 0), lang),
                 "icon": get_weather_icon(current.get("weathercode", 0), current.get("is_day", 1) == 1)
             },
             "clouds": 0,  # Open-Meteo doesn't provide cloud cover in current_weather
@@ -562,7 +531,7 @@ async def get_current_weather(request: Request, lat: Optional[float] = None, lon
         raise HTTPException(status_code=500, detail=f"Error fetching current weather: {str(e)}")
 
 @app.get("/forecast")
-async def get_weather_forecast(request: Request, lat: Optional[float] = None, lon: Optional[float] = None):
+async def get_weather_forecast(request: Request, lat: Optional[float] = None, lon: Optional[float] = None, lang: str = "nl"):
     """Get weather forecast (24h and 7 days)"""
     user = get_current_user(request)
     
@@ -633,8 +602,8 @@ async def get_weather_forecast(request: Request, lat: Optional[float] = None, lo
                         "direction": round(wind_directions[i] if i < len(wind_directions) else 0)
                     },
                     "weather": {
-                        "main": get_weather_description(weather_codes[i] if i < len(weather_codes) else 0),
-                        "description": get_weather_description(weather_codes[i] if i < len(weather_codes) else 0),
+                        "main": get_weather_description(weather_codes[i] if i < len(weather_codes) else 0, lang),
+                        "description": get_weather_description(weather_codes[i] if i < len(weather_codes) else 0, lang),
                         "icon": get_weather_icon(weather_codes[i] if i < len(weather_codes) else 0, True)
                     },
                     "clouds": round(clouds[i] if i < len(clouds) else 0),
@@ -669,8 +638,8 @@ async def get_weather_forecast(request: Request, lat: Optional[float] = None, lo
                         "direction": round(wind_directions[i] if i < len(wind_directions) else 0)
                     },
                     "weather": {
-                        "main": get_weather_description(weather_codes[i] if i < len(weather_codes) else 0),
-                        "description": get_weather_description(weather_codes[i] if i < len(weather_codes) else 0),
+                        "main": get_weather_description(weather_codes[i] if i < len(weather_codes) else 0, lang),
+                        "description": get_weather_description(weather_codes[i] if i < len(weather_codes) else 0, lang),
                         "icon": get_weather_icon(weather_codes[i] if i < len(weather_codes) else 0, True)
                     },
                     "clouds": 0,  # Not available in daily data
@@ -726,6 +695,11 @@ async def health_check():
         "timestamp": datetime.now().isoformat(),
         "cache_size": len(cache)
     }
+
+@app.get("/languages")
+async def get_languages():
+    """Get supported languages"""
+    return {"languages": SUPPORTED_LANGUAGES}
 
 if __name__ == "__main__":
     uvicorn.run("app:app", host="0.0.0.0", port=8000, reload=True)

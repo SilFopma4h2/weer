@@ -79,6 +79,38 @@ header p {
     opacity: 0.9;
 }
 
+.header-controls {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+/* Language selector */
+.language-selector {
+    background: var(--btn-bg);
+    color: var(--header-text);
+    border: 2px solid var(--btn-border);
+    padding: 8px 12px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.85em;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    min-width: 120px;
+}
+
+.language-selector:hover {
+    background: var(--btn-hover-bg);
+    border-color: var(--btn-hover-border);
+    transform: translateY(-1px);
+}
+
+.language-selector option {
+    background: var(--bg-card);
+    color: var(--text-primary);
+    padding: 5px;
+}
+
 /* Theme toggle button */
 .theme-toggle {
     background: var(--btn-bg);
