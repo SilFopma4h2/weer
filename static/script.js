@@ -150,9 +150,10 @@ class WeatherApp {
         const precipitation = data.rain + data.snow;
         document.getElementById('precipitation').textContent = precipitation > 0 ? `${precipitation.toFixed(1)} mm` : '0 mm';
 
-        // Weather icon
+        // Weather icon - use emoji instead of external images
         const iconElement = document.getElementById('weather-icon');
-        iconElement.src = `https://openweathermap.org/img/wn/${data.weather.icon}@2x.png`;
+        const emojiIcon = this.getWeatherEmoji(data.weather.icon);
+        iconElement.src = `data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y="70" font-size="60" text-anchor="middle" x="50">${emojiIcon}</text></svg>`;
         iconElement.alt = data.weather.description;
     }
 
@@ -170,10 +171,12 @@ class WeatherApp {
                 hour12: true
             });
             
+            const emojiIcon = this.getWeatherEmoji(item.weather.icon);
+            
             forecastItem.innerHTML = `
                 <div class="forecast-time">${timeString}</div>
                 <img class="forecast-icon" 
-                     src="https://openweathermap.org/img/wn/${item.weather.icon}.png" 
+                     src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='70' font-size='50' text-anchor='middle' x='50'>${emojiIcon}</text></svg>" 
                      alt="${item.weather.description}">
                 <div class="forecast-temp">${item.temperature.temp}°</div>
                 <div class="forecast-desc">${item.weather.description}</div>
@@ -198,11 +201,13 @@ class WeatherApp {
                 day: 'numeric'
             });
             
+            const emojiIcon = this.getWeatherEmoji(item.weather.icon);
+            
             forecastDay.innerHTML = `
                 <div class="forecast-day-info">
                     <div class="forecast-day-name">${this.capitalizeFirst(dayName)}</div>
                     <img class="forecast-day-icon" 
-                         src="https://openweathermap.org/img/wn/${item.weather.icon}.png" 
+                         src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='70' font-size='50' text-anchor='middle' x='50'>${emojiIcon}</text></svg>" 
                          alt="${item.weather.description}">
                     <div class="forecast-day-desc">${item.weather.description}</div>
                 </div>
@@ -284,6 +289,32 @@ class WeatherApp {
 
     capitalizeFirst(str) {
         return str.charAt(0).toUpperCase() + str.slice(1);
+    }
+
+    getWeatherEmoji(iconCode) {
+        // Convert OpenWeatherMap-style icon codes to emoji
+        const iconMap = {
+            '01d': '☀️',   // clear sky day
+            '01n': '🌙',   // clear sky night
+            '02d': '⛅',   // few clouds day
+            '02n': '☁️',   // few clouds night
+            '03d': '☁️',   // scattered clouds
+            '03n': '☁️',   // scattered clouds
+            '04d': '☁️',   // broken clouds
+            '04n': '☁️',   // broken clouds
+            '09d': '🌦️',   // shower rain
+            '09n': '🌦️',   // shower rain
+            '10d': '🌧️',   // rain day
+            '10n': '🌧️',   // rain night
+            '11d': '⛈️',   // thunderstorm
+            '11n': '⛈️',   // thunderstorm
+            '13d': '❄️',   // snow
+            '13n': '❄️',   // snow
+            '50d': '🌫️',   // mist
+            '50n': '🌫️'    // mist
+        };
+        
+        return iconMap[iconCode] || '☁️'; // default to cloud emoji
     }
 
     // Fishing conditions logic
