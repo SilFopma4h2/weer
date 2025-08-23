@@ -37,6 +37,7 @@
                     <button class="nav-btn" data-tab="week" data-translate="nav_week">📅 Week</button>
                     <button class="nav-btn" data-tab="radar" data-translate="nav_radar">🌧️ Radar</button>
                     <button class="nav-btn" data-tab="fishing" data-translate="nav_fishing">🎣 Vissen</button>
+                    <button class="nav-btn" data-tab="games" data-translate="nav_games">🎮 Games</button>
                 </div>
             </nav>
 
@@ -147,6 +148,69 @@
                     <h2 data-translate="fishing_forecast">📊 Visvoorspelling Komende Dagen</h2>
                     <div id="fishing-forecast-data" class="fishing-forecast-list">
                         <!-- Will be populated by JavaScript -->
+                    </div>
+                </section>
+            </div>
+
+            <!-- Games Tab -->
+            <div id="tab-games" class="tab-content">
+                <!-- Game Selection -->
+                <section id="game-selection" class="weather-card">
+                    <h2 data-translate="games_title">🎮 Games</h2>
+                    <div class="games-menu">
+                        <button class="game-btn" onclick="showGame('2048')" data-translate="game_2048">🔢 2048</button>
+                        <button class="game-btn" onclick="showGame('flappy')" data-translate="game_flappy">🐦 Flappy Bird</button>
+                        <button class="game-btn" onclick="showGame('guess')" data-translate="game_guess">🔢 Guess the Number</button>
+                        <button class="game-btn" onclick="showGame('menu')" data-translate="game_menu">📋 Menu</button>
+                    </div>
+                </section>
+
+                <!-- 2048 Game -->
+                <section id="game-2048" class="weather-card game-container" style="display: none;">
+                    <h3 data-translate="game_2048_title">🔢 2048</h3>
+                    <div class="game-2048">
+                        <div class="game-score">
+                            <span data-translate="score">Score:</span> <span id="score-2048">0</span>
+                        </div>
+                        <div id="grid-2048" class="grid-2048"></div>
+                        <div class="game-controls">
+                            <button onclick="newGame2048()" data-translate="new_game">New Game</button>
+                            <p data-translate="game_2048_instructions">Use arrow keys or swipe to move tiles</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Flappy Bird Game -->
+                <section id="game-flappy" class="weather-card game-container" style="display: none;">
+                    <h3 data-translate="game_flappy_title">🐦 Flappy Bird</h3>
+                    <div class="game-flappy">
+                        <div class="game-score">
+                            <span data-translate="score">Score:</span> <span id="score-flappy">0</span>
+                        </div>
+                        <canvas id="flappy-canvas" width="400" height="300"></canvas>
+                        <div class="game-controls">
+                            <button onclick="startFlappyGame()" data-translate="start_game">Start Game</button>
+                            <p data-translate="game_flappy_instructions">Click or press space to jump</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Guess the Number Game -->
+                <section id="game-guess" class="weather-card game-container" style="display: none;">
+                    <h3 data-translate="game_guess_title">🔢 Guess the Number</h3>
+                    <div class="game-guess">
+                        <div class="game-info">
+                            <p data-translate="guess_range">I'm thinking of a number between 1 and 100</p>
+                            <p data-translate="attempts">Attempts:</p> <span id="attempts-count">0</span>
+                        </div>
+                        <div class="guess-input">
+                            <input type="number" id="guess-input" min="1" max="100" placeholder="Enter your guess">
+                            <button onclick="makeGuess()" data-translate="guess_button">Guess</button>
+                        </div>
+                        <div id="guess-feedback" class="guess-feedback"></div>
+                        <div class="game-controls">
+                            <button onclick="newGuessGame()" data-translate="new_game">New Game</button>
+                        </div>
                     </div>
                 </section>
             </div>
