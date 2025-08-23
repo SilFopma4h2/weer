@@ -10,6 +10,7 @@ const TRANSLATIONS = {
         "nav_week": "📅 Week",
         "nav_radar": "🌧️ Radar",
         "nav_fishing": "🎣 Vissen",
+        "nav_games": "🎮 Games",
         "current_weather": "Huidig Weer",
         "loading": "Weerdata laden...",
         "feels_like": "Gevoelstemperatuur:",
@@ -25,6 +26,22 @@ const TRANSLATIONS = {
         "no_alerts": "Geen actuele waarschuwingen",
         "fishing_conditions": "🎣 Visomstandigheden",
         "fishing_forecast": "📊 Visvoorspelling Komende Dagen",
+        "games_title": "🎮 Games",
+        "game_2048": "🔢 2048",
+        "game_flappy": "🐦 Flappy Bird",
+        "game_guess": "🔢 Raad het Getal",
+        "game_menu": "📋 Menu",
+        "game_2048_title": "🔢 2048",
+        "game_flappy_title": "🐦 Flappy Bird",
+        "game_guess_title": "🔢 Raad het Getal",
+        "score": "Score:",
+        "new_game": "Nieuw Spel",
+        "start_game": "Start Spel",
+        "game_2048_instructions": "Gebruik pijltjestoetsen of swipe om tegels te bewegen",
+        "game_flappy_instructions": "Klik of druk op spatie om te springen",
+        "guess_range": "Ik denk aan een getal tussen 1 en 100",
+        "attempts": "Pogingen:",
+        "guess_button": "Raad",
         "last_updated": "Laatst bijgewerkt:",
         "refresh": "🔄 Vernieuwen",
         "data_source": "Data: Open-Meteo | Radar: Windy.com",
@@ -45,6 +62,7 @@ const TRANSLATIONS = {
         "nav_week": "📅 Week",
         "nav_radar": "🌧️ Radar",
         "nav_fishing": "🎣 Fishing",
+        "nav_games": "🎮 Games",
         "current_weather": "Current Weather",
         "loading": "Loading weather data...",
         "feels_like": "Feels like:",
@@ -60,6 +78,22 @@ const TRANSLATIONS = {
         "no_alerts": "No current alerts",
         "fishing_conditions": "🎣 Fishing Conditions",
         "fishing_forecast": "📊 Fishing Forecast Next Days",
+        "games_title": "🎮 Games",
+        "game_2048": "🔢 2048",
+        "game_flappy": "🐦 Flappy Bird",
+        "game_guess": "🔢 Guess the Number",
+        "game_menu": "📋 Menu",
+        "game_2048_title": "🔢 2048",
+        "game_flappy_title": "🐦 Flappy Bird",
+        "game_guess_title": "🔢 Guess the Number",
+        "score": "Score:",
+        "new_game": "New Game",
+        "start_game": "Start Game",
+        "game_2048_instructions": "Use arrow keys or swipe to move tiles",
+        "game_flappy_instructions": "Click or press space to jump",
+        "guess_range": "I'm thinking of a number between 1 and 100",
+        "attempts": "Attempts:",
+        "guess_button": "Guess",
         "last_updated": "Last updated:",
         "refresh": "🔄 Refresh",
         "data_source": "Data: Open-Meteo | Radar: Windy.com",
@@ -1011,3 +1045,394 @@ window.addEventListener('load', () => {
         console.warn('Load time exceeds 2 second requirement');
     }
 });
+
+// Games functionality
+let currentGame = 'menu';
+
+function showGame(gameType) {
+    // Hide all game containers
+    document.querySelectorAll('.game-container').forEach(container => {
+        container.style.display = 'none';
+    });
+    
+    // Show selected game or menu
+    if (gameType === 'menu') {
+        currentGame = 'menu';
+        return;
+    }
+    
+    const gameContainer = document.getElementById(`game-${gameType}`);
+    if (gameContainer) {
+        gameContainer.style.display = 'block';
+        currentGame = gameType;
+        
+        // Initialize the specific game
+        if (gameType === '2048' && !document.getElementById('grid-2048').hasChildNodes()) {
+            initGame2048();
+        } else if (gameType === 'guess') {
+            newGuessGame();
+        }
+    }
+}
+
+// 2048 Game Implementation
+let game2048 = {
+    grid: [],
+    score: 0,
+    size: 4
+};
+
+function initGame2048() {
+    const gridContainer = document.getElementById('grid-2048');
+    gridContainer.innerHTML = '';
+    
+    // Create grid cells
+    for (let i = 0; i < 16; i++) {
+        const cell = document.createElement('div');
+        cell.className = 'grid-cell';
+        cell.dataset.index = i;
+        gridContainer.appendChild(cell);
+    }
+    
+    newGame2048();
+    
+    // Add keyboard listeners
+    document.addEventListener('keydown', handle2048KeyPress);
+}
+
+function newGame2048() {
+    game2048.grid = Array(16).fill(0);
+    game2048.score = 0;
+    updateScore2048();
+    addRandomTile2048();
+    addRandomTile2048();
+    render2048();
+}
+
+function addRandomTile2048() {
+    const emptyCells = [];
+    for (let i = 0; i < 16; i++) {
+        if (game2048.grid[i] === 0) {
+            emptyCells.push(i);
+        }
+    }
+    
+    if (emptyCells.length > 0) {
+        const randomIndex = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+        game2048.grid[randomIndex] = Math.random() < 0.9 ? 2 : 4;
+    }
+}
+
+function render2048() {
+    const cells = document.querySelectorAll('#grid-2048 .grid-cell');
+    cells.forEach((cell, index) => {
+        const value = game2048.grid[index];
+        cell.textContent = value === 0 ? '' : value;
+        cell.className = `grid-cell ${value === 0 ? '' : `tile-${value}`}`;
+    });
+}
+
+function updateScore2048() {
+    document.getElementById('score-2048').textContent = game2048.score;
+}
+
+function handle2048KeyPress(e) {
+    if (currentGame !== '2048') return;
+    
+    let moved = false;
+    const originalGrid = [...game2048.grid];
+    
+    switch(e.key) {
+        case 'ArrowUp':
+            e.preventDefault();
+            moved = moveUp2048();
+            break;
+        case 'ArrowDown':
+            e.preventDefault();
+            moved = moveDown2048();
+            break;
+        case 'ArrowLeft':
+            e.preventDefault();
+            moved = moveLeft2048();
+            break;
+        case 'ArrowRight':
+            e.preventDefault();
+            moved = moveRight2048();
+            break;
+    }
+    
+    if (moved) {
+        addRandomTile2048();
+        render2048();
+        updateScore2048();
+    }
+}
+
+function moveLeft2048() {
+    let moved = false;
+    for (let row = 0; row < 4; row++) {
+        const rowArray = [];
+        for (let col = 0; col < 4; col++) {
+            rowArray.push(game2048.grid[row * 4 + col]);
+        }
+        
+        const newRow = slideAndMerge(rowArray);
+        for (let col = 0; col < 4; col++) {
+            const newValue = newRow[col];
+            const oldValue = game2048.grid[row * 4 + col];
+            if (newValue !== oldValue) {
+                moved = true;
+            }
+            game2048.grid[row * 4 + col] = newValue;
+        }
+    }
+    return moved;
+}
+
+function moveRight2048() {
+    let moved = false;
+    for (let row = 0; row < 4; row++) {
+        const rowArray = [];
+        for (let col = 3; col >= 0; col--) {
+            rowArray.push(game2048.grid[row * 4 + col]);
+        }
+        
+        const newRow = slideAndMerge(rowArray);
+        for (let col = 0; col < 4; col++) {
+            const newValue = newRow[col];
+            const oldValue = game2048.grid[row * 4 + (3 - col)];
+            if (newValue !== oldValue) {
+                moved = true;
+            }
+            game2048.grid[row * 4 + (3 - col)] = newValue;
+        }
+    }
+    return moved;
+}
+
+function moveUp2048() {
+    let moved = false;
+    for (let col = 0; col < 4; col++) {
+        const colArray = [];
+        for (let row = 0; row < 4; row++) {
+            colArray.push(game2048.grid[row * 4 + col]);
+        }
+        
+        const newCol = slideAndMerge(colArray);
+        for (let row = 0; row < 4; row++) {
+            const newValue = newCol[row];
+            const oldValue = game2048.grid[row * 4 + col];
+            if (newValue !== oldValue) {
+                moved = true;
+            }
+            game2048.grid[row * 4 + col] = newValue;
+        }
+    }
+    return moved;
+}
+
+function moveDown2048() {
+    let moved = false;
+    for (let col = 0; col < 4; col++) {
+        const colArray = [];
+        for (let row = 3; row >= 0; row--) {
+            colArray.push(game2048.grid[row * 4 + col]);
+        }
+        
+        const newCol = slideAndMerge(colArray);
+        for (let row = 0; row < 4; row++) {
+            const newValue = newCol[row];
+            const oldValue = game2048.grid[(3 - row) * 4 + col];
+            if (newValue !== oldValue) {
+                moved = true;
+            }
+            game2048.grid[(3 - row) * 4 + col] = newValue;
+        }
+    }
+    return moved;
+}
+
+function slideAndMerge(array) {
+    // Remove zeros
+    const filtered = array.filter(val => val !== 0);
+    
+    // Merge adjacent equal numbers
+    for (let i = 0; i < filtered.length - 1; i++) {
+        if (filtered[i] === filtered[i + 1]) {
+            filtered[i] *= 2;
+            game2048.score += filtered[i];
+            filtered[i + 1] = 0;
+        }
+    }
+    
+    // Remove zeros again and fill to length 4
+    const result = filtered.filter(val => val !== 0);
+    while (result.length < 4) {
+        result.push(0);
+    }
+    
+    return result;
+}
+
+// Flappy Bird Game Implementation
+let flappyGame = {
+    bird: { x: 50, y: 150, velocity: 0 },
+    pipes: [],
+    score: 0,
+    gameRunning: false,
+    canvas: null,
+    ctx: null
+};
+
+function startFlappyGame() {
+    const canvas = document.getElementById('flappy-canvas');
+    const ctx = canvas.getContext('2d');
+    
+    flappyGame.canvas = canvas;
+    flappyGame.ctx = ctx;
+    flappyGame.bird = { x: 50, y: 150, velocity: 0 };
+    flappyGame.pipes = [];
+    flappyGame.score = 0;
+    flappyGame.gameRunning = true;
+    
+    document.getElementById('score-flappy').textContent = '0';
+    
+    // Add event listeners
+    canvas.addEventListener('click', flappyJump);
+    document.addEventListener('keydown', (e) => {
+        if (e.key === ' ' && currentGame === 'flappy') {
+            e.preventDefault();
+            flappyJump();
+        }
+    });
+    
+    // Start game loop
+    flappyGameLoop();
+}
+
+function flappyJump() {
+    if (flappyGame.gameRunning) {
+        flappyGame.bird.velocity = -8;
+    }
+}
+
+function flappyGameLoop() {
+    if (!flappyGame.gameRunning) return;
+    
+    // Clear canvas
+    flappyGame.ctx.fillStyle = '#87CEEB';
+    flappyGame.ctx.fillRect(0, 0, 400, 300);
+    
+    // Update bird
+    flappyGame.bird.velocity += 0.5; // gravity
+    flappyGame.bird.y += flappyGame.bird.velocity;
+    
+    // Check ground/ceiling collision
+    if (flappyGame.bird.y < 0 || flappyGame.bird.y > 280) {
+        endFlappyGame();
+        return;
+    }
+    
+    // Add pipes
+    if (flappyGame.pipes.length === 0 || flappyGame.pipes[flappyGame.pipes.length - 1].x < 200) {
+        const pipeHeight = Math.random() * 150 + 50;
+        flappyGame.pipes.push({
+            x: 400,
+            topHeight: pipeHeight,
+            bottomY: pipeHeight + 80,
+            scored: false
+        });
+    }
+    
+    // Update and draw pipes
+    flappyGame.pipes.forEach((pipe, index) => {
+        pipe.x -= 3;
+        
+        // Draw top pipe
+        flappyGame.ctx.fillStyle = '#228B22';
+        flappyGame.ctx.fillRect(pipe.x, 0, 30, pipe.topHeight);
+        
+        // Draw bottom pipe
+        flappyGame.ctx.fillRect(pipe.x, pipe.bottomY, 30, 300 - pipe.bottomY);
+        
+        // Check collision
+        if (flappyGame.bird.x + 20 > pipe.x && flappyGame.bird.x < pipe.x + 30) {
+            if (flappyGame.bird.y < pipe.topHeight || flappyGame.bird.y + 20 > pipe.bottomY) {
+                endFlappyGame();
+                return;
+            }
+        }
+        
+        // Score
+        if (!pipe.scored && pipe.x + 30 < flappyGame.bird.x) {
+            pipe.scored = true;
+            flappyGame.score++;
+            document.getElementById('score-flappy').textContent = flappyGame.score;
+        }
+        
+        // Remove off-screen pipes
+        if (pipe.x < -30) {
+            flappyGame.pipes.splice(index, 1);
+        }
+    });
+    
+    // Draw bird
+    flappyGame.ctx.fillStyle = '#FFD700';
+    flappyGame.ctx.fillRect(flappyGame.bird.x, flappyGame.bird.y, 20, 20);
+    
+    requestAnimationFrame(flappyGameLoop);
+}
+
+function endFlappyGame() {
+    flappyGame.gameRunning = false;
+    alert(`Game Over! Final Score: ${flappyGame.score}`);
+}
+
+// Guess the Number Game Implementation
+let guessGame = {
+    targetNumber: 0,
+    attempts: 0,
+    maxNumber: 100
+};
+
+function newGuessGame() {
+    guessGame.targetNumber = Math.floor(Math.random() * guessGame.maxNumber) + 1;
+    guessGame.attempts = 0;
+    document.getElementById('attempts-count').textContent = '0';
+    document.getElementById('guess-input').value = '';
+    document.getElementById('guess-feedback').innerHTML = '';
+    document.getElementById('guess-input').focus();
+    
+    // Add enter key listener
+    document.getElementById('guess-input').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            makeGuess();
+        }
+    });
+}
+
+function makeGuess() {
+    const input = document.getElementById('guess-input');
+    const feedback = document.getElementById('guess-feedback');
+    const guess = parseInt(input.value);
+    
+    if (isNaN(guess) || guess < 1 || guess > 100) {
+        feedback.innerHTML = '<p style="color: red;">Please enter a number between 1 and 100</p>';
+        return;
+    }
+    
+    guessGame.attempts++;
+    document.getElementById('attempts-count').textContent = guessGame.attempts;
+    
+    if (guess === guessGame.targetNumber) {
+        feedback.innerHTML = `<p style="color: green;">🎉 Congratulations! You guessed it in ${guessGame.attempts} attempts!</p>`;
+        input.disabled = true;
+    } else if (guess < guessGame.targetNumber) {
+        feedback.innerHTML = '<p style="color: blue;">📈 Too low! Try a higher number.</p>';
+    } else {
+        feedback.innerHTML = '<p style="color: orange;">📉 Too high! Try a lower number.</p>';
+    }
+    
+    input.value = '';
+    input.focus();
+}
