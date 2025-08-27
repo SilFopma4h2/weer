@@ -161,6 +161,9 @@
                         <button class="game-btn" onclick="showGame('2048')" data-translate="game_2048">🔢 2048</button>
                         <button class="game-btn" onclick="showGame('flappy')" data-translate="game_flappy">🐦 Flappy Bird</button>
                         <button class="game-btn" onclick="showGame('guess')" data-translate="game_guess">🔢 Guess the Number</button>
+                        <button class="game-btn" onclick="showGame('snake')" data-translate="game_snake">🐍 Snake</button>
+                        <button class="game-btn" onclick="showGame('pong')" data-translate="game_pong">🏓 Pong</button>
+                        <button class="game-btn" onclick="showGame('breakout')" data-translate="game_breakout">🧱 Breakout</button>
                         <button class="game-btn" onclick="showGame('menu')" data-translate="game_menu">📋 Menu</button>
                     </div>
                 </section>
@@ -210,6 +213,51 @@
                         <div id="guess-feedback" class="guess-feedback"></div>
                         <div class="game-controls">
                             <button onclick="newGuessGame()" data-translate="new_game">New Game</button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Snake Game -->
+                <section id="game-snake" class="weather-card game-container" style="display: none;">
+                    <h3 data-translate="game_snake_title">🐍 Snake</h3>
+                    <div class="game-snake">
+                        <div class="game-score">
+                            <span data-translate="score">Score:</span> <span id="score-snake">0</span>
+                        </div>
+                        <canvas id="snake-canvas" width="400" height="400"></canvas>
+                        <div class="game-controls">
+                            <button onclick="startSnakeGame()" data-translate="start_game">Start Game</button>
+                            <p data-translate="game_snake_instructions">Use arrow keys to control the snake</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Pong Game -->
+                <section id="game-pong" class="weather-card game-container" style="display: none;">
+                    <h3 data-translate="game_pong_title">🏓 Pong</h3>
+                    <div class="game-pong">
+                        <div class="game-score">
+                            <span data-translate="score">Score:</span> <span id="score-pong">0 - 0</span>
+                        </div>
+                        <canvas id="pong-canvas" width="600" height="300"></canvas>
+                        <div class="game-controls">
+                            <button onclick="startPongGame()" data-translate="start_game">Start Game</button>
+                            <p data-translate="game_pong_instructions">Use W/S keys to move the paddle</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Breakout Game -->
+                <section id="game-breakout" class="weather-card game-container" style="display: none;">
+                    <h3 data-translate="game_breakout_title">🧱 Breakout</h3>
+                    <div class="game-breakout">
+                        <div class="game-score">
+                            <span data-translate="score">Score:</span> <span id="score-breakout">0</span>
+                        </div>
+                        <canvas id="breakout-canvas" width="480" height="320"></canvas>
+                        <div class="game-controls">
+                            <button onclick="startBreakoutGame()" data-translate="start_game">Start Game</button>
+                            <p data-translate="game_breakout_instructions">Use arrow keys or mouse to move the paddle</p>
                         </div>
                     </div>
                 </section>

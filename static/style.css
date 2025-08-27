@@ -1332,6 +1332,51 @@ footer {
     font-weight: 500;
 }
 
+/* Snake Game Styles */
+.game-snake {
+    text-align: center;
+}
+
+#snake-canvas {
+    border: 2px solid #74b9ff;
+    border-radius: 10px;
+    background: #2c3e50;
+    max-width: 100%;
+    height: auto;
+    margin: 0 auto;
+    display: block;
+}
+
+/* Pong Game Styles */
+.game-pong {
+    text-align: center;
+}
+
+#pong-canvas {
+    border: 2px solid #74b9ff;
+    border-radius: 10px;
+    background: #000;
+    max-width: 100%;
+    height: auto;
+    margin: 0 auto;
+    display: block;
+}
+
+/* Breakout Game Styles */
+.game-breakout {
+    text-align: center;
+}
+
+#breakout-canvas {
+    border: 2px solid #74b9ff;
+    border-radius: 10px;
+    background: #2c3e50;
+    max-width: 100%;
+    height: auto;
+    margin: 0 auto;
+    display: block;
+}
+
 /* Mobile responsiveness for games */
 @media (max-width: 768px) {
     .games-menu {
@@ -1365,6 +1410,21 @@ footer {
     #flappy-canvas {
         width: 100%;
         max-width: 350px;
+    }
+    
+    #snake-canvas {
+        width: 100%;
+        max-width: 350px;
+    }
+    
+    #pong-canvas {
+        width: 100%;
+        max-width: 500px;
+    }
+    
+    #breakout-canvas {
+        width: 100%;
+        max-width: 400px;
     }
     
     .guess-input {
