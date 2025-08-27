@@ -30,15 +30,24 @@ const TRANSLATIONS = {
         "game_2048": "🔢 2048",
         "game_flappy": "🐦 Flappy Bird",
         "game_guess": "🔢 Raad het Getal",
+        "game_snake": "🐍 Snake",
+        "game_pong": "🏓 Pong",
+        "game_breakout": "🧱 Breakout",
         "game_menu": "📋 Menu",
         "game_2048_title": "🔢 2048",
         "game_flappy_title": "🐦 Flappy Bird",
         "game_guess_title": "🔢 Raad het Getal",
+        "game_snake_title": "🐍 Snake",
+        "game_pong_title": "🏓 Pong",
+        "game_breakout_title": "🧱 Breakout",
         "score": "Score:",
         "new_game": "Nieuw Spel",
         "start_game": "Start Spel",
         "game_2048_instructions": "Gebruik pijltjestoetsen of swipe om tegels te bewegen",
         "game_flappy_instructions": "Klik of druk op spatie om te springen",
+        "game_snake_instructions": "Gebruik pijltjestoetsen om de slang te besturen",
+        "game_pong_instructions": "Gebruik W/S toetsen om de paddle te bewegen",
+        "game_breakout_instructions": "Gebruik pijltjestoetsen of muis om de paddle te bewegen",
         "guess_range": "Ik denk aan een getal tussen 1 en 100",
         "attempts": "Pogingen:",
         "guess_button": "Raad",
@@ -82,15 +91,24 @@ const TRANSLATIONS = {
         "game_2048": "🔢 2048",
         "game_flappy": "🐦 Flappy Bird",
         "game_guess": "🔢 Guess the Number",
+        "game_snake": "🐍 Snake",
+        "game_pong": "🏓 Pong",
+        "game_breakout": "🧱 Breakout",
         "game_menu": "📋 Menu",
         "game_2048_title": "🔢 2048",
         "game_flappy_title": "🐦 Flappy Bird",
         "game_guess_title": "🔢 Guess the Number",
+        "game_snake_title": "🐍 Snake",
+        "game_pong_title": "🏓 Pong",
+        "game_breakout_title": "🧱 Breakout",
         "score": "Score:",
         "new_game": "New Game",
         "start_game": "Start Game",
         "game_2048_instructions": "Use arrow keys or swipe to move tiles",
         "game_flappy_instructions": "Click or press space to jump",
+        "game_snake_instructions": "Use arrow keys to control the snake",
+        "game_pong_instructions": "Use W/S keys to move the paddle",
+        "game_breakout_instructions": "Use arrow keys or mouse to move the paddle",
         "guess_range": "I'm thinking of a number between 1 and 100",
         "attempts": "Attempts:",
         "guess_button": "Guess",
@@ -1071,6 +1089,12 @@ function showGame(gameType) {
             initGame2048();
         } else if (gameType === 'guess') {
             newGuessGame();
+        } else if (gameType === 'snake') {
+            // Snake game will be initialized when start button is clicked
+        } else if (gameType === 'pong') {
+            // Pong game will be initialized when start button is clicked
+        } else if (gameType === 'breakout') {
+            // Breakout game will be initialized when start button is clicked
         }
     }
 }
@@ -1435,4 +1459,424 @@ function makeGuess() {
     
     input.value = '';
     input.focus();
+}
+
+// Snake Game Implementation
+let snakeGame = {
+    canvas: null,
+    ctx: null,
+    snake: [],
+    food: {},
+    direction: 'right',
+    score: 0,
+    gameRunning: false,
+    gridSize: 20
+};
+
+function startSnakeGame() {
+    const canvas = document.getElementById('snake-canvas');
+    const ctx = canvas.getContext('2d');
+    
+    snakeGame.canvas = canvas;
+    snakeGame.ctx = ctx;
+    snakeGame.snake = [{x: 200, y: 200}];
+    snakeGame.food = generateFood();
+    snakeGame.direction = 'right';
+    snakeGame.score = 0;
+    snakeGame.gameRunning = true;
+    
+    document.getElementById('score-snake').textContent = '0';
+    
+    // Add event listeners
+    document.addEventListener('keydown', handleSnakeKeyPress);
+    
+    // Start game loop
+    snakeGameLoop();
+}
+
+function generateFood() {
+    const canvas = snakeGame.canvas;
+    const gridSize = snakeGame.gridSize;
+    return {
+        x: Math.floor(Math.random() * (canvas.width / gridSize)) * gridSize,
+        y: Math.floor(Math.random() * (canvas.height / gridSize)) * gridSize
+    };
+}
+
+function handleSnakeKeyPress(e) {
+    if (currentGame !== 'snake' || !snakeGame.gameRunning) return;
+    
+    switch(e.key) {
+        case 'ArrowUp':
+            if (snakeGame.direction !== 'down') snakeGame.direction = 'up';
+            break;
+        case 'ArrowDown':
+            if (snakeGame.direction !== 'up') snakeGame.direction = 'down';
+            break;
+        case 'ArrowLeft':
+            if (snakeGame.direction !== 'right') snakeGame.direction = 'left';
+            break;
+        case 'ArrowRight':
+            if (snakeGame.direction !== 'left') snakeGame.direction = 'right';
+            break;
+    }
+}
+
+function snakeGameLoop() {
+    if (!snakeGame.gameRunning) return;
+    
+    // Clear canvas
+    snakeGame.ctx.fillStyle = '#2c3e50';
+    snakeGame.ctx.fillRect(0, 0, snakeGame.canvas.width, snakeGame.canvas.height);
+    
+    // Move snake
+    const head = {...snakeGame.snake[0]};
+    switch(snakeGame.direction) {
+        case 'up': head.y -= snakeGame.gridSize; break;
+        case 'down': head.y += snakeGame.gridSize; break;
+        case 'left': head.x -= snakeGame.gridSize; break;
+        case 'right': head.x += snakeGame.gridSize; break;
+    }
+    
+    // Check wall collision
+    if (head.x < 0 || head.x >= snakeGame.canvas.width || 
+        head.y < 0 || head.y >= snakeGame.canvas.height) {
+        endSnakeGame();
+        return;
+    }
+    
+    // Check self collision
+    for (let segment of snakeGame.snake) {
+        if (head.x === segment.x && head.y === segment.y) {
+            endSnakeGame();
+            return;
+        }
+    }
+    
+    snakeGame.snake.unshift(head);
+    
+    // Check food collision
+    if (head.x === snakeGame.food.x && head.y === snakeGame.food.y) {
+        snakeGame.score += 10;
+        document.getElementById('score-snake').textContent = snakeGame.score;
+        snakeGame.food = generateFood();
+    } else {
+        snakeGame.snake.pop();
+    }
+    
+    // Draw snake
+    snakeGame.ctx.fillStyle = '#27ae60';
+    for (let segment of snakeGame.snake) {
+        snakeGame.ctx.fillRect(segment.x, segment.y, snakeGame.gridSize, snakeGame.gridSize);
+    }
+    
+    // Draw food
+    snakeGame.ctx.fillStyle = '#e74c3c';
+    snakeGame.ctx.fillRect(snakeGame.food.x, snakeGame.food.y, snakeGame.gridSize, snakeGame.gridSize);
+    
+    setTimeout(snakeGameLoop, 150);
+}
+
+function endSnakeGame() {
+    snakeGame.gameRunning = false;
+    snakeGame.ctx.fillStyle = '#fff';
+    snakeGame.ctx.font = '24px Arial';
+    snakeGame.ctx.textAlign = 'center';
+    snakeGame.ctx.fillText('Game Over!', snakeGame.canvas.width/2, snakeGame.canvas.height/2);
+    snakeGame.ctx.fillText(`Score: ${snakeGame.score}`, snakeGame.canvas.width/2, snakeGame.canvas.height/2 + 30);
+}
+
+// Pong Game Implementation
+let pongGame = {
+    canvas: null,
+    ctx: null,
+    paddleHeight: 60,
+    paddleWidth: 10,
+    ballRadius: 8,
+    leftPaddle: { y: 0 },
+    rightPaddle: { y: 0 },
+    ball: { x: 0, y: 0, dx: 0, dy: 0 },
+    leftScore: 0,
+    rightScore: 0,
+    gameRunning: false,
+    keys: {}
+};
+
+function startPongGame() {
+    const canvas = document.getElementById('pong-canvas');
+    const ctx = canvas.getContext('2d');
+    
+    pongGame.canvas = canvas;
+    pongGame.ctx = ctx;
+    pongGame.leftPaddle.y = canvas.height / 2 - pongGame.paddleHeight / 2;
+    pongGame.rightPaddle.y = canvas.height / 2 - pongGame.paddleHeight / 2;
+    pongGame.ball.x = canvas.width / 2;
+    pongGame.ball.y = canvas.height / 2;
+    pongGame.ball.dx = 3;
+    pongGame.ball.dy = 2;
+    pongGame.leftScore = 0;
+    pongGame.rightScore = 0;
+    pongGame.gameRunning = true;
+    
+    document.getElementById('score-pong').textContent = '0 - 0';
+    
+    // Add event listeners
+    document.addEventListener('keydown', handlePongKeyDown);
+    document.addEventListener('keyup', handlePongKeyUp);
+    
+    // Start game loop
+    pongGameLoop();
+}
+
+function handlePongKeyDown(e) {
+    if (currentGame !== 'pong') return;
+    pongGame.keys[e.key] = true;
+}
+
+function handlePongKeyUp(e) {
+    if (currentGame !== 'pong') return;
+    pongGame.keys[e.key] = false;
+}
+
+function pongGameLoop() {
+    if (!pongGame.gameRunning) return;
+    
+    // Clear canvas
+    pongGame.ctx.fillStyle = '#000';
+    pongGame.ctx.fillRect(0, 0, pongGame.canvas.width, pongGame.canvas.height);
+    
+    // Move left paddle (W/S keys)
+    if (pongGame.keys['w'] && pongGame.leftPaddle.y > 0) {
+        pongGame.leftPaddle.y -= 5;
+    }
+    if (pongGame.keys['s'] && pongGame.leftPaddle.y < pongGame.canvas.height - pongGame.paddleHeight) {
+        pongGame.leftPaddle.y += 5;
+    }
+    
+    // Simple AI for right paddle
+    if (pongGame.ball.y < pongGame.rightPaddle.y + pongGame.paddleHeight / 2) {
+        pongGame.rightPaddle.y -= 3;
+    } else {
+        pongGame.rightPaddle.y += 3;
+    }
+    
+    // Move ball
+    pongGame.ball.x += pongGame.ball.dx;
+    pongGame.ball.y += pongGame.ball.dy;
+    
+    // Ball collision with top/bottom
+    if (pongGame.ball.y <= pongGame.ballRadius || pongGame.ball.y >= pongGame.canvas.height - pongGame.ballRadius) {
+        pongGame.ball.dy = -pongGame.ball.dy;
+    }
+    
+    // Ball collision with left paddle
+    if (pongGame.ball.x <= pongGame.paddleWidth + pongGame.ballRadius &&
+        pongGame.ball.y >= pongGame.leftPaddle.y &&
+        pongGame.ball.y <= pongGame.leftPaddle.y + pongGame.paddleHeight) {
+        pongGame.ball.dx = -pongGame.ball.dx;
+    }
+    
+    // Ball collision with right paddle
+    if (pongGame.ball.x >= pongGame.canvas.width - pongGame.paddleWidth - pongGame.ballRadius &&
+        pongGame.ball.y >= pongGame.rightPaddle.y &&
+        pongGame.ball.y <= pongGame.rightPaddle.y + pongGame.paddleHeight) {
+        pongGame.ball.dx = -pongGame.ball.dx;
+    }
+    
+    // Score
+    if (pongGame.ball.x < 0) {
+        pongGame.rightScore++;
+        resetBall();
+    } else if (pongGame.ball.x > pongGame.canvas.width) {
+        pongGame.leftScore++;
+        resetBall();
+    }
+    
+    // Draw paddles
+    pongGame.ctx.fillStyle = '#fff';
+    pongGame.ctx.fillRect(0, pongGame.leftPaddle.y, pongGame.paddleWidth, pongGame.paddleHeight);
+    pongGame.ctx.fillRect(pongGame.canvas.width - pongGame.paddleWidth, pongGame.rightPaddle.y, pongGame.paddleWidth, pongGame.paddleHeight);
+    
+    // Draw ball
+    pongGame.ctx.beginPath();
+    pongGame.ctx.arc(pongGame.ball.x, pongGame.ball.y, pongGame.ballRadius, 0, Math.PI * 2);
+    pongGame.ctx.fill();
+    
+    // Draw center line
+    pongGame.ctx.setLineDash([5, 5]);
+    pongGame.ctx.beginPath();
+    pongGame.ctx.moveTo(pongGame.canvas.width / 2, 0);
+    pongGame.ctx.lineTo(pongGame.canvas.width / 2, pongGame.canvas.height);
+    pongGame.ctx.stroke();
+    
+    // Update score
+    document.getElementById('score-pong').textContent = `${pongGame.leftScore} - ${pongGame.rightScore}`;
+    
+    requestAnimationFrame(pongGameLoop);
+}
+
+function resetBall() {
+    pongGame.ball.x = pongGame.canvas.width / 2;
+    pongGame.ball.y = pongGame.canvas.height / 2;
+    pongGame.ball.dx = -pongGame.ball.dx;
+}
+
+// Breakout Game Implementation
+let breakoutGame = {
+    canvas: null,
+    ctx: null,
+    paddle: { x: 0, y: 0, width: 80, height: 10 },
+    ball: { x: 0, y: 0, dx: 0, dy: 0, radius: 8 },
+    bricks: [],
+    score: 0,
+    gameRunning: false,
+    keys: {}
+};
+
+function startBreakoutGame() {
+    const canvas = document.getElementById('breakout-canvas');
+    const ctx = canvas.getContext('2d');
+    
+    breakoutGame.canvas = canvas;
+    breakoutGame.ctx = ctx;
+    breakoutGame.paddle.x = canvas.width / 2 - breakoutGame.paddle.width / 2;
+    breakoutGame.paddle.y = canvas.height - 20;
+    breakoutGame.ball.x = canvas.width / 2;
+    breakoutGame.ball.y = canvas.height - 40;
+    breakoutGame.ball.dx = 3;
+    breakoutGame.ball.dy = -3;
+    breakoutGame.score = 0;
+    breakoutGame.gameRunning = true;
+    
+    // Initialize bricks
+    breakoutGame.bricks = [];
+    const brickRows = 5;
+    const brickCols = 8;
+    const brickWidth = 50;
+    const brickHeight = 20;
+    
+    for (let row = 0; row < brickRows; row++) {
+        for (let col = 0; col < brickCols; col++) {
+            breakoutGame.bricks.push({
+                x: col * (brickWidth + 5) + 30,
+                y: row * (brickHeight + 5) + 50,
+                width: brickWidth,
+                height: brickHeight,
+                visible: true
+            });
+        }
+    }
+    
+    document.getElementById('score-breakout').textContent = '0';
+    
+    // Add event listeners
+    document.addEventListener('keydown', handleBreakoutKeyDown);
+    document.addEventListener('keyup', handleBreakoutKeyUp);
+    
+    // Start game loop
+    breakoutGameLoop();
+}
+
+function handleBreakoutKeyDown(e) {
+    if (currentGame !== 'breakout') return;
+    breakoutGame.keys[e.key] = true;
+}
+
+function handleBreakoutKeyUp(e) {
+    if (currentGame !== 'breakout') return;
+    breakoutGame.keys[e.key] = false;
+}
+
+function breakoutGameLoop() {
+    if (!breakoutGame.gameRunning) return;
+    
+    // Clear canvas
+    breakoutGame.ctx.fillStyle = '#2c3e50';
+    breakoutGame.ctx.fillRect(0, 0, breakoutGame.canvas.width, breakoutGame.canvas.height);
+    
+    // Move paddle
+    if (breakoutGame.keys['ArrowLeft'] && breakoutGame.paddle.x > 0) {
+        breakoutGame.paddle.x -= 7;
+    }
+    if (breakoutGame.keys['ArrowRight'] && breakoutGame.paddle.x < breakoutGame.canvas.width - breakoutGame.paddle.width) {
+        breakoutGame.paddle.x += 7;
+    }
+    
+    // Move ball
+    breakoutGame.ball.x += breakoutGame.ball.dx;
+    breakoutGame.ball.y += breakoutGame.ball.dy;
+    
+    // Ball collision with walls
+    if (breakoutGame.ball.x <= breakoutGame.ball.radius || breakoutGame.ball.x >= breakoutGame.canvas.width - breakoutGame.ball.radius) {
+        breakoutGame.ball.dx = -breakoutGame.ball.dx;
+    }
+    if (breakoutGame.ball.y <= breakoutGame.ball.radius) {
+        breakoutGame.ball.dy = -breakoutGame.ball.dy;
+    }
+    
+    // Ball collision with paddle
+    if (breakoutGame.ball.y >= breakoutGame.paddle.y - breakoutGame.ball.radius &&
+        breakoutGame.ball.x >= breakoutGame.paddle.x &&
+        breakoutGame.ball.x <= breakoutGame.paddle.x + breakoutGame.paddle.width) {
+        breakoutGame.ball.dy = -breakoutGame.ball.dy;
+    }
+    
+    // Ball collision with bricks
+    for (let brick of breakoutGame.bricks) {
+        if (brick.visible &&
+            breakoutGame.ball.x >= brick.x &&
+            breakoutGame.ball.x <= brick.x + brick.width &&
+            breakoutGame.ball.y >= brick.y &&
+            breakoutGame.ball.y <= brick.y + brick.height) {
+            brick.visible = false;
+            breakoutGame.ball.dy = -breakoutGame.ball.dy;
+            breakoutGame.score += 10;
+            document.getElementById('score-breakout').textContent = breakoutGame.score;
+        }
+    }
+    
+    // Check win condition
+    if (breakoutGame.bricks.every(brick => !brick.visible)) {
+        endBreakoutGame(true);
+        return;
+    }
+    
+    // Check lose condition
+    if (breakoutGame.ball.y > breakoutGame.canvas.height) {
+        endBreakoutGame(false);
+        return;
+    }
+    
+    // Draw paddle
+    breakoutGame.ctx.fillStyle = '#74b9ff';
+    breakoutGame.ctx.fillRect(breakoutGame.paddle.x, breakoutGame.paddle.y, breakoutGame.paddle.width, breakoutGame.paddle.height);
+    
+    // Draw ball
+    breakoutGame.ctx.fillStyle = '#fff';
+    breakoutGame.ctx.beginPath();
+    breakoutGame.ctx.arc(breakoutGame.ball.x, breakoutGame.ball.y, breakoutGame.ball.radius, 0, Math.PI * 2);
+    breakoutGame.ctx.fill();
+    
+    // Draw bricks
+    for (let brick of breakoutGame.bricks) {
+        if (brick.visible) {
+            breakoutGame.ctx.fillStyle = '#e74c3c';
+            breakoutGame.ctx.fillRect(brick.x, brick.y, brick.width, brick.height);
+        }
+    }
+    
+    requestAnimationFrame(breakoutGameLoop);
+}
+
+function endBreakoutGame(won) {
+    breakoutGame.gameRunning = false;
+    breakoutGame.ctx.fillStyle = '#fff';
+    breakoutGame.ctx.font = '24px Arial';
+    breakoutGame.ctx.textAlign = 'center';
+    if (won) {
+        breakoutGame.ctx.fillText('You Win!', breakoutGame.canvas.width/2, breakoutGame.canvas.height/2);
+    } else {
+        breakoutGame.ctx.fillText('Game Over!', breakoutGame.canvas.width/2, breakoutGame.canvas.height/2);
+    }
+    breakoutGame.ctx.fillText(`Score: ${breakoutGame.score}`, breakoutGame.canvas.width/2, breakoutGame.canvas.height/2 + 30);
 }
