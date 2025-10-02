@@ -1579,7 +1579,7 @@ function snakeGameLoop() {
 
 function endSnakeGame() {
     snakeGame.gameRunning = false;
-    snakeGame.ctx.fillStyle = '#fff';
+    snakeGame.ctx.fillStyle = '#f01212ff';
     snakeGame.ctx.font = '24px Arial';
     snakeGame.ctx.textAlign = 'center';
     snakeGame.ctx.fillText('Game Over!', snakeGame.canvas.width/2, snakeGame.canvas.height/2);
