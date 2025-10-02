@@ -124,7 +124,7 @@ async def get_location_name(lat: float, lon: float) -> str:
             (48.1351, 11.5820): "München",         # Germany
             (53.5511, 9.9937): "Hamburg",          # Germany
             (51.0504, 13.7373): "Dresden",         # Germany
-            (49.4521, 11.0767): "Neurenberg",      # Germany
+            (49.4521, 11.0767): "Nürnberg",        # Germany
             (45.0703, 7.6869): "Turijn",           # Italy
             (44.4949, 11.3426): "Bologna",         # Italy
             (40.8518, 14.2681): "Napels",          # Italy
@@ -702,4 +702,4 @@ async def get_languages():
     return {"languages": SUPPORTED_LANGUAGES}
 
 if __name__ == "__main__":
-    uvicorn.run("app:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run("app:app", host="0.0.0.0", port=80, reload=True)
