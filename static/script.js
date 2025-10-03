@@ -1160,28 +1160,49 @@ function updateScore2048() {
     document.getElementById('score-2048').textContent = game2048.score;
 }
 
+// Track game move in database
+async function trackGameMove(direction, score) {
+    try {
+        const formData = new FormData();
+        formData.append('direction', direction);
+        formData.append('score', score);
+        
+        await fetch('/api/track/move', {
+            method: 'POST',
+            body: formData
+        });
+    } catch (error) {
+        console.error('Error tracking move:', error);
+    }
+}
+
 function handle2048KeyPress(e) {
     if (currentGame !== '2048') return;
     
     let moved = false;
+    let direction = '';
     const originalGrid = [...game2048.grid];
     
     switch(e.key) {
         case 'ArrowUp':
             e.preventDefault();
             moved = moveUp2048();
+            direction = 'up';
             break;
         case 'ArrowDown':
             e.preventDefault();
             moved = moveDown2048();
+            direction = 'down';
             break;
         case 'ArrowLeft':
             e.preventDefault();
             moved = moveLeft2048();
+            direction = 'left';
             break;
         case 'ArrowRight':
             e.preventDefault();
             moved = moveRight2048();
+            direction = 'right';
             break;
     }
     
@@ -1189,6 +1210,9 @@ function handle2048KeyPress(e) {
         addRandomTile2048();
         render2048();
         updateScore2048();
+        
+        // Track the move in the database
+        trackGameMove(direction, game2048.score);
     }
 }
 

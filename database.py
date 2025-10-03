@@ -47,6 +47,31 @@ def init_database():
             )
         ''')
         
+        # Create game_moves table for tracking 2048 game moves
+        conn.execute('''
+            CREATE TABLE IF NOT EXISTS game_moves (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER,
+                direction TEXT NOT NULL,
+                score INTEGER DEFAULT 0,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE SET NULL
+            )
+        ''')
+        
+        # Create location_loads table for tracking location data loads
+        conn.execute('''
+            CREATE TABLE IF NOT EXISTS location_loads (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER,
+                latitude REAL NOT NULL,
+                longitude REAL NOT NULL,
+                location_name TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE SET NULL
+            )
+        ''')
+        
         conn.commit()
         print("✅ Database initialized successfully")
         
@@ -238,6 +263,120 @@ class SessionManager:
             
         except Exception as e:
             print(f"Error cleaning up sessions: {e}")
+
+
+class GameMoveTracker:
+    """Track game moves in database"""
+    
+    @staticmethod
+    def log_move(direction: str, score: int = 0, user_id: Optional[int] = None) -> bool:
+        """Log a game move to the database"""
+        try:
+            conn = get_db_connection()
+            conn.execute(
+                'INSERT INTO game_moves (user_id, direction, score) VALUES (?, ?, ?)',
+                (user_id, direction, score)
+            )
+            conn.commit()
+            conn.close()
+            return True
+            
+        except Exception as e:
+            print(f"Error logging game move: {e}")
+            return False
+    
+    @staticmethod
+    def get_move_statistics(user_id: Optional[int] = None) -> Dict[str, Any]:
+        """Get statistics about game moves"""
+        try:
+            conn = get_db_connection()
+            
+            if user_id:
+                result = conn.execute('''
+                    SELECT direction, COUNT(*) as count 
+                    FROM game_moves 
+                    WHERE user_id = ?
+                    GROUP BY direction
+                ''', (user_id,)).fetchall()
+            else:
+                result = conn.execute('''
+                    SELECT direction, COUNT(*) as count 
+                    FROM game_moves 
+                    GROUP BY direction
+                ''').fetchall()
+            
+            conn.close()
+            
+            stats = {row['direction']: row['count'] for row in result}
+            return stats
+            
+        except Exception as e:
+            print(f"Error getting move statistics: {e}")
+            return {}
+
+
+class LocationLoadTracker:
+    """Track location loads in database"""
+    
+    @staticmethod
+    def log_location_load(latitude: float, longitude: float, location_name: Optional[str] = None, 
+                         user_id: Optional[int] = None) -> bool:
+        """Log a location load to the database"""
+        try:
+            conn = get_db_connection()
+            conn.execute(
+                'INSERT INTO location_loads (user_id, latitude, longitude, location_name) VALUES (?, ?, ?, ?)',
+                (user_id, latitude, longitude, location_name)
+            )
+            conn.commit()
+            conn.close()
+            return True
+            
+        except Exception as e:
+            print(f"Error logging location load: {e}")
+            return False
+    
+    @staticmethod
+    def get_location_statistics(user_id: Optional[int] = None) -> Dict[str, Any]:
+        """Get statistics about location loads"""
+        try:
+            conn = get_db_connection()
+            
+            if user_id:
+                total_loads = conn.execute(
+                    'SELECT COUNT(*) as count FROM location_loads WHERE user_id = ?',
+                    (user_id,)
+                ).fetchone()['count']
+                
+                recent_loads = conn.execute('''
+                    SELECT latitude, longitude, location_name, created_at 
+                    FROM location_loads 
+                    WHERE user_id = ?
+                    ORDER BY created_at DESC 
+                    LIMIT 10
+                ''', (user_id,)).fetchall()
+            else:
+                total_loads = conn.execute(
+                    'SELECT COUNT(*) as count FROM location_loads'
+                ).fetchone()['count']
+                
+                recent_loads = conn.execute('''
+                    SELECT latitude, longitude, location_name, created_at 
+                    FROM location_loads 
+                    ORDER BY created_at DESC 
+                    LIMIT 10
+                ''').fetchall()
+            
+            conn.close()
+            
+            return {
+                'total_loads': total_loads,
+                'recent_loads': [dict(row) for row in recent_loads]
+            }
+            
+        except Exception as e:
+            print(f"Error getting location statistics: {e}")
+            return {'total_loads': 0, 'recent_loads': []}
 
 
 # Initialize database on import
