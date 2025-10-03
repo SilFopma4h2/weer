@@ -13,7 +13,7 @@ from cachetools import TTLCache
 import uvicorn
 
 # Import our authentication modules
-from database import init_database, UserManager, SessionManager
+from database import init_database, UserManager, SessionManager, GameMoveTracker, LocationLoadTracker
 from auth import get_current_user, validate_email, validate_password, sanitize_input
 from translations import get_weather_description as get_translated_weather_description, SUPPORTED_LANGUAGES
 
@@ -481,6 +481,10 @@ async def get_current_weather(request: Request, lat: Optional[float] = None, lon
         if not location_name:
             location_name = await get_location_name(lat, lon)
         
+        # Track this location load
+        user_id = user['id'] if user else None
+        LocationLoadTracker.log_location_load(lat, lon, location_name, user_id)
+        
         # Prepare display name - show readable name above coordinates if available
         if location_name and lat != DEFAULT_LAT and lon != DEFAULT_LON:
             display_name = f"{location_name}"
@@ -563,6 +567,10 @@ async def get_weather_forecast(request: Request, lat: Optional[float] = None, lo
         location_name = "Amsterdam" if lat == DEFAULT_LAT and lon == DEFAULT_LON else None
         if not location_name:
             location_name = await get_location_name(lat, lon)
+        
+        # Track this location load
+        user_id = user['id'] if user else None
+        LocationLoadTracker.log_location_load(lat, lon, location_name, user_id)
         
         # Prepare display name - show readable name above coordinates if available
         if location_name and lat != DEFAULT_LAT and lon != DEFAULT_LON:
@@ -695,6 +703,63 @@ async def health_check():
         "timestamp": datetime.now().isoformat(),
         "cache_size": len(cache)
     }
+
+
+@app.post("/api/track/move")
+async def track_game_move(request: Request, direction: str = Form(...), score: int = Form(default=0)):
+    """Track a game move (2048)"""
+    user = get_current_user(request)
+    user_id = user['id'] if user else None
+    
+    # Validate direction
+    if direction not in ['left', 'right', 'up', 'down']:
+        raise HTTPException(status_code=400, detail="Invalid direction")
+    
+    success = GameMoveTracker.log_move(direction, score, user_id)
+    
+    if success:
+        return {"status": "success", "message": "Move tracked"}
+    else:
+        raise HTTPException(status_code=500, detail="Failed to track move")
+
+
+@app.post("/api/track/location")
+async def track_location_load(
+    request: Request, 
+    latitude: float = Form(...), 
+    longitude: float = Form(...),
+    location_name: str = Form(default=None)
+):
+    """Track a location load"""
+    user = get_current_user(request)
+    user_id = user['id'] if user else None
+    
+    success = LocationLoadTracker.log_location_load(latitude, longitude, location_name, user_id)
+    
+    if success:
+        return {"status": "success", "message": "Location load tracked"}
+    else:
+        raise HTTPException(status_code=500, detail="Failed to track location load")
+
+
+@app.get("/api/stats/moves")
+async def get_move_stats(request: Request):
+    """Get game move statistics"""
+    user = get_current_user(request)
+    user_id = user['id'] if user else None
+    
+    stats = GameMoveTracker.get_move_statistics(user_id)
+    return {"stats": stats}
+
+
+@app.get("/api/stats/locations")
+async def get_location_stats(request: Request):
+    """Get location load statistics"""
+    user = get_current_user(request)
+    user_id = user['id'] if user else None
+    
+    stats = LocationLoadTracker.get_location_statistics(user_id)
+    return stats
 
 @app.get("/languages")
 async def get_languages():
