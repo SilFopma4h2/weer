@@ -187,7 +187,7 @@ const TRANSLATIONS = {
         "error_title": "⚠️ Fehler aufgetreten",
         "error_message": "Fehler beim Laden der Wetterdaten.",
         "close": "Schließen",
-        "try_again": "Erneut versuchen",
+        "try_again": "Erneut proberen",
         "use_location": "📍 Mein Standort verwenden",
         "determining_location": "📍 Standort bestimmen...",
         "unknown_weather": "unbekanntes Wetter",
@@ -701,6 +701,478 @@ class WeatherApp {
                 </div>
             `;
         }).join('');
+    }
+
+    updateCurrentWeather(data) {
+        document.getElementById('current-temp').textContent = data.temperature.current;
+        document.getElementById('feels-like').textContent = `${data.temperature.feels_like}°C`;
+        document.getElementById('min-max').textContent = `${data.temperature.min}° / ${data.temperature.max}°`;
+        document.getElementById('weather-description').textContent = data.weather.description;
+        
+        const locationElement = document.getElementById('location-name');
+        if (data.location.coords) {
+            locationElement.innerHTML = `<strong>${data.location.name}</strong><br><small>${data.location.coords}</small>`;
+        } else {
+            locationElement.textContent = data.location.name;
+        }
+        
+        document.getElementById('wind').textContent = `${data.wind.speed} km/h`;
+        document.getElementById('humidity').textContent = `${data.humidity}%`;
+        document.getElementById('clouds').textContent = `${data.clouds}%`;
+        
+        const precipitation = data.rain + data.snow;
+        document.getElementById('precipitation').textContent = precipitation > 0 ? `${precipitation.toFixed(1)} mm` : '0 mm';
+
+        const iconElement = document.getElementById('weather-icon');
+        const emojiIcon = this.getWeatherEmoji(data.weather.icon);
+        iconElement.src = `data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y="70" font-size="60" text-anchor="middle" x="50">${emojiIcon}</text></svg>`;
+        iconElement.alt = data.weather.description;
+    }
+
+    updateForecast24h(forecast) {
+        this.forecast24hElement.innerHTML = '';
+        
+        forecast.forEach(item => {
+            const forecastItem = document.createElement('div');
+            forecastItem.className = 'forecast-item';
+            
+            const time = new Date(item.datetime);
+            const timeString = time.toLocaleTimeString('en-US', { 
+                hour: 'numeric', 
+                minute: '2-digit',
+                hour12: true
+            });
+            
+            const emojiIcon = this.getWeatherEmoji(item.weather.icon);
+            
+            forecastItem.innerHTML = `
+                <div class="forecast-time">${timeString}</div>
+                <img class="forecast-icon" 
+                     src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='70' font-size='50' text-anchor='middle' x='50'>${emojiIcon}</text></svg>" 
+                     alt="${item.weather.description}">
+                <div class="forecast-temp">${item.temperature.temp}°</div>
+                <div class="forecast-desc">${item.weather.description}</div>
+                <div class="forecast-rain">${item.rain > 0 ? `${item.rain.toFixed(1)}mm` : ''}</div>
+            `;
+            
+            this.forecast24hElement.appendChild(forecastItem);
+        });
+    }
+
+    updateForecast7d(forecast) {
+        this.forecast7dElement.innerHTML = '';
+        
+        forecast.forEach(item => {
+            const forecastDay = document.createElement('div');
+            forecastDay.className = 'forecast-day';
+            
+            const date = new Date(item.datetime);
+            const dayName = date.toLocaleDateString('nl-NL', { 
+                weekday: 'long',
+                month: 'short',
+                day: 'numeric'
+            });
+            
+            const emojiIcon = this.getWeatherEmoji(item.weather.icon);
+            
+            forecastDay.innerHTML = `
+                <div class="forecast-day-info">
+                    <div class="forecast-day-name">${this.capitalizeFirst(dayName)}</div>
+                    <img class="forecast-day-icon" 
+                         src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='70' font-size='50' text-anchor='middle' x='50'>${emojiIcon}</text></svg>" 
+                         alt="${item.weather.description}">
+                    <div class="forecast-day-desc">${item.weather.description}</div>
+                </div>
+                <div class="forecast-day-temp">
+                    <strong>${item.temperature.max}°</strong> / ${item.temperature.min}°
+                </div>
+            `;
+            
+            this.forecast7dElement.appendChild(forecastDay);
+        });
+    }
+
+    updateAlerts(alerts) {
+        if (!alerts || alerts.length === 0) {
+            this.alertsElement.innerHTML = '<p class="no-alerts">Geen actuele waarschuwingen</p>';
+            return;
+        }
+
+        this.alertsElement.innerHTML = '';
+        
+        alerts.forEach(alert => {
+            const alertItem = document.createElement('div');
+            alertItem.className = 'alert-item';
+            
+            alertItem.innerHTML = `
+                <div class="alert-severity">${alert.severity}</div>
+                <div class="alert-description">${alert.description}</div>
+                <div class="alert-time">Geldig tot: ${new Date(alert.end).toLocaleString('nl-NL')}</div>
+            `;
+            
+            this.alertsElement.appendChild(alertItem);
+        });
+    }
+
+    updateLastUpdate() {
+        const now = new Date();
+        const timeString = now.toLocaleTimeString('nl-NL', {
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
+        });
+        this.lastUpdateElement.textContent = timeString;
+    }
+
+    showLoading() {
+        if (this.loadingElement) this.loadingElement.style.display = 'block';
+        if (this.currentWeatherElement) this.currentWeatherElement.style.display = 'none';
+    }
+
+    hideLoading() {
+        if (this.loadingElement) this.loadingElement.style.display = 'none';
+        if (this.currentWeatherElement) this.currentWeatherElement.style.display = 'block';
+    }
+
+    refreshWeatherData() {
+        this.refreshBtn.disabled = true;
+        this.refreshBtn.innerHTML = '🔄 Laden...';
+        
+        const lat = this.userLocation ? this.userLocation.lat : null;
+        const lon = this.userLocation ? this.userLocation.lon : null;
+        
+        this.loadWeatherData(true, lat, lon).finally(() => {
+            setTimeout(() => {
+                this.refreshBtn.disabled = false;
+                this.refreshBtn.innerHTML = '🔄 Vernieuwen';
+            }, 1000);
+        });
+    }
+
+    showError(message) {
+        this.errorMessage.textContent = message;
+        this.errorModal.style.display = 'flex';
+    }
+
+    closeErrorModal() {
+        this.errorModal.style.display = 'none';
+    }
+
+    capitalizeFirst(str) {
+        return str.charAt(0).toUpperCase() + str.slice(1);
+    }
+
+    getWeatherEmoji(iconCode) {
+        const iconMap = {
+            '01d': '☀️',
+            '01n': '🌙',
+            '02d': '⛅',
+            '02n': '☁️',
+            '03d': '☁️',
+            '03n': '☁️',
+            '04d': '☁️',
+            '04n': '☁️',
+            '09d': '🌦️',
+            '09n': '🌦️',
+            '10d': '🌧️',
+            '10n': '🌧️',
+            '11d': '⛈️',
+            '11n': '⛈️',
+            '13d': '❄️',
+            '13n': '❄️',
+            '50d': '🌫️',
+            '50n': '🌫️'
+        };
+        
+        return iconMap[iconCode] || '☁️';
+    }
+
+    updateFishingConditions() {
+        const currentTemp = document.getElementById('current-temp')?.textContent || '15';
+        const windSpeed = document.getElementById('wind')?.textContent?.replace(' km/h', '') || '10';
+        const clouds = document.getElementById('clouds')?.textContent?.replace('%', '') || '50';
+        const humidity = document.getElementById('humidity')?.textContent?.replace('%', '') || '60';
+        const precipitation = document.getElementById('precipitation')?.textContent?.replace(' mm', '') || '0';
+
+        const fishingData = this.calculateFishingConditions({
+            temperature: parseInt(currentTemp),
+            windSpeed: parseInt(windSpeed),
+            clouds: parseInt(clouds),
+            humidity: parseInt(humidity),
+            precipitation: parseFloat(precipitation)
+        });
+
+        this.displayFishingConditions(fishingData);
+        this.displayFishingForecast();
+    }
+
+    calculateFishingConditions(weather) {
+        let score = 0;
+        let factors = [];
+
+        const temp = weather.temperature;
+        let tempScore = 0;
+        let tempStatus = '';
+        if (temp >= 15 && temp <= 25) {
+            tempScore = 25;
+            tempStatus = 'Ideaal voor vissen';
+        } else if (temp >= 10 && temp < 15 || temp > 25 && temp <= 30) {
+            tempScore = 15;
+            tempStatus = 'Goed voor vissen';
+        } else if (temp >= 5 && temp < 10 || temp > 30 && temp <= 35) {
+            tempScore = 10;
+            tempStatus = 'Matig voor vissen';
+        } else {
+            tempScore = 5;
+            tempStatus = 'Moeilijke omstandigheden';
+        }
+        
+        factors.push({
+            icon: '🌡️',
+            name: 'Temperatuur',
+            value: `${temp}°C`,
+            status: tempStatus
+        });
+
+        const wind = weather.windSpeed;
+        let windScore = 0;
+        let windStatus = '';
+        if (wind >= 5 && wind <= 15) {
+            windScore = 25;
+            windStatus = 'Perfect voor vissen';
+        } else if (wind >= 0 && wind < 5 || wind > 15 && wind <= 25) {
+            windScore = 15;
+            windStatus = 'Acceptabel';
+        } else if (wind > 25 && wind <= 35) {
+            windScore = 10;
+            windStatus = 'Te winderig';
+        } else {
+            windScore = 5;
+            windStatus = 'Zeer moeilijk';
+        }
+        
+        factors.push({
+            icon: '💨',
+            name: 'Wind',
+            value: `${wind} km/h`,
+            status: windStatus
+        });
+
+        const cloudCover = weather.clouds;
+        let cloudScore = 0;
+        let cloudStatus = '';
+        if (cloudCover >= 50 && cloudCover <= 80) {
+            cloudScore = 20;
+            cloudStatus = 'Ideaal bewolkt';
+        } else if (cloudCover >= 30 && cloudCover < 50 || cloudCover > 80 && cloudCover <= 95) {
+            cloudScore = 15;
+            cloudStatus = 'Goed';
+        } else if (cloudCover < 30) {
+            cloudScore = 10;
+            cloudStatus = 'Te zonnig';
+        } else {
+            cloudScore = 8;
+            cloudStatus = 'Te bewolkt';
+        }
+        
+        factors.push({
+            icon: '☁️',
+            name: 'Bewolking',
+            value: `${cloudCover}%`,
+            status: cloudStatus
+        });
+
+        const rain = weather.precipitation;
+        let rainScore = 0;
+        let rainStatus = '';
+        if (rain === 0) {
+            rainScore = 15;
+            rainStatus = 'Droog weer';
+        } else if (rain > 0 && rain <= 2) {
+            rainScore = 20;
+            rainStatus = 'Lichte regen - goed!';
+        } else if (rain > 2 && rain <= 5) {
+            rainScore = 10;
+            rainStatus = 'Matige regen';
+        } else {
+            rainScore = 5;
+            rainStatus = 'Teveel regen';
+        }
+        
+        factors.push({
+            icon: '🌧️',
+            name: 'Neerslag',
+            value: rain > 0 ? `${rain} mm` : 'Geen',
+            status: rainStatus
+        });
+
+        const humid = weather.humidity;
+        let humidScore = 0;
+        let humidStatus = '';
+        if (humid >= 60 && humid <= 80) {
+            humidScore = 10;
+            humidStatus = 'Ideaal vochtig';
+        } else if (humid >= 50 && humid < 60 || humid > 80 && humid <= 90) {
+            humidScore = 8;
+            humidStatus = 'Acceptabel';
+        } else {
+            humidScore = 5;
+            humidStatus = humid < 50 ? 'Te droog' : 'Te vochtig';
+        }
+        
+        factors.push({
+            icon: '💧',
+            name: 'Luchtvochtigheid',
+            value: `${humid}%`,
+            status: humidStatus
+        });
+
+        score = tempScore + windScore + cloudScore + rainScore + humidScore;
+        
+        let rating = '';
+        let description = '';
+        if (score >= 80) {
+            rating = 'Uitstekend';
+            description = 'Perfect weer om te gaan vissen!';
+        } else if (score >= 60) {
+            rating = 'Goed';
+            description = 'Goede omstandigheden voor het vissen.';
+        } else if (score >= 40) {
+            rating = 'Matig';
+            description = 'Redelijke omstandigheden.';
+        } else {
+            rating = 'Slecht';
+            description = 'Moeilijke omstandigheden.';
+        }
+
+        return {
+            score: score,
+            rating: rating,
+            description: description,
+            factors: factors
+        };
+    }
+
+    displayFishingConditions(fishingData) {
+        const fishingDataElement = document.getElementById('fishing-data');
+        if (!fishingDataElement) return;
+
+        let scoreColor = '';
+        if (fishingData.score >= 80) scoreColor = '#00b894';
+        else if (fishingData.score >= 60) scoreColor = '#74b9ff';
+        else if (fishingData.score >= 40) scoreColor = '#fdcb6e';
+        else scoreColor = '#e17055';
+
+        fishingDataElement.innerHTML = `
+            <div class="fishing-overview">
+                <div class="fishing-score" style="background: linear-gradient(135deg, ${scoreColor}, ${scoreColor}aa);">
+                    <div class="score-value">${fishingData.score}</div>
+                    <div class="score-label">${fishingData.rating}</div>
+                    <div class="score-description">${fishingData.description}</div>
+                </div>
+            </div>
+            
+            <div class="fishing-factors">
+                ${fishingData.factors.map(factor => `
+                    <div class="fishing-factor">
+                        <div class="factor-icon">${factor.icon}</div>
+                        <div class="factor-info">
+                            <h4>${factor.name}</h4>
+                            <p class="factor-value">${factor.value}</p>
+                            <p class="factor-status">${factor.status}</p>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+    }
+
+    displayFishingForecast() {
+        const forecastElement = document.getElementById('fishing-forecast-data');
+        if (!forecastElement) return;
+
+        const days = [
+            { name: 'Morgen', temp: 18, wind: 12, rain: 0, clouds: 60 },
+            { name: 'Overmorgen', temp: 22, wind: 8, rain: 1, clouds: 40 },
+            { name: 'Woensdag', temp: 16, wind: 15, rain: 3, clouds: 80 },
+            { name: 'Donderdag', temp: 20, wind: 6, rain: 0, clouds: 30 },
+            { name: 'Vrijdag', temp: 24, wind: 18, rain: 0, clouds: 20 }
+        ];
+
+        const forecastHTML = days.map(day => {
+            const conditions = this.calculateFishingConditions({
+                temperature: day.temp,
+                windSpeed: day.wind,
+                clouds: day.clouds,
+                humidity: 65,
+                precipitation: day.rain
+            });
+
+            let ratingClass = '';
+            if (conditions.score >= 80) ratingClass = 'excellent';
+            else if (conditions.score >= 60) ratingClass = 'good';
+            else if (conditions.score >= 40) ratingClass = 'fair';
+            else ratingClass = 'poor';
+
+            return `
+                <div class="fishing-forecast-day ${ratingClass}">
+                    <div class="fishing-day-info">
+                        <div class="fishing-day-name">${day.name}</div>
+                        <div class="fishing-score-badge ${ratingClass}">${conditions.score}</div>
+                        <div class="fishing-conditions-summary">
+                            ${day.wind} km/h wind, ${day.clouds}% bewolkt
+                            ${day.rain > 0 ? `, ${day.rain}mm regen` : ''}
+                        </div>
+                    </div>
+                    <div class="fishing-weather-summary">
+                        <div class="fishing-temp">${day.temp}°C</div>
+                        <div class="fishing-weather-desc">${conditions.rating}</div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        forecastElement.innerHTML = forecastHTML;
+    }
+
+    async getUserLocation() {
+        return new Promise((resolve, reject) => {
+            if (!navigator.geolocation) {
+                reject(new Error('Geolocatie wordt niet ondersteund'));
+                return;
+            }
+
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    resolve({
+                        lat: position.coords.latitude,
+                        lon: position.coords.longitude
+                    });
+                },
+                (error) => {
+                    let errorMessage = 'Kon locatie niet bepalen';
+                    
+                    switch(error.code) {
+                        case error.PERMISSION_DENIED:
+                            errorMessage = 'Locatietoegang geweigerd.';
+                            break;
+                        case error.POSITION_UNAVAILABLE:
+                            errorMessage = 'Locatie niet beschikbaar.';
+                            break;
+                        case error.TIMEOUT:
+                            errorMessage = 'Time-out bij bepalen locatie.';
+                            break;
+                    }
+                    
+                    reject(new Error(errorMessage));
+                },
+                {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 300000
+                }
+            );
+        });
     }
 }
 
