@@ -1048,3 +1048,12 @@ async def get_air_quality_history(request: Request, lat: Optional[float] = None,
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error fetching air quality history: {str(e)}")
+
+if __name__ == "__main__":
+    uvicorn.run(
+        "app:app",
+        host="127.0.0.1",
+        port=8000,
+        reload=True,
+        log_level="info"
+    )
