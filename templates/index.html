@@ -35,6 +35,7 @@
                 <div class="nav-buttons">
                     <button class="nav-btn active" data-tab="today" data-translate="nav_today">🌤️ Vandaag</button>
                     <button class="nav-btn" data-tab="week" data-translate="nav_week">📅 Week</button>
+                    <button class="nav-btn" data-tab="air" data-translate="nav_air">💨 Luchtkwaliteit</button>
                     <button class="nav-btn" data-tab="radar" data-translate="nav_radar">🌧️ Radar</button>
                     <button class="nav-btn" data-tab="fishing" data-translate="nav_fishing">🎣 Vissen</button>
                     <button class="nav-btn" data-tab="games" data-translate="nav_games">🎮 Games</button>
@@ -106,6 +107,53 @@
                     <h2 data-translate="forecast_7d">7 Dagen Voorspelling</h2>
                     <div id="forecast-7d-data" class="forecast-list">
                         <!-- Will be populated by JavaScript -->
+                    </div>
+                </section>
+            </div>
+
+            <!-- Air Quality Tab -->
+            <div id="tab-air" class="tab-content">
+                <!-- Air Quality Section -->
+                <section id="air-quality" class="weather-card">
+                    <h2 data-translate="air_quality">💨 Luchtkwaliteit</h2>
+                    <div id="loading-aqi" class="loading">
+                        <div class="spinner"></div>
+                        <p data-translate="loading">Luchtkwaliteitsdata laden...</p>
+                    </div>
+                    <div id="air-quality-data" style="display: none;">
+                        <!-- AQI Overview -->
+                        <div class="aqi-overview">
+                            <div id="aqi-score" class="aqi-score">
+                                <div class="aqi-value">--</div>
+                                <div class="aqi-level">--</div>
+                                <div class="aqi-color-bar"></div>
+                            </div>
+                            <div id="aqi-info" class="aqi-info">
+                                <p id="aqi-recommendation"></p>
+                                <p id="aqi-location" class="aqi-location"></p>
+                                <p id="aqi-time" class="aqi-time"></p>
+                            </div>
+                        </div>
+
+                        <!-- Pollutants Grid -->
+                        <div class="pollutants-grid">
+                            <div id="pollutants-container">
+                                <!-- Will be populated by JavaScript -->
+                            </div>
+                        </div>
+
+                        <!-- Health Warnings -->
+                        <div id="aqi-warnings" class="aqi-warnings">
+                            <!-- Will be populated by JavaScript -->
+                        </div>
+
+                        <!-- Historical Data -->
+                        <section id="aqi-history-section" class="aqi-history-section" style="display: none;">
+                            <h3 data-translate="aqi_history">📊 Luchtkwaliteit Geschiedenis</h3>
+                            <div id="aqi-history-chart" class="aqi-history-chart">
+                                <!-- Will be populated by JavaScript -->
+                            </div>
+                        </section>
                     </div>
                 </section>
             </div>

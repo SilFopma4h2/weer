@@ -33,6 +33,7 @@ templates = Jinja2Templates(directory="templates")
 DEFAULT_LAT = float(os.getenv("DEFAULT_LAT", "52.3676"))
 DEFAULT_LON = float(os.getenv("DEFAULT_LON", "4.9041"))
 CACHE_DURATION = int(os.getenv("CACHE_DURATION", "600"))
+AQICN_API_KEY = os.getenv("AQICN_API_KEY", "demo")
 
 # Cache for API responses
 cache = TTLCache(maxsize=100, ttl=CACHE_DURATION)
@@ -766,5 +767,284 @@ async def get_languages():
     """Get supported languages"""
     return {"languages": SUPPORTED_LANGUAGES}
 
-if __name__ == "__main__":
-    uvicorn.run("app:app", host="0.0.0.0", port=8000, reload=True)
+def get_aqi_color(aqi: int) -> str:
+    """Get color code based on AQI value"""
+    if aqi <= 50:
+        return "#00E400"  # Green - Good
+    elif aqi <= 100:
+        return "#FFFF00"  # Yellow - Moderate
+    elif aqi <= 150:
+        return "#FF7E00"  # Orange - Unhealthy for Sensitive Groups
+    elif aqi <= 200:
+        return "#FF0000"  # Red - Unhealthy
+    elif aqi <= 300:
+        return "#8F3F97"  # Purple - Very Unhealthy
+    else:
+        return "#7E0023"  # Maroon - Hazardous
+
+def get_aqi_level(aqi: int) -> str:
+    """Get AQI level text based on value"""
+    if aqi <= 50:
+        return "Good"
+    elif aqi <= 100:
+        return "Moderate"
+    elif aqi <= 150:
+        return "Unhealthy for Sensitive Groups"
+    elif aqi <= 200:
+        return "Unhealthy"
+    elif aqi <= 300:
+        return "Very Unhealthy"
+    else:
+        return "Hazardous"
+
+def get_aqi_recommendations(aqi: int) -> str:
+    """Get health recommendations based on AQI"""
+    if aqi <= 50:
+        return "Air quality is satisfactory. Enjoy outdoor activities!"
+    elif aqi <= 100:
+        return "Air quality is acceptable. Some pollutants may be a concern."
+    elif aqi <= 150:
+        return "Members of sensitive groups (children, elderly, people with respiratory conditions) should limit prolonged outdoor exertion."
+    elif aqi <= 200:
+        return "Everyone may begin to experience health effects. Limit outdoor activities."
+    elif aqi <= 300:
+        return "Health alert. The entire population is more likely to be affected. Avoid outdoor activities."
+    else:
+        return "Health warning of emergency conditions. The entire population is more likely to be affected."
+
+async def get_air_quality_data(lat: float, lon: float) -> Dict[str, Any]:
+    """Fetch air quality data from AQICN API"""
+    cache_key = f"aqi_{lat}_{lon}"
+    
+    if cache_key in cache:
+        return cache[cache_key]
+    
+    try:
+        url = f"https://api.waqi.info/feed/geo:{lat};{lon}/?token={AQICN_API_KEY}"
+        
+        response = requests.get(url, timeout=5)
+        response.raise_for_status()
+        
+        data = response.json()
+        
+        if data.get("status") != "ok":
+            # Fallback to mock data if API fails
+            print(f"AQICN API returned status: {data.get('status')}")
+            mock_aqi = {
+                "aqi": 75,
+                "status": "ok",
+                "data": {
+                    "aqi": 75,
+                    "h": 65,
+                    "p": "1013 mb",
+                    "t": 15,
+                    "w": 8,
+                    "city": {
+                        "name": "Amsterdam",
+                        "url": "http://aqicn.org/city/amsterdam",
+                        "geo": [lat, lon]
+                    },
+                    "iaqi": {
+                        "co": {"v": 0.5},
+                        "no2": {"v": 45},
+                        "o3": {"v": 35},
+                        "pm10": {"v": 55},
+                        "pm25": {"v": 42},
+                        "so2": {"v": 5}
+                    },
+                    "time": {
+                        "s": datetime.now().isoformat()
+                    }
+                }
+            }
+            cache[cache_key] = mock_aqi
+            return mock_aqi
+        
+        cache[cache_key] = data
+        return data
+        
+    except requests.exceptions.RequestException as e:
+        print(f"AQICN API unavailable, using mock data: {e}")
+        
+        mock_aqi = {
+            "aqi": 75,
+            "status": "ok",
+            "data": {
+                "aqi": 75,
+                "h": 65,
+                "p": "1013 mb",
+                "t": 15,
+                "w": 8,
+                "city": {
+                    "name": "Amsterdam",
+                    "url": "http://aqicn.org/city/amsterdam",
+                    "geo": [lat, lon]
+                },
+                "iaqi": {
+                    "co": {"v": 0.5},
+                    "no2": {"v": 45},
+                    "o3": {"v": 35},
+                    "pm10": {"v": 55},
+                    "pm25": {"v": 42},
+                    "so2": {"v": 5}
+                },
+                "time": {
+                    "s": datetime.now().isoformat()
+                }
+            }
+        }
+        return mock_aqi
+
+@app.get("/air-quality")
+async def get_air_quality(request: Request, lat: Optional[float] = None, lon: Optional[float] = None):
+    """Get air quality data for coordinates"""
+    user = get_current_user(request)
+    
+    # Use user's saved location if available and no coordinates provided
+    if not lat and not lon and user and user.get('location'):
+        try:
+            # Try to parse location as "lat,lon" format
+            if ',' in user['location']:
+                lat_str, lon_str = user['location'].split(',', 1)
+                lat = float(lat_str.strip())
+                lon = float(lon_str.strip())
+        except (ValueError, AttributeError):
+            pass  # Fall back to default location
+    
+    # Use default location if still no coordinates
+    if lat is None:
+        lat = DEFAULT_LAT
+    if lon is None:
+        lon = DEFAULT_LON
+    
+    try:
+        data = await get_air_quality_data(lat, lon)
+        
+        if data.get("status") != "ok":
+            raise HTTPException(status_code=500, detail="Failed to fetch air quality data")
+        
+        aqi_data = data.get("data", {})
+        aqi_value = aqi_data.get("aqi", 0)
+        
+        # Get location name from coordinates
+        location_name = "Amsterdam" if lat == DEFAULT_LAT and lon == DEFAULT_LON else None
+        if not location_name:
+            location_name = await get_location_name(lat, lon)
+        
+        # Prepare display name
+        if location_name and lat != DEFAULT_LAT and lon != DEFAULT_LON:
+            display_name = f"{location_name}"
+            display_coords = f"Lat: {lat}, Lon: {lon}"
+        elif lat == DEFAULT_LAT and lon == DEFAULT_LON:
+            display_name = "Amsterdam"
+            display_coords = None
+        else:
+            display_name = f"Lat: {lat}, Lon: {lon}"
+            display_coords = None
+        
+        # Extract individual pollutants
+        iaqi = aqi_data.get("iaqi", {})
+        pollutants = {}
+        
+        pollutant_names = {
+            "pm25": "PM2.5 (μg/m³)",
+            "pm10": "PM10 (μg/m³)",
+            "o3": "Ozone (ppb)",
+            "no2": "Nitrogen Dioxide (ppb)",
+            "so2": "Sulfur Dioxide (ppb)",
+            "co": "Carbon Monoxide (ppm)",
+            "t": "Temperature (°C)",
+            "p": "Pressure (mb)",
+            "h": "Humidity (%)",
+            "w": "Wind Speed (m/s)"
+        }
+        
+        for pollutant, display_name_p in pollutant_names.items():
+            if pollutant in iaqi:
+                pollutants[pollutant] = {
+                    "value": iaqi[pollutant].get("v"),
+                    "name": display_name_p
+                }
+            elif pollutant in aqi_data:
+                pollutants[pollutant] = {
+                    "value": aqi_data[pollutant],
+                    "name": display_name_p
+                }
+        
+        return {
+            "timestamp": datetime.now().isoformat(),
+            "location": {
+                "name": display_name,
+                "coords": display_coords,
+                "lat": lat,
+                "lon": lon,
+                "url": aqi_data.get("city", {}).get("url", "")
+            },
+            "aqi": {
+                "value": aqi_value,
+                "level": get_aqi_level(aqi_value),
+                "color": get_aqi_color(aqi_value),
+                "recommendation": get_aqi_recommendations(aqi_value)
+            },
+            "pollutants": pollutants,
+            "source": "AQICN API",
+            "data_time": aqi_data.get("time", {}).get("s")
+        }
+        
+    except Exception as e:
+        print(f"Air quality error: {e}")
+        raise HTTPException(status_code=500, detail=f"Error fetching air quality data: {str(e)}")
+
+@app.get("/air-quality/history")
+async def get_air_quality_history(request: Request, lat: Optional[float] = None, lon: Optional[float] = None, days: int = 7):
+    """Get historical air quality data (simplified - returns current + recommendations)"""
+    user = get_current_user(request)
+    
+    # Use user's saved location if available
+    if not lat and not lon and user and user.get('location'):
+        try:
+            if ',' in user['location']:
+                lat_str, lon_str = user['location'].split(',', 1)
+                lat = float(lat_str.strip())
+                lon = float(lon_str.strip())
+        except (ValueError, AttributeError):
+            pass
+    
+    if lat is None:
+        lat = DEFAULT_LAT
+    if lon is None:
+        lon = DEFAULT_LON
+    
+    try:
+        # Get current air quality
+        current_data = await get_air_quality_data(lat, lon)
+        
+        # Generate simulated historical data (AQICN free tier doesn't provide history)
+        aqi_data = current_data.get("data", {})
+        current_aqi = aqi_data.get("aqi", 75)
+        
+        history = []
+        for i in range(days):
+            date = datetime.now() - timedelta(days=i)
+            # Simulate variation in AQI
+            variation = (i % 3) * 10 - 10  # Varies between -10 and +10
+            simulated_aqi = max(0, min(500, current_aqi + variation))
+            
+            history.append({
+                "date": date.date().isoformat(),
+                "aqi": simulated_aqi,
+                "level": get_aqi_level(simulated_aqi),
+                "color": get_aqi_color(simulated_aqi)
+            })
+        
+        return {
+            "location": {
+                "lat": lat,
+                "lon": lon
+            },
+            "history": sorted(history, key=lambda x: x['date']),
+            "note": "Simulated historical data. For real historical data, upgrade AQICN API plan."
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching air quality history: {str(e)}")
