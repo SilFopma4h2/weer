@@ -1138,38 +1138,47 @@ class WeatherApp {
     async getUserLocation() {
         return new Promise((resolve, reject) => {
             if (!navigator.geolocation) {
-                reject(new Error('Geolocatie wordt niet ondersteund'));
+                reject(new Error('Geolocatie wordt niet ondersteund door deze browser'));
                 return;
             }
 
+            const timeout = setTimeout(() => {
+                reject(new Error('Locatiebepaling duurde te lang. Probeer het opnieuw of voer handmatig coördinaten in.'));
+            }, 15000); // 15 second timeout
+
             navigator.geolocation.getCurrentPosition(
                 (position) => {
+                    clearTimeout(timeout);
                     resolve({
                         lat: position.coords.latitude,
                         lon: position.coords.longitude
                     });
                 },
                 (error) => {
+                    clearTimeout(timeout);
                     let errorMessage = 'Kon locatie niet bepalen';
                     
                     switch(error.code) {
                         case error.PERMISSION_DENIED:
-                            errorMessage = 'Locatietoegang geweigerd.';
+                            errorMessage = 'Locatietoegang geweigerd. Controleer de instellingen van uw browser.';
                             break;
                         case error.POSITION_UNAVAILABLE:
-                            errorMessage = 'Locatie niet beschikbaar.';
+                            errorMessage = 'Locatie niet beschikbaar. Zorg dat GPS/locatiediensten ingeschakeld zijn.';
                             break;
                         case error.TIMEOUT:
-                            errorMessage = 'Time-out bij bepalen locatie.';
+                            errorMessage = 'Timeout bij bepalen van locatie. Probeer het opnieuw.';
+                            break;
+                        default:
+                            errorMessage = 'Onbekende fout: ' + error.message;
                             break;
                     }
                     
                     reject(new Error(errorMessage));
                 },
                 {
-                    enableHighAccuracy: true,
-                    timeout: 10000,
-                    maximumAge: 300000
+                    enableHighAccuracy: false,  // Changed to false for faster results
+                    timeout: 12000,              // Increased timeout
+                    maximumAge: 0                // Don't use cached location
                 }
             );
         });
@@ -1222,25 +1231,35 @@ document.addEventListener('DOMContentLoaded', () => {
                 window.weatherApp.userLocation = location;
                 
                 // Load weather data with GPS coordinates
-                window.weatherApp.loadWeatherData(true, location.lat, location.lon);
+                await window.weatherApp.loadWeatherData(true, location.lat, location.lon);
+                
+                // Show success message
+                locationBtn.innerHTML = '✅ Locatie ingesteld';
+                setTimeout(() => {
+                    locationBtn.innerHTML = window.weatherApp ? window.weatherApp.translate('use_location') : '📍 Gebruik mijn locatie';
+                    locationBtn.disabled = false;
+                }, 2000);
                 
             } catch (error) {
                 console.error('Geolocation error:', error);
                 window.weatherApp.showError(error.message);
-            } finally {
                 locationBtn.disabled = false;
                 locationBtn.innerHTML = window.weatherApp ? window.weatherApp.translate('use_location') : '📍 Gebruik mijn locatie';
             }
         });
         
         locationBtn.addEventListener('mouseenter', () => {
-            locationBtn.style.background = 'rgba(255, 255, 255, 0.3)';
-            locationBtn.style.borderColor = 'rgba(255, 255, 255, 0.5)';
+            if (!locationBtn.disabled) {
+                locationBtn.style.background = 'rgba(255, 255, 255, 0.3)';
+                locationBtn.style.borderColor = 'rgba(255, 255, 255, 0.5)';
+            }
         });
         
         locationBtn.addEventListener('mouseleave', () => {
-            locationBtn.style.background = 'rgba(255, 255, 255, 0.2)';
-            locationBtn.style.borderColor = 'rgba(255, 255, 255, 0.3)';
+            if (!locationBtn.disabled) {
+                locationBtn.style.background = 'rgba(255, 255, 255, 0.2)';
+                locationBtn.style.borderColor = 'rgba(255, 255, 255, 0.3)';
+            }
         });
         
         header.appendChild(locationBtn);
