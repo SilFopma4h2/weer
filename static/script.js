@@ -1145,7 +1145,7 @@ function addRandomTile2048() {
         const randomIndex = emptyCells[Math.floor(Math.random() * emptyCells.length)];
         game2048.grid[randomIndex] = Math.random() < 0.9 ? 2 : 4;
     }
-}
+}+
 
 function render2048() {
     const cells = document.querySelectorAll('#grid-2048 .grid-cell');
@@ -1904,3 +1904,4 @@ function endBreakoutGame(won) {
     }
     breakoutGame.ctx.fillText(`Score: ${breakoutGame.score}`, breakoutGame.canvas.width/2, breakoutGame.canvas.height/2 + 30);
 }
+console.log('Weather app script loaded');
