@@ -11,6 +11,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 from cachetools import TTLCache
 import uvicorn
+import subprocess
+import time
+import json
 
 # Import our authentication modules
 from database import init_database, UserManager, SessionManager, GameMoveTracker, LocationLoadTracker
@@ -37,6 +40,10 @@ AQICN_API_KEY = os.getenv("AQICN_API_KEY", "demo")
 
 # Cache for API responses
 cache = TTLCache(maxsize=100, ttl=CACHE_DURATION)
+
+# Ngrok and Discord configuration
+NGROK_AUTH_TOKEN = os.getenv("NGROK_AUTH_TOKEN", "")
+DISCORD_WEBHOOK_URL = os.getenv("DISCORD_WEBHOOK_URL", "")
 
 def get_weather_description(weather_code: int, language: str = "nl") -> str:
     """Get weather description from Open-Meteo weather code in specified language"""
@@ -1049,11 +1056,157 @@ async def get_air_quality_history(request: Request, lat: Optional[float] = None,
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error fetching air quality history: {str(e)}")
 
+def start_ngrok(port: int = 8000) -> Optional[str]:
+    """Start ngrok tunnel and return public URL"""
+    try:
+        import pyngrok
+        from pyngrok import ngrok
+        
+        # Set auth token if available
+        if NGROK_AUTH_TOKEN:
+            ngrok.set_auth_token(NGROK_AUTH_TOKEN)
+        
+        try:
+            # Start ngrok tunnel (non-blocking)
+            public_url = ngrok.connect(port, "http")
+            
+            # Extract the URL string
+            if public_url:
+                url_string = str(public_url).replace("http://", "https://")
+                return url_string
+            
+            return None
+            
+        except Exception as e:
+            print(f"⚠️  Ngrok connection error: {e}")
+            return None
+        
+    except ImportError:
+        print("❌ pyngrok is not installed.")
+        print("   Install with: pip install pyngrok")
+        print("   Or download ngrok from: https://ngrok.com/download")
+        return None
+    except Exception as e:
+        print(f"❌ Error starting ngrok: {e}")
+        return None
+
+def send_discord_notification(public_url: str, port: int = 8000) -> bool:
+    """Send Discord notification with the new public URL"""
+    if not DISCORD_WEBHOOK_URL:
+        print("⚠️  DISCORD_WEBHOOK_URL not set. Skipping Discord notification.")
+        return False
+    
+    try:
+        # Create Discord embed message
+        embed = {
+            "title": "🌤️ Weer App - Server Started",
+            "description": "Your weather app is now running and accessible!",
+            "color": 3447003,  # Blue color
+            "fields": [
+                {
+                    "name": "🔗 Public URL",
+                    "value": f"[{public_url}]({public_url})",
+                    "inline": False
+                },
+                {
+                    "name": "💻 Local URL",
+                    "value": f"http://127.0.0.1:{port}",
+                    "inline": False
+                },
+                {
+                    "name": "⏰ Started At",
+                    "value": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                    "inline": True
+                },
+                {
+                    "name": "🌐 Status",
+                    "value": "✅ Online",
+                    "inline": True
+                }
+            ],
+            "footer": {
+                "text": "Weer App | ngrok tunnel"
+            },
+            "timestamp": datetime.now().isoformat()
+        }
+        
+        payload = {
+            "username": "Weer App Bot",
+            "avatar_url": "https://cdn-icons-png.flaticon.com/512/4436/4436481.png",
+            "embeds": [embed]
+        }
+        
+        response = requests.post(
+            DISCORD_WEBHOOK_URL,
+            json=payload,
+            timeout=10
+        )
+        
+        if response.status_code == 204:
+            print("✅ Discord notification sent successfully!")
+            return True
+        else:
+            print(f"⚠️  Discord notification failed: {response.status_code}")
+            return False
+            
+    except Exception as e:
+        print(f"❌ Error sending Discord notification: {e}")
+        return False
+
+def print_startup_info(local_url: str, public_url: Optional[str] = None):
+    """Print startup information"""
+    print("\n" + "="*70)
+    print("🌤️  WEER APP - STARTED SUCCESSFULLY")
+    print("="*70)
+    print(f"\n📍 Local URL:  {local_url}")
+    if public_url:
+        print(f"🌐 Public URL: {public_url}")
+        print(f"   (Accessible from anywhere)")
+    print(f"\n⏰ Started at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    print(f"📊 API Docs:   {local_url}/docs")
+    print("="*70 + "\n")
+
 if __name__ == "__main__":
-    uvicorn.run(
-        "app:app",
-        host="127.0.0.1",
-        port=8000,
-        reload=True,
-        log_level="info"
-    )
+    local_port = 8000
+    local_url = f"http://127.0.0.1:{local_port}"
+    public_url = None
+    
+    print("\n🚀 Starting Weer App...\n")
+    
+    # Try to start ngrok tunnel
+    print("🔗 Attempting to start ngrok tunnel...")
+    try:
+        public_url = start_ngrok(local_port)
+        
+        if public_url:
+            print(f"✅ Ngrok tunnel started: {public_url}")
+            
+            # Send Discord notification
+            print("📢 Sending Discord notification...")
+            send_discord_notification(public_url, local_port)
+        else:
+            print("⚠️  Ngrok tunnel not available. Running locally only.")
+    except Exception as e:
+        print(f"⚠️  Ngrok startup failed: {e}")
+        print("   Running locally only.")
+    
+    # Print startup information
+    print_startup_info(local_url, public_url)
+    
+    # Start uvicorn server
+    try:
+        uvicorn.run(
+            "app:app",
+            host="127.0.0.1",
+            port=local_port,
+            reload=True,
+            log_level="info"
+        )
+    except KeyboardInterrupt:
+        print("\n\n👋 Shutting down Weer App...")
+        if public_url:
+            from pyngrok import ngrok
+            ngrok.disconnect(public_url)
+        print("✅ App stopped.")
+    except Exception as e:
+        print(f"\n❌ Error: {e}")
