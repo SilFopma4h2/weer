@@ -8,4 +8,4 @@ cachetools==5.3.2
 bcrypt==4.1.2
 python-multipart==0.0.6
 pygame==2.5.2
-ngrok==7.5.0
+pyngrok==7.5.0
