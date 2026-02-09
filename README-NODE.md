@@ -1,6 +1,6 @@
-# 🌤️ Weer App - Lokale Weer-Applicatie
+# 🌤️ Weer App - Lokale Weer-Applicatie (Node.js + Electron)
 
-Een moderne, responsieve weer-applicatie die actuele lokale weersinformatie toont voor Nederland. Nu gebouwd met **Node.js** en **Electron** voor desktop ondersteuning!
+Een moderne, responsieve weer-applicatie die actuele lokale weersinformatie toont voor Nederland, nu gebouwd met Node.js en Electron.
 
 ## 🚀 Functies
 
@@ -8,22 +8,23 @@ Een moderne, responsieve weer-applicatie die actuele lokale weersinformatie toon
 - **24-uurs voorspelling**: Gedetailleerde voorspelling per 3 uur
 - **7-dagen voorspelling**: Dagelijkse voorspelling voor de komende week
 - **Regenradar**: Live regenradar via Windy.com
-- **Nederlandse lokalisatie**: Alle teksten in het Nederlands
+- **Nederlandse lokalisatie**: Alle teksten in het Nederlands (met meertalige ondersteuning)
 - **Responsief design**: Werkt op desktop, tablet en mobiel
 - **Automatische updates**: Data wordt elke 10 minuten ververst
-- **🆕 Electron Desktop App**: Draait als native desktop applicatie
+- **Desktop App**: Draait als native desktop applicatie met Electron
 
 ## 🛠️ Technische Specificaties
 
 ### Backend (Node.js + Express)
 - **Framework**: Express.js
-- **Runtime**: Node.js 18+
+- **Runtime**: Node.js
 - **Endpoints**:
   - `GET /`: Hoofdpagina
   - `GET /current`: Huidig weer
   - `GET /forecast`: 24u & 7d voorspelling
   - `GET /alerts`: Weerswaarschuwingen
   - `GET /health`: Health check
+  - `GET /air-quality`: Luchtkwaliteit
 - **Data bron**: Open-Meteo API (gratis, geen API key vereist)
 - **Caching**: TTL cache (10 minuten)
 - **Performance**: API response ≤ 500ms
@@ -35,10 +36,15 @@ Een moderne, responsieve weer-applicatie die actuele lokale weersinformatie toon
 - **Auto-refresh**: Elke 10 minuten
 - **Offline-ready**: Error handling en fallbacks
 
+### Desktop App (Electron)
+- **Platform**: Cross-platform (Windows, macOS, Linux)
+- **Native integration**: Systeem tray, notifications
+- **Auto-start**: Kan automatisch starten bij opstarten
+
 ## 📋 Installatie & Setup
 
 ### Vereisten
-- **Node.js 18+** (met npm)
+- Node.js 18+ (met npm)
 - Geen API key vereist (Open-Meteo is gratis)
 
 ### Stap 1: Dependencies installeren
@@ -56,16 +62,17 @@ Bewerk `.env` om de standaard locatie aan te passen:
 DEFAULT_LAT=52.3676
 DEFAULT_LON=4.9041
 CACHE_DURATION=600
+AQICN_API_KEY=demo
 ```
 
 ### Stap 3: Applicatie starten
 
-#### 🖥️ Als Electron Desktop App (aanbevolen)
+#### Als Electron Desktop App (aanbevolen)
 ```bash
 npm start
 ```
 
-#### 🌐 Als Web Server (development)
+#### Als Web Server (development)
 ```bash
 npm run dev
 ```
@@ -75,8 +82,20 @@ Of start de server direct:
 node server.js
 ```
 
-### Stap 4: Open in browser (web mode alleen)
+### Stap 4: Open in browser (web mode)
 Ga naar: `http://localhost:8000`
+
+## 🏗️ Bouwen voor Distributie
+
+### Desktop App Bouwen
+```bash
+npm run build
+```
+
+Dit maakt distributie packages voor:
+- **Windows**: NSIS installer in `dist/`
+- **macOS**: DMG en app bundle in `dist/`
+- **Linux**: AppImage in `dist/`
 
 ## 🌍 Open-Meteo API
 
@@ -93,13 +112,14 @@ Deze applicatie gebruikt de gratis [Open-Meteo API](https://open-meteo.com/) voo
 2. **Handmatige locatie**: Voeg `?lat=XX&lon=XX` toe aan de URL
 3. **Verversen**: Klik op de "🔄 Vernieuwen" knop
 4. **Mobiel**: Volledig responsive design
+5. **Desktop**: Start als native app met Electron
 
 ## 🔧 API Endpoints
 
 ### GET /current
 ```json
 {
-  "timestamp": "2025-01-13T10:30:00",
+  "timestamp": "2026-02-09T10:30:00",
   "location": {
     "name": "Amsterdam",
     "lat": 52.3676,
@@ -107,9 +127,7 @@ Deze applicatie gebruikt de gratis [Open-Meteo API](https://open-meteo.com/) voo
   },
   "temperature": {
     "current": 15,
-    "feels_like": 13,
-    "min": 12,
-    "max": 18
+    "feels_like": 13
   },
   "wind": {
     "speed": 12.5,
@@ -128,9 +146,18 @@ Retourneert 24-uurs en 7-dagen voorspelling in vergelijkbaar formaat.
 ### GET /alerts
 ```json
 {
-  "timestamp": "2025-01-13T10:30:00",
+  "timestamp": "2026-02-09T10:30:00",
   "alerts": [],
   "message": "Geen waarschuwingen beschikbaar in MVP versie"
+}
+```
+
+### GET /health
+```json
+{
+  "status": "ok",
+  "timestamp": "2026-02-09T10:30:00",
+  "version": "1.0.0"
 }
 ```
 
@@ -149,45 +176,38 @@ Retourneert 24-uurs en 7-dagen voorspelling in vergelijkbaar formaat.
 - Error handling en graceful degradation
 - No sensitive data in frontend
 
-## 🚀 Deployment
+## 📦 Project Structuur
 
-### 🏗️ Build Desktop App
+```
+weer/
+├── server.js              # Node.js Express server
+├── electron-main.js       # Electron main process
+├── package.json           # NPM dependencies en scripts
+├── translations.json      # Meertalige vertalingen
+├── static/               # Frontend assets
+│   ├── script.js         # Client-side JavaScript
+│   └── style.css         # Styling
+├── templates/            # HTML templates
+│   └── index.html        # Hoofdpagina
+└── .env                  # Environment configuratie
+```
+
+## 🚀 Development
+
+### Run in development mode
 ```bash
-npm run build
+# Server met auto-reload
+npm run dev
+
+# Electron met development tools
+npm run electron-dev
 ```
 
-Dit maakt distributie packages voor:
-- **Windows**: NSIS installer in `dist/`
-- **macOS**: DMG en app bundle in `dist/`
-- **Linux**: AppImage in `dist/`
-
-### Docker (optioneel voor web mode)
-```dockerfile
-FROM node:18-slim
-WORKDIR /app
-COPY package*.json ./
-RUN npm install --production
-COPY . .
-EXPOSE 8000
-CMD ["node", "server.js"]
-```
-
-### Systemd Service (Linux web server)
-```ini
-[Unit]
-Description=Weer App
-After=network.target
-
-[Service]
-Type=simple
-User=www-data
-WorkingDirectory=/path/to/weer
-ExecStart=/usr/bin/node server.js
-Restart=always
-
-[Install]
-WantedBy=multi-user.target
-```
+### Scripts
+- `npm start` - Start Electron app
+- `npm run dev` - Start server met nodemon (auto-reload)
+- `npm run electron-dev` - Start Electron in development mode
+- `npm run build` - Build distributie packages
 
 ## 🐛 Troubleshooting
 
@@ -201,6 +221,11 @@ WantedBy=multi-user.target
 - Verhoog cache duration in `.env`
 - Monitor API response times in browser dev tools
 
+### Electron problemen
+- Zorg dat Node.js 18+ is geïnstalleerd
+- Verwijder `node_modules` en run `npm install` opnieuw
+- Check `npm start` logs voor errors
+
 ### Frontend problemen
 - Hard refresh (Ctrl+F5 of Cmd+Shift+R)
 - Controleer browser console voor JavaScript errors
@@ -210,25 +235,30 @@ WantedBy=multi-user.target
 
 - [ ] KNMI API integratie voor lokale waarschuwingen
 - [ ] PWA ondersteuning (offline functionaliteit)
-- [ ] Dark mode
+- [ ] Native systeem notificaties
 - [ ] Grafische weertrends
-- [ ] Native systeem notificaties (Electron)
 - [ ] Meerdere locaties opslaan
 - [ ] Historical weather data
-- [ ] Auto-update functionaliteit (Electron)
+- [ ] Auto-update functionaliteit
 - [ ] Tray icon met quick stats
 
-## 🔄 Migratie naar Node.js
+## 🔄 Migratie van Python
 
-Deze app is gemigreerd van Python/FastAPI naar Node.js/Express met Electron ondersteuning:
+Deze applicatie is gemigreerd van Python/FastAPI naar Node.js/Express met Electron ondersteuning:
 
+### Wat is veranderd:
 - ✅ Backend: Python → Node.js/Express
-- ✅ Desktop: Electron ondersteuning toegevoegd
-- ✅ Dependencies: `requirements.txt` → `package.json`
+- ✅ Desktop: Toegevoegd Electron support
+- ✅ Dependencies: requirements.txt → package.json
+- ✅ Database: SQLite met better-sqlite3 → In-memory storage (voor MVP)
+- ✅ Authentication: Tijdelijk verwijderd (kan later worden toegevoegd)
+
+### Wat is hetzelfde:
 - ✅ Alle API endpoints behouden
 - ✅ Frontend HTML/CSS/JS ongewijzigd
-
-Voor gedetailleerde informatie, zie [README-NODE.md](README-NODE.md).
+- ✅ Open-Meteo API integratie
+- ✅ Cache systeem
+- ✅ Meertalige ondersteuning
 
 ## 📄 Licentie
 
