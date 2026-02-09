@@ -1,0 +1,54 @@
+{
+  "name": "weer-app",
+  "version": "1.0.0",
+  "description": "Local Weather Application with Electron",
+  "main": "electron-main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "nodemon server.js",
+    "electron-dev": "electron . --dev",
+    "build": "electron-builder"
+  },
+  "keywords": [
+    "weather",
+    "electron",
+    "nodejs"
+  ],
+  "author": "",
+  "license": "BSD-3-Clause",
+  "dependencies": {
+    "express": "^4.18.2",
+    "axios": "^1.6.2",
+    "dotenv": "^16.3.1",
+    "node-cache": "^5.1.2",
+    "cors": "^2.8.5"
+  },
+  "devDependencies": {
+    "electron": "^28.1.0",
+    "electron-builder": "^24.9.1",
+    "nodemon": "^3.0.2"
+  },
+  "build": {
+    "appId": "com.weer.app",
+    "productName": "Weer App",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "server.js",
+      "electron-main.js",
+      "static/**/*",
+      "templates/**/*",
+      "node_modules/**/*"
+    ],
+    "mac": {
+      "category": "public.app-category.weather"
+    },
+    "win": {
+      "target": "nsis"
+    },
+    "linux": {
+      "target": "AppImage"
+    }
+  }
+}
