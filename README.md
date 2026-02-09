@@ -1,6 +1,6 @@
 # 🌤️ Weer App - Lokale Weer-Applicatie
 
-Een moderne, responsieve weer-applicatie die actuele lokale weersinformatie toont voor Nederland.
+Een moderne, responsieve weer-applicatie die actuele lokale weersinformatie toont voor Nederland. Nu gebouwd met **Node.js** en **Electron** voor desktop ondersteuning!
 
 ## 🚀 Functies
 
@@ -11,11 +11,13 @@ Een moderne, responsieve weer-applicatie die actuele lokale weersinformatie toon
 - **Nederlandse lokalisatie**: Alle teksten in het Nederlands
 - **Responsief design**: Werkt op desktop, tablet en mobiel
 - **Automatische updates**: Data wordt elke 10 minuten ververst
+- **🆕 Electron Desktop App**: Draait als native desktop applicatie
 
 ## 🛠️ Technische Specificaties
 
-### Backend (FastAPI)
-- **Framework**: FastAPI 0.104.1
+### Backend (Node.js + Express)
+- **Framework**: Express.js
+- **Runtime**: Node.js 18+
 - **Endpoints**:
   - `GET /`: Hoofdpagina
   - `GET /current`: Huidig weer
@@ -36,12 +38,12 @@ Een moderne, responsieve weer-applicatie die actuele lokale weersinformatie toon
 ## 📋 Installatie & Setup
 
 ### Vereisten
-- Python 3.8+
+- **Node.js 18+** (met npm)
 - Geen API key vereist (Open-Meteo is gratis)
 
 ### Stap 1: Dependencies installeren
 ```bash
-pip install -r requirements.txt
+npm install
 ```
 
 ### Stap 2: Environment variabelen (optioneel)
@@ -57,16 +59,23 @@ CACHE_DURATION=600
 ```
 
 ### Stap 3: Applicatie starten
+
+#### 🖥️ Als Electron Desktop App (aanbevolen)
 ```bash
-python app.py
+npm start
 ```
 
-Of gebruik uvicorn direct:
+#### 🌐 Als Web Server (development)
 ```bash
-uvicorn app:app --host 0.0.0.0 --port 8000 --reload
+npm run dev
 ```
 
-### Stap 4: Open in browser
+Of start de server direct:
+```bash
+node server.js
+```
+
+### Stap 4: Open in browser (web mode alleen)
 Ga naar: `http://localhost:8000`
 
 ## 🌍 Open-Meteo API
@@ -142,18 +151,28 @@ Retourneert 24-uurs en 7-dagen voorspelling in vergelijkbaar formaat.
 
 ## 🚀 Deployment
 
-### Docker (optioneel)
-```dockerfile
-FROM python:3.12-slim
-WORKDIR /app
-COPY requirements.txt .
-RUN pip install -r requirements.txt
-COPY . .
-EXPOSE 8000
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
+### 🏗️ Build Desktop App
+```bash
+npm run build
 ```
 
-### Systemd Service (Linux)
+Dit maakt distributie packages voor:
+- **Windows**: NSIS installer in `dist/`
+- **macOS**: DMG en app bundle in `dist/`
+- **Linux**: AppImage in `dist/`
+
+### Docker (optioneel voor web mode)
+```dockerfile
+FROM node:18-slim
+WORKDIR /app
+COPY package*.json ./
+RUN npm install --production
+COPY . .
+EXPOSE 8000
+CMD ["node", "server.js"]
+```
+
+### Systemd Service (Linux web server)
 ```ini
 [Unit]
 Description=Weer App
@@ -163,7 +182,7 @@ After=network.target
 Type=simple
 User=www-data
 WorkingDirectory=/path/to/weer
-ExecStart=/usr/bin/python3 app.py
+ExecStart=/usr/bin/node server.js
 Restart=always
 
 [Install]
@@ -193,10 +212,23 @@ WantedBy=multi-user.target
 - [ ] PWA ondersteuning (offline functionaliteit)
 - [ ] Dark mode
 - [ ] Grafische weertrends
-- [ ] Push notificaties voor waarschuwingen
+- [ ] Native systeem notificaties (Electron)
 - [ ] Meerdere locaties opslaan
 - [ ] Historical weather data
-- [ ] Weather widgets voor andere sites
+- [ ] Auto-update functionaliteit (Electron)
+- [ ] Tray icon met quick stats
+
+## 🔄 Migratie naar Node.js
+
+Deze app is gemigreerd van Python/FastAPI naar Node.js/Express met Electron ondersteuning:
+
+- ✅ Backend: Python → Node.js/Express
+- ✅ Desktop: Electron ondersteuning toegevoegd
+- ✅ Dependencies: `requirements.txt` → `package.json`
+- ✅ Alle API endpoints behouden
+- ✅ Frontend HTML/CSS/JS ongewijzigd
+
+Voor gedetailleerde informatie, zie [README-NODE.md](README-NODE.md).
 
 ## 📄 Licentie
 
