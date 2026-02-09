@@ -3,6 +3,7 @@ const path = require('path');
 const axios = require('axios');
 const NodeCache = require('node-cache');
 const fs = require('fs');
+const rateLimit = require('express-rate-limit');
 require('dotenv').config();
 
 const app = express();
@@ -21,6 +22,15 @@ console.log('✅ Server initialized successfully');
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use('/static', express.static(path.join(__dirname, 'static')));
+
+// Rate limiting middleware for all routes
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per windowMs
+  message: 'Too many requests from this IP, please try again later.'
+});
+
+app.use(limiter);
 
 // Configuration
 const DEFAULT_LAT = parseFloat(process.env.DEFAULT_LAT || '52.3676');
