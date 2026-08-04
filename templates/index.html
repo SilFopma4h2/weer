@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weer App - Lokaal Weer</title>
+    <title data-translate="app_title">Weer App - Lokaal Weer</title>
     <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
@@ -14,9 +14,9 @@
                     <h1 data-translate="app_title">🌤️ Weer App</h1>
                     <p data-translate="app_subtitle">Actueel lokaal weer voor Nederland</p>
                 </div>
-                
+
                 <div class="header-controls">
-                    <select id="language-selector" class="language-selector">
+                    <select id="language-selector" class="language-selector" aria-label="Taal">
                         <option value="nl">🇳🇱 Nederlands</option>
                         <option value="en">🇬🇧 English</option>
                         <option value="de">🇩🇪 Deutsch</option>
@@ -26,24 +26,44 @@
                     <button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()">
                         <span data-translate="theme_dark">🌙 Dark</span>
                     </button>
+
+                    <div class="header-auth">
+                        {% if user %}
+                            <div class="user-info">
+                                <span class="user-email">{{ user.email }}</span>
+                                <div class="user-menu">
+                                    <a class="btn-link" href="/settings" data-translate="settings">Instellingen</a>
+                                    <form class="inline-form" action="/logout" method="post">
+                                        <button class="btn-link" type="submit" data-translate="logout">Uitloggen</button>
+                                    </form>
+                                </div>
+                            </div>
+                        {% else %}
+                            <div class="auth-buttons">
+                                <a class="btn-primary" href="/login" data-translate="login">Inloggen</a>
+                                <a class="btn-primary" href="/register" data-translate="register">Registreren</a>
+                            </div>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
         </header>
 
         <main>
-            <nav class="weather-nav">
+            <nav class="weather-nav" aria-label="Hoofdnavigatie">
                 <div class="nav-buttons">
                     <button class="nav-btn active" data-tab="today" data-translate="nav_today">🌤️ Vandaag</button>
                     <button class="nav-btn" data-tab="week" data-translate="nav_week">📅 Week</button>
                     <button class="nav-btn" data-tab="radar" data-translate="nav_radar">🌧️ Radar</button>
                     <button class="nav-btn" data-tab="fishing" data-translate="nav_fishing">🎣 Vissen</button>
+                    <button class="nav-btn" data-tab="fire" data-translate="nav_fire">🔥 Bosbranden</button>
+                    <button class="nav-btn" data-tab="air" data-translate="nav_air">🌫️ Luchtkwaliteit</button>
                     <button class="nav-btn" data-tab="games" data-translate="nav_games">🎮 Games</button>
                 </div>
             </nav>
 
             <!-- Today Tab -->
             <div id="tab-today" class="tab-content active">
-                <!-- Current Weather Section -->
                 <section id="current-weather" class="weather-card">
                     <h2 data-translate="current_weather">Huidig Weer</h2>
                     <div id="loading" class="loading">
@@ -67,16 +87,20 @@
                                 <span id="feels-like">--°C</span>
                             </div>
                             <div class="detail-item">
-                                <span class="label" data-translate="min_max">Min/Max:</span>
-                                <span id="min-max">--° / --°</span>
-                            </div>
-                            <div class="detail-item">
                                 <span class="label" data-translate="wind">Wind:</span>
                                 <span id="wind">-- km/h</span>
                             </div>
                             <div class="detail-item">
+                                <span class="label" data-translate="wind_gust">Windstoten:</span>
+                                <span id="wind-gust">-- km/h</span>
+                            </div>
+                            <div class="detail-item">
                                 <span class="label" data-translate="humidity">Luchtvochtigheid:</span>
                                 <span id="humidity">--%</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="label" data-translate="pressure">Luchtdruk:</span>
+                                <span id="pressure">-- hPa</span>
                             </div>
                             <div class="detail-item">
                                 <span class="label" data-translate="clouds">Bewolking:</span>
@@ -86,45 +110,43 @@
                                 <span class="label" data-translate="precipitation">Neerslag:</span>
                                 <span id="precipitation">-- mm</span>
                             </div>
+                            <div class="detail-item">
+                                <span class="label" data-translate="visibility">Zicht:</span>
+                                <span id="visibility">-- km</span>
+                            </div>
                         </div>
                     </div>
                 </section>
 
-                <!-- 24h Forecast Section -->
                 <section id="forecast-24h" class="weather-card">
                     <h2 data-translate="forecast_24h">24 Uur Voorspelling</h2>
-                    <div id="forecast-24h-data" class="forecast-grid">
-                        <!-- Will be populated by JavaScript -->
-                    </div>
+                    <div id="forecast-24h-data" class="forecast-grid"></div>
                 </section>
             </div>
 
             <!-- Week Tab -->
             <div id="tab-week" class="tab-content">
-                <!-- 7 Day Forecast Section -->
                 <section id="forecast-7d" class="weather-card">
                     <h2 data-translate="forecast_7d">7 Dagen Voorspelling</h2>
-                    <div id="forecast-7d-data" class="forecast-list">
-                        <!-- Will be populated by JavaScript -->
-                    </div>
+                    <div id="forecast-7d-data" class="forecast-list"></div>
                 </section>
             </div>
 
             <!-- Radar Tab -->
             <div id="tab-radar" class="tab-content">
-                <!-- Rain Radar Section -->
                 <section id="rain-radar" class="weather-card">
                     <h2 data-translate="rain_radar">Regenradar</h2>
                     <div class="radar-container">
-                        <iframe 
+                        <iframe
+                            id="radar-iframe"
                             src="https://embed.windy.com/embed2.html?lat=52.367&lon=4.904&detailLat=52.367&detailLon=4.904&width=650&height=450&zoom=7&level=surface&overlay=rain&product=ecmwf&menu=&message=&marker=&calendar=now&pressure=&type=map&location=coordinates&detail=&metricWind=km%2Fh&metricTemp=%C2%B0C&radarRange=-1"
                             frameborder="0"
-                            class="radar-iframe">
+                            class="radar-iframe"
+                            loading="lazy">
                         </iframe>
                     </div>
                 </section>
 
-                <!-- Alerts Section -->
                 <section id="alerts" class="weather-card">
                     <h2 data-translate="weather_alerts">Weerswaarschuwingen</h2>
                     <div id="alerts-data">
@@ -135,104 +157,130 @@
 
             <!-- Fishing Tab -->
             <div id="tab-fishing" class="tab-content">
-                <!-- Fishing Conditions Section -->
                 <section id="fishing-conditions" class="weather-card">
                     <h2 data-translate="fishing_conditions">🎣 Visomstandigheden</h2>
-                    <div id="fishing-data">
-                        <!-- Will be populated by JavaScript -->
+                    <div id="fishing-data"></div>
+                </section>
+
+                <section id="fishing-forecast" class="weather-card">
+                    <h2 data-translate="fishing_forecast">📊 Visvoorspelling Komende Dagen</h2>
+                    <div id="fishing-forecast-data" class="fishing-forecast-list"></div>
+                </section>
+            </div>
+
+            <!-- Fire Risk Tab (Bosbranden) -->
+            <div id="tab-fire" class="tab-content">
+                <section id="fire-current" class="weather-card">
+                    <h2 data-translate="fire_risk_title">🔥 Brandrisico</h2>
+                    <div id="fire-data" class="fire-data">
+                        <p class="no-alerts" data-translate="fire_loading">Brandrisico laden...</p>
                     </div>
                 </section>
 
-                <!-- Fishing Forecast Section -->
-                <section id="fishing-forecast" class="weather-card">
-                    <h2 data-translate="fishing_forecast">📊 Visvoorspelling Komende Dagen</h2>
-                    <div id="fishing-forecast-data" class="fishing-forecast-list">
-                        <!-- Will be populated by JavaScript -->
+                <section id="fire-forecast" class="weather-card">
+                    <h2 data-translate="fire_forecast_title">📅 Brandrisico Komende Dagen</h2>
+                    <div id="fire-forecast-data" class="fire-forecast-list"></div>
+                </section>
+            </div>
+
+            <!-- Air Quality Tab -->
+            <div id="tab-air" class="tab-content">
+                <section id="air-quality" class="weather-card">
+                    <h2 data-translate="air_quality_title">🌫️ Luchtkwaliteit</h2>
+                    <div id="air-data" class="air-data">
+                        <p class="no-alerts" data-translate="air_loading">Luchtkwaliteit laden...</p>
                     </div>
                 </section>
             </div>
 
             <!-- Games Tab -->
             <div id="tab-games" class="tab-content">
-                <!-- Game Selection -->
                 <section id="game-selection" class="weather-card">
                     <h2 data-translate="games_title">🎮 Games</h2>
                     <div class="games-menu">
                         <button class="game-btn" onclick="showGame('2048')" data-translate="game_2048">🔢 2048</button>
                         <button class="game-btn" onclick="showGame('flappy')" data-translate="game_flappy">🐦 Flappy Bird</button>
-                        <button class="game-btn" onclick="showGame('guess')" data-translate="game_guess">🔢 Guess the Number</button>
+                        <button class="game-btn" onclick="showGame('guess')" data-translate="game_guess">🔢 Raad het Getal</button>
                         <button class="game-btn" onclick="showGame('snake')" data-translate="game_snake">🐍 Snake</button>
                         <button class="game-btn" onclick="showGame('pong')" data-translate="game_pong">🏓 Pong</button>
                         <button class="game-btn" onclick="showGame('breakout')" data-translate="game_breakout">🧱 Breakout</button>
+                        <button class="game-btn" onclick="showGame('memory')" data-translate="game_memory">🃏 Memory</button>
                         <button class="game-btn" onclick="showGame('menu')" data-translate="game_menu">📋 Menu</button>
                     </div>
                 </section>
 
-                <!-- 2048 Game -->
+                <!-- 2048 -->
                 <section id="game-2048" class="weather-card game-container" style="display: none;">
                     <h3 data-translate="game_2048_title">🔢 2048</h3>
                     <div class="game-2048">
                         <div class="game-score">
                             <span data-translate="score">Score:</span> <span id="score-2048">0</span>
+                            <span class="game-highscore"> | <span data-translate="best_score">Record:</span> <span id="highscore-2048">0</span></span>
                         </div>
                         <div id="grid-2048" class="grid-2048"></div>
+                        <div id="gameover-2048" class="game-overlay" style="display: none;">
+                            <h4 data-translate="game_over">Game Over</h4>
+                            <button onclick="newGame2048()" data-translate="new_game">Nieuw Spel</button>
+                        </div>
                         <div class="game-controls">
-                            <button onclick="newGame2048()" data-translate="new_game">New Game</button>
-                            <p data-translate="game_2048_instructions">Use arrow keys or swipe to move tiles</p>
+                            <button onclick="newGame2048()" data-translate="new_game">Nieuw Spel</button>
+                            <p data-translate="game_2048_instructions">Gebruik pijltjestoetsen of swipe om tegels te bewegen</p>
                         </div>
                     </div>
                 </section>
 
-                <!-- Flappy Bird Game -->
+                <!-- Flappy Bird -->
                 <section id="game-flappy" class="weather-card game-container" style="display: none;">
                     <h3 data-translate="game_flappy_title">🐦 Flappy Bird</h3>
                     <div class="game-flappy">
                         <div class="game-score">
                             <span data-translate="score">Score:</span> <span id="score-flappy">0</span>
+                            <span class="game-highscore"> | <span data-translate="best_score">Record:</span> <span id="highscore-flappy">0</span></span>
                         </div>
                         <canvas id="flappy-canvas" width="400" height="300"></canvas>
                         <div class="game-controls">
-                            <button onclick="startFlappyGame()" data-translate="start_game">Start Game</button>
-                            <p data-translate="game_flappy_instructions">Click or press space to jump</p>
+                            <button onclick="startFlappyGame()" data-translate="start_game">Start Spel</button>
+                            <p data-translate="game_flappy_instructions">Klik of druk op spatie om te springen</p>
                         </div>
                     </div>
                 </section>
 
-                <!-- Guess the Number Game -->
+                <!-- Guess the Number -->
                 <section id="game-guess" class="weather-card game-container" style="display: none;">
-                    <h3 data-translate="game_guess_title">🔢 Guess the Number</h3>
+                    <h3 data-translate="game_guess_title">🔢 Raad het Getal</h3>
                     <div class="game-guess">
                         <div class="game-info">
-                            <p data-translate="guess_range">I'm thinking of a number between 1 and 100</p>
-                            <p data-translate="attempts">Attempts:</p> <span id="attempts-count">0</span>
+                            <p data-translate="guess_range">Ik denk aan een getal tussen 1 en 100</p>
+                            <p data-translate="attempts">Pogingen:</p> <span id="attempts-count">0</span>
                         </div>
                         <div class="guess-input">
-                            <input type="number" id="guess-input" min="1" max="100" placeholder="Enter your guess">
-                            <button onclick="makeGuess()" data-translate="guess_button">Guess</button>
+                            <input type="number" id="guess-input" min="1" max="100" placeholder="..." aria-label="Gok">
+                            <button onclick="makeGuess()" data-translate="guess_button">Raad</button>
                         </div>
                         <div id="guess-feedback" class="guess-feedback"></div>
                         <div class="game-controls">
-                            <button onclick="newGuessGame()" data-translate="new_game">New Game</button>
+                            <button onclick="newGuessGame()" data-translate="new_game">Nieuw Spel</button>
                         </div>
                     </div>
                 </section>
 
-                <!-- Snake Game -->
+                <!-- Snake -->
                 <section id="game-snake" class="weather-card game-container" style="display: none;">
                     <h3 data-translate="game_snake_title">🐍 Snake</h3>
                     <div class="game-snake">
                         <div class="game-score">
                             <span data-translate="score">Score:</span> <span id="score-snake">0</span>
+                            <span class="game-highscore"> | <span data-translate="best_score">Record:</span> <span id="highscore-snake">0</span></span>
                         </div>
                         <canvas id="snake-canvas" width="400" height="400"></canvas>
                         <div class="game-controls">
-                            <button onclick="startSnakeGame()" data-translate="start_game">Start Game</button>
-                            <p data-translate="game_snake_instructions">Use arrow keys to control the snake</p>
+                            <button onclick="startSnakeGame()" data-translate="start_game">Start Spel</button>
+                            <p data-translate="game_snake_instructions">Gebruik pijltjestoetsen om de slang te besturen</p>
                         </div>
                     </div>
                 </section>
 
-                <!-- Pong Game -->
+                <!-- Pong -->
                 <section id="game-pong" class="weather-card game-container" style="display: none;">
                     <h3 data-translate="game_pong_title">🏓 Pong</h3>
                     <div class="game-pong">
@@ -241,23 +289,40 @@
                         </div>
                         <canvas id="pong-canvas" width="600" height="300"></canvas>
                         <div class="game-controls">
-                            <button onclick="startPongGame()" data-translate="start_game">Start Game</button>
-                            <p data-translate="game_pong_instructions">Use W/S keys to move the paddle</p>
+                            <button onclick="startPongGame()" data-translate="start_game">Start Spel</button>
+                            <p data-translate="game_pong_instructions">Gebruik W/S toetsen om de paddle te bewegen</p>
                         </div>
                     </div>
                 </section>
 
-                <!-- Breakout Game -->
+                <!-- Breakout -->
                 <section id="game-breakout" class="weather-card game-container" style="display: none;">
                     <h3 data-translate="game_breakout_title">🧱 Breakout</h3>
                     <div class="game-breakout">
                         <div class="game-score">
                             <span data-translate="score">Score:</span> <span id="score-breakout">0</span>
+                            <span class="game-highscore"> | <span data-translate="best_score">Record:</span> <span id="highscore-breakout">0</span></span>
                         </div>
                         <canvas id="breakout-canvas" width="480" height="320"></canvas>
                         <div class="game-controls">
-                            <button onclick="startBreakoutGame()" data-translate="start_game">Start Game</button>
-                            <p data-translate="game_breakout_instructions">Use arrow keys or mouse to move the paddle</p>
+                            <button onclick="startBreakoutGame()" data-translate="start_game">Start Spel</button>
+                            <p data-translate="game_breakout_instructions">Gebruik pijltjestoetsen of muis om de paddle te bewegen</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Memory -->
+                <section id="game-memory" class="weather-card game-container" style="display: none;">
+                    <h3 data-translate="game_memory_title">🃏 Memory</h3>
+                    <div class="game-memory">
+                        <div class="game-score">
+                            <span data-translate="score">Score:</span> <span id="score-memory">0</span>
+                            <span class="game-highscore"> | <span data-translate="moves">Zetten:</span> <span id="moves-memory">0</span></span>
+                        </div>
+                        <div id="memory-grid" class="memory-grid"></div>
+                        <div class="game-controls">
+                            <button onclick="startMemoryGame()" data-translate="start_game">Start Spel</button>
+                            <p data-translate="game_memory_instructions">Vind de paren met dezelfde kaarten</p>
                         </div>
                     </div>
                 </section>
@@ -277,7 +342,7 @@
 
     <!-- Error Modal -->
     <div id="error-modal" class="modal" style="display: none;">
-        <div class="modal-content">
+        <div class="modal-content error-content">
             <h3 data-translate="error_title">⚠️ Fout opgetreden</h3>
             <p id="error-message" data-translate="error_message">Er is een fout opgetreden bij het laden van de weerdata.</p>
             <button onclick="closeErrorModal()" data-translate="close">Sluiten</button>
@@ -285,15 +350,94 @@
         </div>
     </div>
 
+    <!-- Login Modal -->
+    <div id="login-modal" class="auth-modal" {% if not show_login %}style="display: none;"{% endif %}>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 data-translate="login_title">Inloggen</h3>
+                <button class="close-btn" onclick="closeAuthModal('login-modal')" aria-label="Sluiten">×</button>
+            </div>
+            {% if error and show_login %}<div class="error-message">{{ error }}</div>{% endif %}
+            <form class="auth-form" method="post" action="/login">
+                <div class="form-group">
+                    <label for="login-email" data-translate="email">E-mailadres</label>
+                    <input type="email" id="login-email" name="email" required autocomplete="email">
+                </div>
+                <div class="form-group">
+                    <label for="login-password" data-translate="password">Wachtwoord</label>
+                    <input type="password" id="login-password" name="password" required autocomplete="current-password">
+                </div>
+                <div class="form-buttons">
+                    <button class="btn-primary" type="submit" data-translate="login">Inloggen</button>
+                    <button class="btn-link" type="button" onclick="switchAuthModal('register-modal')" data-translate="no_account">Nog geen account? Registreren</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div id="register-modal" class="auth-modal" {% if not show_register %}style="display: none;"{% endif %}>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 data-translate="register_title">Registreren</h3>
+                <button class="close-btn" onclick="closeAuthModal('register-modal')" aria-label="Sluiten">×</button>
+            </div>
+            {% if error and show_register %}<div class="error-message">{{ error }}</div>{% endif %}
+            <form class="auth-form" method="post" action="/register">
+                <div class="form-group">
+                    <label for="reg-email" data-translate="email">E-mailadres</label>
+                    <input type="email" id="reg-email" name="email" required autocomplete="email">
+                </div>
+                <div class="form-group">
+                    <label for="reg-password" data-translate="password">Wachtwoord</label>
+                    <input type="password" id="reg-password" name="password" required autocomplete="new-password">
+                    <small data-translate="password_hint">Minimaal 8 tekens, met een letter en een cijfer.</small>
+                </div>
+                <div class="form-group">
+                    <label for="reg-confirm" data-translate="confirm_password">Bevestig wachtwoord</label>
+                    <input type="password" id="reg-confirm" name="confirm_password" required autocomplete="new-password">
+                </div>
+                <div class="form-group">
+                    <label for="reg-location" data-translate="location">Locatie (optioneel, "breedtegraad,lengtegraad")</label>
+                    <input type="text" id="reg-location" name="location" placeholder="52.3676,4.9041">
+                </div>
+                <div class="form-buttons">
+                    <button class="btn-primary" type="submit" data-translate="register">Registreren</button>
+                    <button class="btn-link" type="button" onclick="switchAuthModal('login-modal')" data-translate="have_account">Al een account? Inloggen</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="auth-modal" {% if not show_settings %}style="display: none;"{% endif %}>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 data-translate="settings_title">Instellingen</h3>
+                <button class="close-btn" onclick="closeAuthModal('settings-modal')" aria-label="Sluiten">×</button>
+            </div>
+            {% if error and show_settings %}<div class="error-message">{{ error }}</div>{% endif %}
+            {% if success and show_settings %}<div class="success-message">{{ success }}</div>{% endif %}
+            <form class="auth-form" method="post" action="/settings">
+                <div class="form-group">
+                    <label for="settings-location" data-translate="location">Locatie ("breedtegraad,lengtegraad")</label>
+                    <input type="text" id="settings-location" name="location"
+                           value="{{ user.location if user and user.location else '' }}" placeholder="52.3676,4.9041">
+                    <small data-translate="location_hint">Laat leeg voor de standaardlocatie (Amsterdam).</small>
+                </div>
+                <div class="form-buttons">
+                    <button class="btn-primary" type="submit" data-translate="save">Opslaan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script src="/static/script.js"></script>
-    
-    <!-- Theme JavaScript -->
+
+    <!-- Theme + Auth UI JavaScript -->
     <script>
-        // Theme toggle functionality
         function toggleTheme() {
             const body = document.documentElement;
-            const themeToggleBtn = document.getElementById('theme-toggle');
-            
             if (body.getAttribute('data-theme') === 'dark') {
                 body.removeAttribute('data-theme');
                 localStorage.setItem('theme', 'light');
@@ -301,32 +445,42 @@
                 body.setAttribute('data-theme', 'dark');
                 localStorage.setItem('theme', 'dark');
             }
-            
-            // Update theme toggle text using translations
             if (window.weatherApp) {
                 window.weatherApp.applyTranslations();
             }
         }
-        
-        // Load saved theme on page load
-        document.addEventListener('DOMContentLoaded', function() {
+
+        function openAuthModal(id) {
+            const modal = document.getElementById(id);
+            if (modal) modal.style.display = 'flex';
+        }
+
+        function closeAuthModal(id) {
+            const modal = document.getElementById(id);
+            if (modal) modal.style.display = 'none';
+        }
+
+        function switchAuthModal(targetId) {
+            document.querySelectorAll('.auth-modal').forEach(m => m.style.display = 'none');
+            openAuthModal(targetId);
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
             const savedTheme = localStorage.getItem('theme');
-            
             if (savedTheme === 'dark') {
                 document.documentElement.setAttribute('data-theme', 'dark');
             }
-            
-            // Theme toggle text will be set by applyTranslations() when weather app initializes
         });
-        
-        // Close error modal when clicking outside
-        window.onclick = function(event) {
+
+        window.onclick = function (event) {
+            if (event.target.classList && event.target.classList.contains('auth-modal')) {
+                event.target.style.display = 'none';
+            }
             const errorModal = document.getElementById('error-modal');
-            
             if (event.target === errorModal) {
                 errorModal.style.display = 'none';
             }
-        }
+        };
     </script>
 </body>
 </html>

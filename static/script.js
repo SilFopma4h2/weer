@@ -1,257 +1,564 @@
-// Weather App JavaScript
-// Translation support
+// ============================================================================
+// Weer App - Frontend JavaScript
+// ============================================================================
+
 const TRANSLATIONS = {
     nl: {
-        "app_title": "🌤️ Weer App",
-        "app_subtitle": "Actueel lokaal weer voor Nederland",
-        "theme_dark": "🌙 Dark",
-        "theme_light": "☀️ Light",
-        "nav_today": "🌤️ Vandaag",
-        "nav_week": "📅 Week",
-        "nav_radar": "🌧️ Radar",
-        "nav_fishing": "🎣 Vissen",
-        "nav_games": "🎮 Games",
-        "current_weather": "Huidig Weer",
-        "loading": "Weerdata laden...",
-        "feels_like": "Gevoelstemperatuur:",
-        "min_max": "Min/Max:",
-        "wind": "Wind:",
-        "humidity": "Luchtvochtigheid:",
-        "clouds": "Bewolking:",
-        "precipitation": "Neerslag:",
-        "forecast_24h": "24 Uur Voorspelling",
-        "forecast_7d": "7 Dagen Voorspelling",
-        "rain_radar": "Regenradar",
-        "weather_alerts": "Weerswaarschuwingen",
-        "no_alerts": "Geen actuele waarschuwingen",
-        "fishing_conditions": "🎣 Visomstandigheden",
-        "fishing_forecast": "📊 Visvoorspelling Komende Dagen",
-        "games_title": "🎮 Games",
-        "game_2048": "🔢 2048",
-        "game_flappy": "🐦 Flappy Bird",
-        "game_guess": "🔢 Raad het Getal",
-        "game_snake": "🐍 Snake",
-        "game_pong": "🏓 Pong",
-        "game_breakout": "🧱 Breakout",
-        "game_menu": "📋 Menu",
-        "game_2048_title": "🔢 2048",
-        "game_flappy_title": "🐦 Flappy Bird",
-        "game_guess_title": "🔢 Raad het Getal",
-        "game_snake_title": "🐍 Snake",
-        "game_pong_title": "🏓 Pong",
-        "game_breakout_title": "🧱 Breakout",
-        "score": "Score:",
-        "new_game": "Nieuw Spel",
-        "start_game": "Start Spel",
-        "game_2048_instructions": "Gebruik pijltjestoetsen of swipe om tegels te bewegen",
-        "game_flappy_instructions": "Klik of druk op spatie om te springen",
-        "game_snake_instructions": "Gebruik pijltjestoetsen om de slang te besturen",
-        "game_pong_instructions": "Gebruik W/S toetsen om de paddle te bewegen",
-        "game_breakout_instructions": "Gebruik pijltjestoetsen of muis om de paddle te bewegen",
-        "guess_range": "Ik denk aan een getal tussen 1 en 100",
-        "attempts": "Pogingen:",
-        "guess_button": "Raad",
-        "last_updated": "Laatst bijgewerkt:",
-        "refresh": "🔄 Vernieuwen",
-        "data_source": "Data: Open-Meteo | Radar: Windy.com",
-        "error_title": "⚠️ Fout opgetreden",
-        "error_message": "Er is een fout opgetreden bij het laden van de weerdata.",
-        "close": "Sluiten",
-        "try_again": "Opnieuw proberen",
-        "use_location": "📍 Gebruik mijn locatie",
-        "determining_location": "📍 Locatie bepalen...",
-        "unknown_weather": "onbekend weer"
+        app_title: "🌤️ Weer App",
+        app_subtitle: "Actueel lokaal weer voor Nederland",
+        theme_dark: "🌙 Dark",
+        theme_light: "☀️ Light",
+        nav_today: "🌤️ Vandaag",
+        nav_week: "📅 Week",
+        nav_radar: "🌧️ Radar",
+        nav_fishing: "🎣 Vissen",
+        nav_fire: "🔥 Bosbranden",
+        nav_air: "🌫️ Luchtkwaliteit",
+        nav_games: "🎮 Games",
+        current_weather: "Huidig Weer",
+        loading: "Weerdata laden...",
+        feels_like: "Gevoelstemperatuur:",
+        wind: "Wind:",
+        wind_gust: "Windstoten:",
+        pressure: "Luchtdruk:",
+        visibility: "Zicht:",
+        humidity: "Luchtvochtigheid:",
+        clouds: "Bewolking:",
+        precipitation: "Neerslag:",
+        forecast_24h: "24 Uur Voorspelling",
+        forecast_7d: "7 Dagen Voorspelling",
+        rain_radar: "Regenradar",
+        weather_alerts: "Weerswaarschuwingen",
+        no_alerts: "Geen actuele waarschuwingen",
+        fishing_conditions: "🎣 Visomstandigheden",
+        fishing_forecast: "📊 Visvoorspelling Komende Dagen",
+        games_title: "🎮 Games",
+        game_2048: "🔢 2048",
+        game_flappy: "🐦 Flappy Bird",
+        game_guess: "🔢 Raad het Getal",
+        game_snake: "🐍 Snake",
+        game_pong: "🏓 Pong",
+        game_breakout: "🧱 Breakout",
+        game_memory: "🃏 Memory",
+        game_menu: "📋 Menu",
+        game_2048_title: "🔢 2048",
+        game_flappy_title: "🐦 Flappy Bird",
+        game_guess_title: "🔢 Raad het Getal",
+        game_snake_title: "🐍 Snake",
+        game_pong_title: "🏓 Pong",
+        game_breakout_title: "🧱 Breakout",
+        game_memory_title: "🃏 Memory",
+        score: "Score:",
+        best_score: "Record:",
+        moves: "Zetten:",
+        new_game: "Nieuw Spel",
+        start_game: "Start Spel",
+        game_over: "Game Over",
+        you_win: "Gefeliciteerd, je hebt gewonnen!",
+        game_2048_instructions: "Gebruik pijltjestoetsen of swipe om tegels te bewegen",
+        game_flappy_instructions: "Klik of druk op spatie om te springen",
+        game_snake_instructions: "Gebruik pijltjestoetsen om de slang te besturen",
+        game_pong_instructions: "Gebruik W/S toetsen om de paddle te bewegen",
+        game_breakout_instructions: "Gebruik pijltjestoetsen of muis om de paddle te bewegen",
+        game_memory_instructions: "Vind de paren met dezelfde kaarten",
+        guess_range: "Ik denk aan een getal tussen 1 en 100",
+        attempts: "Pogingen:",
+        guess_button: "Raad",
+        too_low: "📈 Te laag! Kies een hoger getal.",
+        too_high: "📉 Te hoog! Kies een lager getal.",
+        guess_correct: "🎉 Gefeliciteerd! Geraden in",
+        guess_attempts: "pogingen!",
+        guess_invalid: "Voer een getal tussen 1 en 100 in.",
+        last_updated: "Laatst bijgewerkt:",
+        refresh: "🔄 Vernieuwen",
+        data_source: "Data: Open-Meteo | Radar: Windy.com",
+        error_title: "⚠️ Fout opgetreden",
+        error_message: "Er is een fout opgetreden bij het laden van de weerdata.",
+        close: "Sluiten",
+        try_again: "Opnieuw proberen",
+        use_location: "📍 Gebruik mijn locatie",
+        determining_location: "📍 Locatie bepalen...",
+        unknown_weather: "onbekend weer",
+        fire_risk_title: "🔥 Brandrisico",
+        fire_forecast_title: "📅 Brandrisico Komende Dagen",
+        fire_loading: "Brandrisico laden...",
+        fire_level_matig: "Matig",
+        fire_level_verhoogd: "Verhoogd",
+        fire_level_hoog: "Hoog",
+        fire_level_extreem: "Extreem",
+        fire_level_laag: "Laag",
+        fire_desc_laag: "Laag brandgevaar. Brandomstandigheden zijn gunstig.",
+        fire_desc_matig: "Beperkt brandgevaar. Condities voor bosbranden zijn gunstig.",
+        fire_desc_verhoogd: "Verhoogd brandgevaar. Droge en warme omstandigheden.",
+        fire_desc_hoog: "Hoog brandgevaar. Wees extra voorzichtig met open vuur.",
+        fire_desc_extreem: "Extreem brandgevaar. Open vuur is ten zeerste af te raden.",
+        fire_angstrom: "Angström-index",
+        fire_smoke: "Rook van bosbranden",
+        air_quality_title: "🌫️ Luchtkwaliteit",
+        air_loading: "Luchtkwaliteit laden...",
+        aqi_good: "Goed",
+        aqi_moderate: "Matig",
+        aqi_unhealthy: "Ongezond",
+        aqi_hazardous: "Gevaarlijk",
+        aqi_scale_us: "US AQI",
+        aqi_scale_european: "Europese AQI",
+        pollutants: "Verontreinigende stoffen",
+        login: "Inloggen",
+        register: "Registreren",
+        logout: "Uitloggen",
+        settings: "Instellingen",
     },
     en: {
-        "app_title": "🌤️ Weather App",
-        "app_subtitle": "Current local weather information",
-        "theme_dark": "🌙 Dark",
-        "theme_light": "☀️ Light",
-        "nav_today": "🌤️ Today",
-        "nav_week": "📅 Week",
-        "nav_radar": "🌧️ Radar",
-        "nav_fishing": "🎣 Fishing",
-        "nav_games": "🎮 Games",
-        "current_weather": "Current Weather",
-        "loading": "Loading weather data...",
-        "feels_like": "Feels like:",
-        "min_max": "Min/Max:",
-        "wind": "Wind:",
-        "humidity": "Humidity:",
-        "clouds": "Clouds:",
-        "precipitation": "Precipitation:",
-        "forecast_24h": "24 Hour Forecast",
-        "forecast_7d": "7 Day Forecast",
-        "rain_radar": "Rain Radar",
-        "weather_alerts": "Weather Alerts",
-        "no_alerts": "No current alerts",
-        "fishing_conditions": "🎣 Fishing Conditions",
-        "fishing_forecast": "📊 Fishing Forecast Next Days",
-        "games_title": "🎮 Games",
-        "game_2048": "🔢 2048",
-        "game_flappy": "🐦 Flappy Bird",
-        "game_guess": "🔢 Guess the Number",
-        "game_snake": "🐍 Snake",
-        "game_pong": "🏓 Pong",
-        "game_breakout": "🧱 Breakout",
-        "game_menu": "📋 Menu",
-        "game_2048_title": "🔢 2048",
-        "game_flappy_title": "🐦 Flappy Bird",
-        "game_guess_title": "🔢 Guess the Number",
-        "game_snake_title": "🐍 Snake",
-        "game_pong_title": "🏓 Pong",
-        "game_breakout_title": "🧱 Breakout",
-        "score": "Score:",
-        "new_game": "New Game",
-        "start_game": "Start Game",
-        "game_2048_instructions": "Use arrow keys or swipe to move tiles",
-        "game_flappy_instructions": "Click or press space to jump",
-        "game_snake_instructions": "Use arrow keys to control the snake",
-        "game_pong_instructions": "Use W/S keys to move the paddle",
-        "game_breakout_instructions": "Use arrow keys or mouse to move the paddle",
-        "guess_range": "I'm thinking of a number between 1 and 100",
-        "attempts": "Attempts:",
-        "guess_button": "Guess",
-        "last_updated": "Last updated:",
-        "refresh": "🔄 Refresh",
-        "data_source": "Data: Open-Meteo | Radar: Windy.com",
-        "error_title": "⚠️ Error Occurred",
-        "error_message": "An error occurred while loading weather data.",
-        "close": "Close",
-        "try_again": "Try Again",
-        "use_location": "📍 Use my location",
-        "determining_location": "📍 Determining location...",
-        "unknown_weather": "unknown weather"
+        app_title: "🌤️ Weather App",
+        app_subtitle: "Current local weather information",
+        theme_dark: "🌙 Dark",
+        theme_light: "☀️ Light",
+        nav_today: "🌤️ Today",
+        nav_week: "📅 Week",
+        nav_radar: "🌧️ Radar",
+        nav_fishing: "🎣 Fishing",
+        nav_fire: "🔥 Forest Fires",
+        nav_air: "🌫️ Air Quality",
+        nav_games: "🎮 Games",
+        current_weather: "Current Weather",
+        loading: "Loading weather data...",
+        feels_like: "Feels like:",
+        wind: "Wind:",
+        wind_gust: "Wind gusts:",
+        pressure: "Pressure:",
+        visibility: "Visibility:",
+        humidity: "Humidity:",
+        clouds: "Clouds:",
+        precipitation: "Precipitation:",
+        forecast_24h: "24 Hour Forecast",
+        forecast_7d: "7 Day Forecast",
+        rain_radar: "Rain Radar",
+        weather_alerts: "Weather Alerts",
+        no_alerts: "No current alerts",
+        fishing_conditions: "🎣 Fishing Conditions",
+        fishing_forecast: "📊 Fishing Forecast Next Days",
+        games_title: "🎮 Games",
+        game_2048: "🔢 2048",
+        game_flappy: "🐦 Flappy Bird",
+        game_guess: "🔢 Guess the Number",
+        game_snake: "🐍 Snake",
+        game_pong: "🏓 Pong",
+        game_breakout: "🧱 Breakout",
+        game_memory: "🃏 Memory",
+        game_menu: "📋 Menu",
+        game_2048_title: "🔢 2048",
+        game_flappy_title: "🐦 Flappy Bird",
+        game_guess_title: "🔢 Guess the Number",
+        game_snake_title: "🐍 Snake",
+        game_pong_title: "🏓 Pong",
+        game_breakout_title: "🧱 Breakout",
+        game_memory_title: "🃏 Memory",
+        score: "Score:",
+        best_score: "Best:",
+        moves: "Moves:",
+        new_game: "New Game",
+        start_game: "Start Game",
+        game_over: "Game Over",
+        you_win: "Congratulations, you won!",
+        game_2048_instructions: "Use arrow keys or swipe to move tiles",
+        game_flappy_instructions: "Click or press space to jump",
+        game_snake_instructions: "Use arrow keys to control the snake",
+        game_pong_instructions: "Use W/S keys to move the paddle",
+        game_breakout_instructions: "Use arrow keys or mouse to move the paddle",
+        game_memory_instructions: "Find the matching pairs",
+        guess_range: "I'm thinking of a number between 1 and 100",
+        attempts: "Attempts:",
+        guess_button: "Guess",
+        too_low: "📈 Too low! Try a higher number.",
+        too_high: "📉 Too high! Try a lower number.",
+        guess_correct: "🎉 Congratulations! Guessed in",
+        guess_attempts: "attempts!",
+        guess_invalid: "Please enter a number between 1 and 100.",
+        last_updated: "Last updated:",
+        refresh: "🔄 Refresh",
+        data_source: "Data: Open-Meteo | Radar: Windy.com",
+        error_title: "⚠️ Error Occurred",
+        error_message: "An error occurred while loading weather data.",
+        close: "Close",
+        try_again: "Try Again",
+        use_location: "📍 Use my location",
+        determining_location: "📍 Determining location...",
+        unknown_weather: "unknown weather",
+        fire_risk_title: "🔥 Fire Risk",
+        fire_forecast_title: "📅 Fire Risk Next Days",
+        fire_loading: "Loading fire risk...",
+        fire_level_matig: "Moderate",
+        fire_level_verhoogd: "Elevated",
+        fire_level_hoog: "High",
+        fire_level_extreem: "Extreme",
+        fire_level_laag: "Low",
+        fire_desc_laag: "Low fire danger. Conditions are favourable.",
+        fire_desc_matig: "Limited fire danger. Conditions are favourable.",
+        fire_desc_verhoogd: "Elevated fire danger. Dry and warm conditions.",
+        fire_desc_hoog: "High fire danger. Be careful with open flames.",
+        fire_desc_extreem: "Extreme fire danger. Open flames strongly discouraged.",
+        fire_angstrom: "Angström index",
+        fire_smoke: "Wildfire smoke",
+        air_quality_title: "🌫️ Air Quality",
+        air_loading: "Loading air quality...",
+        aqi_good: "Good",
+        aqi_moderate: "Moderate",
+        aqi_unhealthy: "Unhealthy",
+        aqi_hazardous: "Hazardous",
+        aqi_scale_us: "US AQI",
+        aqi_scale_european: "European AQI",
+        pollutants: "Pollutants",
+        login: "Log in",
+        register: "Register",
+        logout: "Log out",
+        settings: "Settings",
     },
     de: {
-        "app_title": "🌤️ Wetter App",
-        "app_subtitle": "Aktuelle lokale Wetterinformationen",
-        "theme_dark": "🌙 Dunkel",
-        "theme_light": "☀️ Hell",
-        "nav_today": "🌤️ Heute",
-        "nav_week": "📅 Woche",
-        "nav_radar": "🌧️ Radar",
-        "nav_fishing": "🎣 Angeln",
-        "current_weather": "Aktuelles Wetter",
-        "loading": "Wetterdaten laden...",
-        "feels_like": "Gefühlt wie:",
-        "min_max": "Min/Max:",
-        "wind": "Wind:",
-        "humidity": "Luftfeuchtigkeit:",
-        "clouds": "Bewölkung:",
-        "precipitation": "Niederschlag:",
-        "forecast_24h": "24 Stunden Vorhersage",
-        "forecast_7d": "7 Tage Vorhersage",
-        "rain_radar": "Regenradar",
-        "weather_alerts": "Wetterwarnungen",
-        "no_alerts": "Keine aktuellen Warnungen",
-        "fishing_conditions": "🎣 Angelbedingungen",
-        "fishing_forecast": "📊 Angelvorhersage Nächste Tage",
-        "last_updated": "Zuletzt aktualisiert:",
-        "refresh": "🔄 Aktualisieren",
-        "data_source": "Daten: Open-Meteo | Radar: Windy.com",
-        "error_title": "⚠️ Fehler aufgetreten",
-        "error_message": "Fehler beim Laden der Wetterdaten.",
-        "close": "Schließen",
-        "try_again": "Erneut versuchen",
-        "use_location": "📍 Mein Standort verwenden",
-        "determining_location": "📍 Standort bestimmen...",
-        "unknown_weather": "unbekanntes Wetter"
+        app_title: "🌤️ Wetter App",
+        app_subtitle: "Aktuelle lokale Wetterinformationen",
+        theme_dark: "🌙 Dunkel",
+        theme_light: "☀️ Hell",
+        nav_today: "🌤️ Heute",
+        nav_week: "📅 Woche",
+        nav_radar: "🌧️ Radar",
+        nav_fishing: "🎣 Angeln",
+        nav_fire: "🔥 Waldbrände",
+        nav_air: "🌫️ Luftqualität",
+        nav_games: "🎮 Spiele",
+        current_weather: "Aktuelles Wetter",
+        loading: "Wetterdaten laden...",
+        feels_like: "Gefühlt wie:",
+        wind: "Wind:",
+        wind_gust: "Windböen:",
+        pressure: "Druck:",
+        visibility: "Sicht:",
+        humidity: "Luftfeuchtigkeit:",
+        clouds: "Bewölkung:",
+        precipitation: "Niederschlag:",
+        forecast_24h: "24 Stunden Vorhersage",
+        forecast_7d: "7 Tage Vorhersage",
+        rain_radar: "Regenradar",
+        weather_alerts: "Wetterwarnungen",
+        no_alerts: "Keine aktuellen Warnungen",
+        fishing_conditions: "🎣 Angelbedingungen",
+        fishing_forecast: "📊 Angelvorhersage Nächste Tage",
+        games_title: "🎮 Spiele",
+        game_2048: "🔢 2048",
+        game_flappy: "🐦 Flappy Bird",
+        game_guess: "🔢 Rate die Zahl",
+        game_snake: "🐍 Schlange",
+        game_pong: "🏓 Pong",
+        game_breakout: "🧱 Breakout",
+        game_memory: "🃏 Memory",
+        game_menu: "📋 Menü",
+        game_2048_title: "🔢 2048",
+        game_flappy_title: "🐦 Flappy Bird",
+        game_guess_title: "🔢 Rate die Zahl",
+        game_snake_title: "🐍 Schlange",
+        game_pong_title: "🏓 Pong",
+        game_breakout_title: "🧱 Breakout",
+        game_memory_title: "🃏 Memory",
+        score: "Punktzahl:",
+        best_score: "Rekord:",
+        moves: "Züge:",
+        new_game: "Neues Spiel",
+        start_game: "Spiel starten",
+        game_over: "Spiel vorbei",
+        you_win: "Glückwunsch, du hast gewonnen!",
+        game_2048_instructions: "Verwende Pfeiltasten oder Wischen",
+        game_flappy_instructions: "Klicken oder Leertaste zum Springen",
+        game_snake_instructions: "Verwende Pfeiltasten für die Schlange",
+        game_pong_instructions: "W/S Tasten für den Schläger",
+        game_breakout_instructions: "Pfeiltasten oder Maus für den Schläger",
+        game_memory_instructions: "Finde die passenden Paare",
+        guess_range: "Ich denke an eine Zahl zwischen 1 und 100",
+        attempts: "Versuche:",
+        guess_button: "Raten",
+        too_low: "📈 Zu niedrig! Versuche eine höhere Zahl.",
+        too_high: "📉 Zu hoch! Versuche eine niedrigere Zahl.",
+        guess_correct: "🎉 Glückwunsch! Erraten in",
+        guess_attempts: "Versuchen!",
+        guess_invalid: "Bitte gib eine Zahl zwischen 1 und 100 ein.",
+        last_updated: "Zuletzt aktualisiert:",
+        refresh: "🔄 Aktualisieren",
+        data_source: "Daten: Open-Meteo | Radar: Windy.com",
+        error_title: "⚠️ Fehler aufgetreten",
+        error_message: "Fehler beim Laden der Wetterdaten.",
+        close: "Schließen",
+        try_again: "Erneut versuchen",
+        use_location: "📍 Mein Standort verwenden",
+        determining_location: "📍 Standort bestimmen...",
+        unknown_weather: "unbekanntes Wetter",
+        fire_risk_title: "🔥 Brandrisiko",
+        fire_forecast_title: "📅 Brandrisiko Nächste Tage",
+        fire_loading: "Brandrisiko wird geladen...",
+        fire_level_matig: "Mäßig",
+        fire_level_verhoogd: "Erhöht",
+        fire_level_hoog: "Hoch",
+        fire_level_extreem: "Extrem",
+        fire_level_laag: "Niedrig",
+        fire_desc_laag: "Niedrige Brandgefahr. Bedingungen sind günstig.",
+        fire_desc_matig: "Begrenzte Brandgefahr. Bedingungen sind günstig.",
+        fire_desc_verhoogd: "Erhöhte Brandgefahr. Trockene und warme Bedingungen.",
+        fire_desc_hoog: "Hohe Brandgefahr. Sei vorsichtig mit offenem Feuer.",
+        fire_desc_extreem: "Extreme Brandgefahr. Offenes Feuer wird dringend abgeraten.",
+        fire_angstrom: "Angström-Index",
+        fire_smoke: "Waldbrandrauch",
+        air_quality_title: "🌫️ Luftqualität",
+        air_loading: "Luftqualität wird geladen...",
+        aqi_good: "Gut",
+        aqi_moderate: "Mäßig",
+        aqi_unhealthy: "Ungesund",
+        aqi_hazardous: "Gefährlich",
+        aqi_scale_us: "US AQI",
+        aqi_scale_european: "Europäischer AQI",
+        pollutants: "Schadstoffe",
+        login: "Anmelden",
+        register: "Registrieren",
+        logout: "Abmelden",
+        settings: "Einstellungen",
     },
     it: {
-        "app_title": "🌤️ App Meteo",
-        "app_subtitle": "Informazioni meteo locali attuali",
-        "theme_dark": "🌙 Scuro",
-        "theme_light": "☀️ Chiaro",
-        "nav_today": "🌤️ Oggi",
-        "nav_week": "📅 Settimana",
-        "nav_radar": "🌧️ Radar",
-        "nav_fishing": "🎣 Pesca",
-        "current_weather": "Meteo Attuale",
-        "loading": "Caricamento dati meteo...",
-        "feels_like": "Percepita:",
-        "min_max": "Min/Max:",
-        "wind": "Vento:",
-        "humidity": "Umidità:",
-        "clouds": "Nuvolosità:",
-        "precipitation": "Precipitazioni:",
-        "forecast_24h": "Previsioni 24 Ore",
-        "forecast_7d": "Previsioni 7 Giorni",
-        "rain_radar": "Radar Pioggia",
-        "weather_alerts": "Allerte Meteo",
-        "no_alerts": "Nessun allerta attuale",
-        "fishing_conditions": "🎣 Condizioni di Pesca",
-        "fishing_forecast": "📊 Previsioni Pesca Prossimi Giorni",
-        "last_updated": "Ultimo aggiornamento:",
-        "refresh": "🔄 Aggiorna",
-        "data_source": "Dati: Open-Meteo | Radar: Windy.com",
-        "error_title": "⚠️ Errore Verificato",
-        "error_message": "Si è verificato un errore nel caricamento dei dati meteo.",
-        "close": "Chiudi",
-        "try_again": "Riprova",
-        "use_location": "📍 Usa la mia posizione",
-        "determining_location": "📍 Determinazione posizione...",
-        "unknown_weather": "tempo sconosciuto"
+        app_title: "🌤️ App Meteo",
+        app_subtitle: "Informazioni meteo locali attuali",
+        theme_dark: "🌙 Scuro",
+        theme_light: "☀️ Chiaro",
+        nav_today: "🌤️ Oggi",
+        nav_week: "📅 Settimana",
+        nav_radar: "🌧️ Radar",
+        nav_fishing: "🎣 Pesca",
+        nav_fire: "🔥 Incendi Boschivi",
+        nav_air: "🌫️ Qualità dell'Aria",
+        nav_games: "🎮 Giochi",
+        current_weather: "Meteo Attuale",
+        loading: "Caricamento dati meteo...",
+        feels_like: "Percepita:",
+        wind: "Vento:",
+        wind_gust: "Raffiche:",
+        pressure: "Pressione:",
+        visibility: "Visibilità:",
+        humidity: "Umidità:",
+        clouds: "Nuvolosità:",
+        precipitation: "Precipitazioni:",
+        forecast_24h: "Previsioni 24 Ore",
+        forecast_7d: "Previsioni 7 Giorni",
+        rain_radar: "Radar Pioggia",
+        weather_alerts: "Allerte Meteo",
+        no_alerts: "Nessun allerta attuale",
+        fishing_conditions: "🎣 Condizioni di Pesca",
+        fishing_forecast: "📊 Previsioni Pesca Prossimi Giorni",
+        games_title: "🎮 Giochi",
+        game_2048: "🔢 2048",
+        game_flappy: "🐦 Flappy Bird",
+        game_guess: "🔢 Indovina il Numero",
+        game_snake: "🐍 Serpente",
+        game_pong: "🏓 Pong",
+        game_breakout: "🧱 Breakout",
+        game_memory: "🃏 Memory",
+        game_menu: "📋 Menu",
+        game_2048_title: "🔢 2048",
+        game_flappy_title: "🐦 Flappy Bird",
+        game_guess_title: "🔢 Indovina il Numero",
+        game_snake_title: "🐍 Serpente",
+        game_pong_title: "🏓 Pong",
+        game_breakout_title: "🧱 Breakout",
+        game_memory_title: "🃏 Memory",
+        score: "Punti:",
+        best_score: "Record:",
+        moves: "Mosse:",
+        new_game: "Nuova Partita",
+        start_game: "Inizia",
+        game_over: "Game Over",
+        you_win: "Congratulazioni, hai vinto!",
+        game_2048_instructions: "Usa le frecce o scorri per muovere le tessere",
+        game_flappy_instructions: "Clicca o premi spazio per saltare",
+        game_snake_instructions: "Usa le frecce per controllare il serpente",
+        game_pong_instructions: "Usa i tasti W/S per la racchetta",
+        game_breakout_instructions: "Frecce o mouse per la racchetta",
+        game_memory_instructions: "Trova le coppie corrispondenti",
+        guess_range: "Penso a un numero tra 1 e 100",
+        attempts: "Tentativi:",
+        guess_button: "Indovina",
+        too_low: "📈 Troppo basso! Prova più in alto.",
+        too_high: "📉 Troppo alto! Prova più in basso.",
+        guess_correct: "🎉 Congratulazioni! Indovinato in",
+        guess_attempts: "tentativi!",
+        guess_invalid: "Inserisci un numero tra 1 e 100.",
+        last_updated: "Ultimo aggiornamento:",
+        refresh: "🔄 Aggiorna",
+        data_source: "Dati: Open-Meteo | Radar: Windy.com",
+        error_title: "⚠️ Errore Verificato",
+        error_message: "Si è verificato un errore nel caricamento dei dati meteo.",
+        close: "Chiudi",
+        try_again: "Riprova",
+        use_location: "📍 Usa la mia posizione",
+        determining_location: "📍 Determinazione posizione...",
+        unknown_weather: "tempo sconosciuto",
+        fire_risk_title: "🔥 Rischio Incendio",
+        fire_forecast_title: "📅 Rischio Incendio Prossimi Giorni",
+        fire_loading: "Caricamento rischio incendio...",
+        fire_level_matig: "Moderato",
+        fire_level_verhoogd: "Elevato",
+        fire_level_hoog: "Alto",
+        fire_level_extreem: "Estremo",
+        fire_level_laag: "Basso",
+        fire_desc_laag: "Pericolo basso. Condizioni favorevoli.",
+        fire_desc_matig: "Pericolo limitato. Condizioni favorevoli.",
+        fire_desc_verhoogd: "Pericolo elevato. Condizioni secche e calde.",
+        fire_desc_hoog: "Pericolo alto. Attenzione al fuoco all'aperto.",
+        fire_desc_extreem: "Pericolo estremo. Fuoco all'aperto sconsigliato.",
+        fire_angstrom: "Indice Angström",
+        fire_smoke: "Fumo di incendi",
+        air_quality_title: "🌫️ Qualità dell'Aria",
+        air_loading: "Caricamento qualità dell'aria...",
+        aqi_good: "Buona",
+        aqi_moderate: "Moderata",
+        aqi_unhealthy: "Malsana",
+        aqi_hazardous: "Pericolosa",
+        aqi_scale_us: "AQI USA",
+        aqi_scale_european: "AQI Europeo",
+        pollutants: "Inquinanti",
+        login: "Accedi",
+        register: "Registrati",
+        logout: "Esci",
+        settings: "Impostazioni",
     },
     fr: {
-        "app_title": "🌤️ App Météo",
-        "app_subtitle": "Informations météo locales actuelles",
-        "theme_dark": "🌙 Sombre",
-        "theme_light": "☀️ Clair",
-        "nav_today": "🌤️ Aujourd'hui",
-        "nav_week": "📅 Semaine",
-        "nav_radar": "🌧️ Radar",
-        "nav_fishing": "🎣 Pêche",
-        "current_weather": "Météo Actuelle",
-        "loading": "Chargement des données météo...",
-        "feels_like": "Ressenti:",
-        "min_max": "Min/Max:",
-        "wind": "Vent:",
-        "humidity": "Humidité:",
-        "clouds": "Nuages:",
-        "precipitation": "Précipitations:",
-        "forecast_24h": "Prévisions 24h",
-        "forecast_7d": "Prévisions 7 Jours",
-        "rain_radar": "Radar Pluie",
-        "weather_alerts": "Alertes Météo",
-        "no_alerts": "Aucune alerte actuelle",
-        "fishing_conditions": "🎣 Conditions de Pêche",
-        "fishing_forecast": "📊 Prévisions Pêche Prochains Jours",
-        "last_updated": "Dernière mise à jour:",
-        "refresh": "🔄 Actualiser",
-        "data_source": "Données: Open-Meteo | Radar: Windy.com",
-        "error_title": "⚠️ Erreur Survenue",
-        "error_message": "Une erreur s'est produite lors du chargement des données météo.",
-        "close": "Fermer",
-        "try_again": "Réessayer",
-        "use_location": "📍 Utiliser ma position",
-        "determining_location": "📍 Détermination de la position...",
-        "unknown_weather": "temps inconnu"
+        app_title: "🌤️ App Météo",
+        app_subtitle: "Informations météo locales actuelles",
+        theme_dark: "🌙 Sombre",
+        theme_light: "☀️ Clair",
+        nav_today: "🌤️ Aujourd'hui",
+        nav_week: "📅 Semaine",
+        nav_radar: "🌧️ Radar",
+        nav_fishing: "🎣 Pêche",
+        nav_fire: "🔥 Feux de forêt",
+        nav_air: "🌫️ Qualité de l'air",
+        nav_games: "🎮 Jeux",
+        current_weather: "Météo Actuelle",
+        loading: "Chargement des données météo...",
+        feels_like: "Ressenti:",
+        wind: "Vent:",
+        wind_gust: "Rafales:",
+        pressure: "Pression:",
+        visibility: "Visibilité:",
+        humidity: "Humidité:",
+        clouds: "Nuages:",
+        precipitation: "Précipitations:",
+        forecast_24h: "Prévisions 24h",
+        forecast_7d: "Prévisions 7 Jours",
+        rain_radar: "Radar Pluie",
+        weather_alerts: "Alertes Météo",
+        no_alerts: "Aucune alerte actuelle",
+        fishing_conditions: "🎣 Conditions de Pêche",
+        fishing_forecast: "📊 Prévisions Pêche Prochains Jours",
+        games_title: "🎮 Jeux",
+        game_2048: "🔢 2048",
+        game_flappy: "🐦 Flappy Bird",
+        game_guess: "🔢 Devine le Nombre",
+        game_snake: "🐍 Serpent",
+        game_pong: "🏓 Pong",
+        game_breakout: "🧱 Breakout",
+        game_memory: "🃏 Memory",
+        game_menu: "📋 Menu",
+        game_2048_title: "🔢 2048",
+        game_flappy_title: "🐦 Flappy Bird",
+        game_guess_title: "🔢 Devine le Nombre",
+        game_snake_title: "🐍 Serpent",
+        game_pong_title: "🏓 Pong",
+        game_breakout_title: "🧱 Breakout",
+        game_memory_title: "🃏 Memory",
+        score: "Score:",
+        best_score: "Record:",
+        moves: "Coups:",
+        new_game: "Nouvelle Partie",
+        start_game: "Commencer",
+        game_over: "Game Over",
+        you_win: "Félicitations, vous avez gagné!",
+        game_2048_instructions: "Flèches ou glisser pour déplacer les tuiles",
+        game_flappy_instructions: "Cliquer ou espace pour sauter",
+        game_snake_instructions: "Flèches pour contrôler le serpent",
+        game_pong_instructions: "W/S pour la raquette",
+        game_breakout_instructions: "Flèches ou souris pour la raquette",
+        game_memory_instructions: "Trouvez les paires correspondantes",
+        guess_range: "Je pense à un nombre entre 1 et 100",
+        attempts: "Essais:",
+        guess_button: "Deviner",
+        too_low: "📈 Trop bas! Essayez plus haut.",
+        too_high: "📉 Trop haut! Essayez plus bas.",
+        guess_correct: "🎉 Félicitations! Trouvé en",
+        guess_attempts: "essais!",
+        guess_invalid: "Entrez un nombre entre 1 et 100.",
+        last_updated: "Dernière mise à jour:",
+        refresh: "🔄 Actualiser",
+        data_source: "Données: Open-Meteo | Radar: Windy.com",
+        error_title: "⚠️ Erreur Survenue",
+        error_message: "Une erreur s'est produite lors du chargement des données météo.",
+        close: "Fermer",
+        try_again: "Réessayer",
+        use_location: "📍 Utiliser ma position",
+        determining_location: "📍 Détermination de la position...",
+        unknown_weather: "temps inconnu",
+        fire_risk_title: "🔥 Risque d'incendie",
+        fire_forecast_title: "📅 Risque d'incendie Prochains Jours",
+        fire_loading: "Chargement du risque d'incendie...",
+        fire_level_matig: "Modéré",
+        fire_level_verhoogd: "Élevé",
+        fire_level_hoog: "Haut",
+        fire_level_extreem: "Extrême",
+        fire_level_laag: "Faible",
+        fire_desc_laag: "Danger faible. Conditions favorables.",
+        fire_desc_matig: "Danger limité. Conditions favorables.",
+        fire_desc_verhoogd: "Danger élevé. Conditions sèches et chaudes.",
+        fire_desc_hoog: "Danger haut. Prudence avec le feu.",
+        fire_desc_extreem: "Danger extrême. Feu à l'air libre déconseillé.",
+        fire_angstrom: "Indice d'Angström",
+        fire_smoke: "Fumée de feux de forêt",
+        air_quality_title: "🌫️ Qualité de l'air",
+        air_loading: "Chargement de la qualité de l'air...",
+        aqi_good: "Bonne",
+        aqi_moderate: "Modérée",
+        aqi_unhealthy: "Malsaine",
+        aqi_hazardous: "Dangereuse",
+        aqi_scale_us: "AQI US",
+        aqi_scale_european: "AQI Européen",
+        pollutants: "Polluants",
+        login: "Connexion",
+        register: "S'inscrire",
+        logout: "Déconnexion",
+        settings: "Paramètres",
     }
 };
 
+// ============================================================================
+// WeatherApp core
+// ============================================================================
 class WeatherApp {
     constructor() {
         this.currentLanguage = localStorage.getItem('weatherAppLanguage') || 'nl';
-        this.init();
-        this.bindEvents();
-        this.userLocation = null; // Store GPS coordinates
-        
-        // Initialize language system
+        this.userLocation = null;
+        this.currentData = null;
+        this.forecast24h = null;
+        this.forecast7d = null;
+        this.alerts = null;
+
+        this.initElements();
         this.initLanguageSystem();
-        
-        // Load weather data immediately (no authentication required)
+        this.bindEvents();
         this.loadWeatherData();
-        
-        // Auto-refresh every 10 minutes
         setInterval(() => {
-            const lat = this.userLocation ? this.userLocation.lat : null;
-            const lon = this.userLocation ? this.userLocation.lon : null;
+            const { lat, lon } = this._coords();
             this.loadWeatherData(false, lat, lon);
         }, 10 * 60 * 1000);
     }
 
-    init() {
+    _coords() {
+        return this.userLocation
+            ? { lat: this.userLocation.lat, lon: this.userLocation.lon }
+            : { lat: null, lon: null };
+    }
+
+    initElements() {
         this.currentWeatherElement = document.getElementById('current-data');
         this.loadingElement = document.getElementById('loading');
         this.forecast24hElement = document.getElementById('forecast-24h-data');
@@ -265,294 +572,228 @@ class WeatherApp {
         this.themeToggle = document.getElementById('theme-toggle');
     }
 
-    // Language system methods
     initLanguageSystem() {
-        // Set initial language
         if (this.languageSelector) {
             this.languageSelector.value = this.currentLanguage;
             this.languageSelector.addEventListener('change', (e) => {
                 this.changeLanguage(e.target.value);
             });
         }
-        
-        // Apply translations
         this.applyTranslations();
     }
 
     translate(key) {
-        return TRANSLATIONS[this.currentLanguage]?.[key] || TRANSLATIONS['nl'][key] || key;
+        return (TRANSLATIONS[this.currentLanguage] || TRANSLATIONS.nl)[key]
+            || TRANSLATIONS.nl[key] || key;
     }
 
     changeLanguage(lang) {
-        if (TRANSLATIONS[lang]) {
-            this.currentLanguage = lang;
-            localStorage.setItem('weatherAppLanguage', lang);
-            this.applyTranslations();
-            
-            // Reload weather data with new language
-            const lat = this.userLocation ? this.userLocation.lat : null;
-            const lon = this.userLocation ? this.userLocation.lon : null;
-            this.loadWeatherData(true, lat, lon);
-        }
+        if (!TRANSLATIONS[lang]) return;
+        this.currentLanguage = lang;
+        localStorage.setItem('weatherAppLanguage', lang);
+        this.applyTranslations();
+        const { lat, lon } = this._coords();
+        this.loadWeatherData(true, lat, lon);
+        this.loadFireRisk();
+        this.loadAirQuality();
     }
 
     applyTranslations() {
-        // Apply translations to all elements with data-translate attribute
-        const elements = document.querySelectorAll('[data-translate]');
-        elements.forEach(element => {
-            const key = element.getAttribute('data-translate');
-            element.textContent = this.translate(key);
+        document.querySelectorAll('[data-translate]').forEach(el => {
+            const key = el.getAttribute('data-translate');
+            el.textContent = this.translate(key);
         });
-
-        // Update theme toggle button text based on current theme
         const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
         const themeText = this.translate(isDark ? 'theme_light' : 'theme_dark');
         if (this.themeToggle && this.themeToggle.querySelector('span')) {
             this.themeToggle.querySelector('span').textContent = themeText;
         }
-        
-        // Update location button if it exists
-        const locationBtn = document.querySelector('.location-btn');
-        if (locationBtn && !locationBtn.disabled) {
-            locationBtn.innerHTML = this.translate('use_location');
-        }
     }
 
     bindEvents() {
-        this.refreshBtn.addEventListener('click', () => {
-            this.refreshWeatherData();
-        });
+        this.refreshBtn.addEventListener('click', () => this.refreshWeatherData());
 
-        // Tab navigation
-        const navButtons = document.querySelectorAll('.nav-btn');
-        navButtons.forEach(button => {
+        document.querySelectorAll('.nav-btn').forEach(button => {
             button.addEventListener('click', (e) => {
                 e.preventDefault();
-                const tabName = e.target.dataset.tab;
-                if (tabName) {
-                    this.switchTab(tabName);
-                }
+                const tabName = e.currentTarget.dataset.tab;
+                if (tabName) this.switchTab(tabName);
             });
         });
 
-        // Keyboard accessibility
         document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                this.closeErrorModal();
-            }
-            if (e.key === 'F5' || (e.ctrlKey && e.key === 'r')) {
-                e.preventDefault();
-                this.refreshWeatherData();
-            }
+            if (e.key === 'Escape') this.closeErrorModal();
         });
     }
 
     switchTab(tabName) {
-        // Update active button
-        document.querySelectorAll('.nav-btn').forEach(btn => {
-            btn.classList.remove('active');
-        });
-        
+        document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
         const targetButton = document.querySelector(`.nav-btn[data-tab="${tabName}"]`);
-        if (targetButton) {
-            targetButton.classList.add('active');
-        }
+        if (targetButton) targetButton.classList.add('active');
 
-        // Update active tab content
-        document.querySelectorAll('.tab-content').forEach(tab => {
-            tab.classList.remove('active');
-        });
-        
+        document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
         const targetContent = document.getElementById(`tab-${tabName}`);
-        if (targetContent) {
-            targetContent.classList.add('active');
-        }
+        if (targetContent) targetContent.classList.add('active');
 
-        // Load fishing data when switching to fishing tab
-        if (tabName === 'fishing') {
-            this.updateFishingConditions();
+        if (tabName === 'fishing') this.updateFishingConditions();
+        if (tabName === 'fire') this.loadFireRisk();
+        if (tabName === 'air') this.loadAirQuality();
+        if (tabName !== 'games') stopAllGames();
+    }
+
+    async _fetchJSON(url) {
+        const res = await fetch(url);
+        if (res.status === 401) {
+            window.location.href = '/login';
+            throw new Error('Not authenticated');
         }
+        if (!res.ok) throw new Error(`Request failed: ${url}`);
+        return res.json();
     }
 
     async loadWeatherData(showLoading = true, lat = null, lon = null) {
-        if (showLoading) {
-            this.showLoading();
-        }
+        if (showLoading) this.showLoading();
+        const lang = this.currentLanguage;
+        const q = (lat && lon) ? `?lat=${lat}&lon=${lon}` : '';
 
         try {
-            // Build URLs with coordinates and language if provided
-            const langParam = `&lang=${this.currentLanguage}`;
-            const currentUrl = lat && lon ? `/current?lat=${lat}&lon=${lon}${langParam}` : `/current?lang=${this.currentLanguage}`;
-            const forecastUrl = lat && lon ? `/forecast?lat=${lat}&lon=${lon}${langParam}` : `/forecast?lang=${this.currentLanguage}`;
-            const alertsUrl = lat && lon ? `/alerts?lat=${lat}&lon=${lon}` : '/alerts';
-
-            // Load all data in parallel for better performance
-            const [currentResponse, forecastResponse, alertsResponse] = await Promise.all([
-                fetch(currentUrl),
-                fetch(forecastUrl),
-                fetch(alertsUrl)
-            ]);
-
-            if (!currentResponse.ok || !forecastResponse.ok || !alertsResponse.ok) {
-                // Check if any response is an authentication error
-                if (currentResponse.status === 401 || forecastResponse.status === 401 || alertsResponse.status === 401) {
-                    // Redirect to login page
-                    window.location.href = '/login';
-                    return;
-                }
-                throw new Error('Failed to fetch weather data');
-            }
-
             const [currentData, forecastData, alertsData] = await Promise.all([
-                currentResponse.json(),
-                forecastResponse.json(),
-                alertsResponse.json()
+                this._fetchJSON(`/current${q}?lang=${lang}`),
+                this._fetchJSON(`/forecast${q}?lang=${lang}`),
+                this._fetchJSON(`/alerts${q}`)
             ]);
+
+            this.currentData = currentData;
+            this.forecast24h = forecastData.forecast_24h;
+            this.forecast7d = forecastData.forecast_7d;
+            this.alerts = alertsData.alerts;
 
             this.updateCurrentWeather(currentData);
-            this.updateForecast24h(forecastData.forecast_24h);
-            this.updateForecast7d(forecastData.forecast_7d);
-            this.updateAlerts(alertsData.alerts);
+            this.updateForecast24h(this.forecast24h);
+            this.updateForecast7d(this.forecast7d);
+            this.updateAlerts(this.alerts);
             this.updateLastUpdate();
-            
-            if (showLoading) {
-                this.hideLoading();
-            }
 
+            if (this.tabIsActive('fishing')) this.updateFishingConditions();
+            if (this.tabIsActive('fire')) this.loadFireRisk();
+            if (this.tabIsActive('air')) this.loadAirQuality();
         } catch (error) {
             console.error('Error loading weather data:', error);
             this.showError('Kon weerdata niet laden. Controleer uw internetverbinding en probeer het opnieuw.');
-            
-            if (showLoading) {
-                this.hideLoading();
-            }
+        } finally {
+            if (showLoading) this.hideLoading();
         }
+    }
+
+    tabIsActive(tabName) {
+        const content = document.getElementById(`tab-${tabName}`);
+        return content && content.classList.contains('active');
     }
 
     updateCurrentWeather(data) {
         document.getElementById('current-temp').textContent = data.temperature.current;
         document.getElementById('feels-like').textContent = `${data.temperature.feels_like}°C`;
-        document.getElementById('min-max').textContent = `${data.temperature.min}° / ${data.temperature.max}°`;
         document.getElementById('weather-description').textContent = data.weather.description;
-        
-        // Update location display - show place name and coordinates separately if available
+        document.getElementById('wind').textContent = `${data.wind.speed} km/h`;
+        document.getElementById('wind-gust').textContent = data.wind.gust ? `${data.wind.gust} km/h` : '--';
+        document.getElementById('humidity').textContent = `${data.humidity}%`;
+        document.getElementById('pressure').textContent = `${data.pressure} hPa`;
+        document.getElementById('clouds').textContent = `${data.clouds}%`;
+        document.getElementById('visibility').textContent =
+            data.visibility != null ? `${(data.visibility / 1000).toFixed(1)} km` : '--';
+
+        const precipitation = data.rain + data.snow;
+        document.getElementById('precipitation').textContent =
+            precipitation > 0 ? `${precipitation.toFixed(1)} mm` : '0 mm';
+
         const locationElement = document.getElementById('location-name');
         if (data.location.coords) {
-            // Show place name above coordinates
-            locationElement.innerHTML = `<strong>${data.location.name}</strong><br><small>${data.location.coords}</small>`;
+            locationElement.innerHTML =
+                `<strong>${data.location.name}</strong><br><small>${data.location.coords}</small>`;
         } else {
-            // Show just the name
             locationElement.textContent = data.location.name;
         }
-        
-        document.getElementById('wind').textContent = `${data.wind.speed} km/h`;
-        document.getElementById('humidity').textContent = `${data.humidity}%`;
-        document.getElementById('clouds').textContent = `${data.clouds}%`;
-        
-        // Precipitation (rain or snow)
-        const precipitation = data.rain + data.snow;
-        document.getElementById('precipitation').textContent = precipitation > 0 ? `${precipitation.toFixed(1)} mm` : '0 mm';
 
-        // Weather icon - use emoji instead of external images
         const iconElement = document.getElementById('weather-icon');
         const emojiIcon = this.getWeatherEmoji(data.weather.icon);
         iconElement.src = `data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y="70" font-size="60" text-anchor="middle" x="50">${emojiIcon}</text></svg>`;
         iconElement.alt = data.weather.description;
     }
 
+    _timeString(datetime) {
+        return new Date(datetime).toLocaleTimeString('nl-NL', {
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    }
+
     updateForecast24h(forecast) {
+        if (!this.forecast24hElement) return;
         this.forecast24hElement.innerHTML = '';
-        
-        forecast.forEach(item => {
-            const forecastItem = document.createElement('div');
-            forecastItem.className = 'forecast-item';
-            
-            const time = new Date(item.datetime);
-            const timeString = time.toLocaleTimeString('en-US', { 
-                hour: 'numeric', 
-                minute: '2-digit',
-                hour12: true
-            });
-            
-            const emojiIcon = this.getWeatherEmoji(item.weather.icon);
-            
-            forecastItem.innerHTML = `
-                <div class="forecast-time">${timeString}</div>
-                <img class="forecast-icon" 
-                     src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='70' font-size='50' text-anchor='middle' x='50'>${emojiIcon}</text></svg>" 
-                     alt="${item.weather.description}">
+        (forecast || []).forEach(item => {
+            const emoji = this.getWeatherEmoji(item.weather.icon);
+            const el = document.createElement('div');
+            el.className = 'forecast-item';
+            el.innerHTML = `
+                <div class="forecast-time">${this._timeString(item.datetime)}</div>
+                <img class="forecast-icon" src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='70' font-size='50' text-anchor='middle' x='50'>${emoji}</text></svg>" alt="${item.weather.description}">
                 <div class="forecast-temp">${item.temperature.temp}°</div>
                 <div class="forecast-desc">${item.weather.description}</div>
-                <div class="forecast-rain">${item.rain > 0 ? `${item.rain.toFixed(1)}mm` : ''}</div>
+                ${item.rain > 0 ? `<div class="forecast-rain">${item.rain.toFixed(1)}mm</div>` : ''}
+                ${item.precipitation_probability > 0 ? `<div class="forecast-rain">💧 ${item.precipitation_probability}%</div>` : ''}
             `;
-            
-            this.forecast24hElement.appendChild(forecastItem);
+            this.forecast24hElement.appendChild(el);
         });
     }
 
     updateForecast7d(forecast) {
+        if (!this.forecast7dElement) return;
         this.forecast7dElement.innerHTML = '';
-        
-        forecast.forEach(item => {
-            const forecastDay = document.createElement('div');
-            forecastDay.className = 'forecast-day';
-            
+        (forecast || []).forEach(item => {
             const date = new Date(item.datetime);
-            const dayName = date.toLocaleDateString('nl-NL', { 
-                weekday: 'long',
-                month: 'short',
-                day: 'numeric'
+            const dayName = date.toLocaleDateString('nl-NL', {
+                weekday: 'long', month: 'short', day: 'numeric'
             });
-            
-            const emojiIcon = this.getWeatherEmoji(item.weather.icon);
-            
-            forecastDay.innerHTML = `
+            const emoji = this.getWeatherEmoji(item.weather.icon);
+            const el = document.createElement('div');
+            el.className = 'forecast-day';
+            el.innerHTML = `
                 <div class="forecast-day-info">
                     <div class="forecast-day-name">${this.capitalizeFirst(dayName)}</div>
-                    <img class="forecast-day-icon" 
-                         src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='70' font-size='50' text-anchor='middle' x='50'>${emojiIcon}</text></svg>" 
-                         alt="${item.weather.description}">
+                    <img class="forecast-day-icon" src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='70' font-size='50' text-anchor='middle' x='50'>${emoji}</text></svg>" alt="${item.weather.description}">
                     <div class="forecast-day-desc">${item.weather.description}</div>
+                    ${item.precipitation_probability ? `<div class="forecast-rain">💧 ${item.precipitation_probability}%</div>` : ''}
                 </div>
                 <div class="forecast-day-temp">
                     <strong>${item.temperature.max}°</strong> / ${item.temperature.min}°
                 </div>
             `;
-            
-            this.forecast7dElement.appendChild(forecastDay);
+            this.forecast7dElement.appendChild(el);
         });
     }
 
     updateAlerts(alerts) {
+        if (!this.alertsElement) return;
         if (!alerts || alerts.length === 0) {
             this.alertsElement.innerHTML = '<p class="no-alerts">Geen actuele waarschuwingen</p>';
             return;
         }
-
         this.alertsElement.innerHTML = '';
-        
         alerts.forEach(alert => {
-            const alertItem = document.createElement('div');
-            alertItem.className = 'alert-item';
-            
-            alertItem.innerHTML = `
+            const el = document.createElement('div');
+            el.className = 'alert-item';
+            el.innerHTML = `
                 <div class="alert-severity">${alert.severity}</div>
                 <div class="alert-description">${alert.description}</div>
-                <div class="alert-time">Geldig tot: ${new Date(alert.end).toLocaleString('nl-NL')}</div>
             `;
-            
-            this.alertsElement.appendChild(alertItem);
+            this.alertsElement.appendChild(el);
         });
     }
 
     updateLastUpdate() {
-        const now = new Date();
-        const timeString = now.toLocaleTimeString('nl-NL', {
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit'
+        this.lastUpdateElement.textContent = new Date().toLocaleTimeString('nl-NL', {
+            hour: '2-digit', minute: '2-digit', second: '2-digit'
         });
-        this.lastUpdateElement.textContent = timeString;
     }
 
     showLoading() {
@@ -567,243 +808,144 @@ class WeatherApp {
 
     refreshWeatherData() {
         this.refreshBtn.disabled = true;
-        this.refreshBtn.innerHTML = '🔄 Laden...';
-        
-        // Use stored GPS coordinates if available
-        const lat = this.userLocation ? this.userLocation.lat : null;
-        const lon = this.userLocation ? this.userLocation.lon : null;
-        
+        const original = this.refreshBtn.textContent;
+        this.refreshBtn.textContent = '🔄 ...';
+        const { lat, lon } = this._coords();
         this.loadWeatherData(true, lat, lon).finally(() => {
             setTimeout(() => {
                 this.refreshBtn.disabled = false;
-                this.refreshBtn.innerHTML = '🔄 Vernieuwen';
+                this.refreshBtn.textContent = original;
             }, 1000);
         });
     }
 
     showError(message) {
+        if (!this.errorMessage || !this.errorModal) return;
         this.errorMessage.textContent = message;
         this.errorModal.style.display = 'flex';
     }
 
     closeErrorModal() {
-        this.errorModal.style.display = 'none';
+        if (this.errorModal) this.errorModal.style.display = 'none';
     }
 
     capitalizeFirst(str) {
-        return str.charAt(0).toUpperCase() + str.slice(1);
+        return str ? str.charAt(0).toUpperCase() + str.slice(1) : str;
     }
 
     getWeatherEmoji(iconCode) {
-        // Convert OpenWeatherMap-style icon codes to emoji
         const iconMap = {
-            '01d': '☀️',   // clear sky day
-            '01n': '🌙',   // clear sky night
-            '02d': '⛅',   // few clouds day
-            '02n': '☁️',   // few clouds night
-            '03d': '☁️',   // scattered clouds
-            '03n': '☁️',   // scattered clouds
-            '04d': '☁️',   // broken clouds
-            '04n': '☁️',   // broken clouds
-            '09d': '🌦️',   // shower rain
-            '09n': '🌦️',   // shower rain
-            '10d': '🌧️',   // rain day
-            '10n': '🌧️',   // rain night
-            '11d': '⛈️',   // thunderstorm
-            '11n': '⛈️',   // thunderstorm
-            '13d': '❄️',   // snow
-            '13n': '❄️',   // snow
-            '50d': '🌫️',   // mist
-            '50n': '🌫️'    // mist
+            '01d': '☀️', '01n': '🌙',
+            '02d': '⛅', '02n': '☁️',
+            '03d': '☁️', '03n': '☁️',
+            '04d': '☁️', '04n': '☁️',
+            '09d': '🌦️', '09n': '🌦️',
+            '10d': '🌧️', '10n': '🌧️',
+            '11d': '⛈️', '11n': '⛈️',
+            '13d': '❄️', '13n': '❄️',
+            '50d': '🌫️', '50n': '🌫️'
         };
-        
-        return iconMap[iconCode] || '☁️'; // default to cloud emoji
+        return iconMap[iconCode] || '☁️';
     }
 
-    // Fishing conditions logic
+    // ========================================================================
+    // Fishing
+    // ========================================================================
+    _cloudFromCode(code) {
+        if (code === 0) return 5;
+        if (code === 1) return 20;
+        if (code === 2) return 45;
+        if (code === 3) return 85;
+        if (code === 45 || code === 48) return 95;
+        if (code >= 51 && code <= 67) return 80;
+        if (code >= 71 && code <= 77) return 90;
+        if (code >= 80 && code <= 82) return 75;
+        return 80;
+    }
+
     updateFishingConditions() {
-        // Try to get weather data for fishing analysis
-        const currentTemp = document.getElementById('current-temp')?.textContent || '15';
-        const windSpeed = document.getElementById('wind')?.textContent?.replace(' km/h', '') || '10';
-        const clouds = document.getElementById('clouds')?.textContent?.replace('%', '') || '50';
-        const humidity = document.getElementById('humidity')?.textContent?.replace('%', '') || '60';
-        const precipitation = document.getElementById('precipitation')?.textContent?.replace(' mm', '') || '0';
-
+        const element = document.getElementById('fishing-data');
+        if (!element) return;
+        if (!this.currentData) {
+            element.innerHTML = '<p class="no-alerts">Nog geen weerdata. Laad eerst het weer.</p>';
+            return;
+        }
+        const c = this.currentData;
         const fishingData = this.calculateFishingConditions({
-            temperature: parseInt(currentTemp),
-            windSpeed: parseInt(windSpeed),
-            clouds: parseInt(clouds),
-            humidity: parseInt(humidity),
-            precipitation: parseFloat(precipitation)
+            temperature: c.temperature.current,
+            windSpeed: c.wind.speed,
+            clouds: c.clouds,
+            humidity: c.humidity,
+            precipitation: c.rain + c.snow
         });
-
         this.displayFishingConditions(fishingData);
         this.displayFishingForecast();
     }
 
     calculateFishingConditions(weather) {
         let score = 0;
-        let factors = [];
-
-        // Temperature factor (ideal: 15-25°C)
+        const factors = [];
         const temp = weather.temperature;
-        let tempScore = 0;
-        let tempStatus = '';
-        if (temp >= 15 && temp <= 25) {
-            tempScore = 25;
-            tempStatus = 'Ideaal voor vissen';
-        } else if (temp >= 10 && temp < 15 || temp > 25 && temp <= 30) {
-            tempScore = 15;
-            tempStatus = 'Goed voor vissen';
-        } else if (temp >= 5 && temp < 10 || temp > 30 && temp <= 35) {
-            tempScore = 10;
-            tempStatus = 'Matig voor vissen';
-        } else {
-            tempScore = 5;
-            tempStatus = 'Moeilijke omstandigheden';
-        }
-        
-        factors.push({
-            icon: '🌡️',
-            name: 'Temperatuur',
-            value: `${temp}°C`,
-            status: tempStatus
-        });
 
-        // Wind factor (ideal: 5-15 km/h)
+        let tempScore, tempStatus;
+        if (temp >= 15 && temp <= 25) { tempScore = 25; tempStatus = 'Ideaal voor vissen'; }
+        else if ((temp >= 10 && temp < 15) || (temp > 25 && temp <= 30)) { tempScore = 15; tempStatus = 'Goed voor vissen'; }
+        else if ((temp >= 5 && temp < 10) || (temp > 30 && temp <= 35)) { tempScore = 10; tempStatus = 'Matig voor vissen'; }
+        else { tempScore = 5; tempStatus = 'Moeilijke omstandigheden'; }
+        factors.push({ icon: '🌡️', name: 'Temperatuur', value: `${temp}°C`, status: tempStatus });
+
         const wind = weather.windSpeed;
-        let windScore = 0;
-        let windStatus = '';
-        if (wind >= 5 && wind <= 15) {
-            windScore = 25;
-            windStatus = 'Perfect voor vissen';
-        } else if (wind >= 0 && wind < 5 || wind > 15 && wind <= 25) {
-            windScore = 15;
-            windStatus = 'Acceptabel';
-        } else if (wind > 25 && wind <= 35) {
-            windScore = 10;
-            windStatus = 'Te winderig';
-        } else {
-            windScore = 5;
-            windStatus = 'Zeer moeilijk';
-        }
-        
-        factors.push({
-            icon: '💨',
-            name: 'Wind',
-            value: `${wind} km/h`,
-            status: windStatus
-        });
+        let windScore, windStatus;
+        if (wind >= 5 && wind <= 15) { windScore = 25; windStatus = 'Perfect voor vissen'; }
+        else if ((wind >= 0 && wind < 5) || (wind > 15 && wind <= 25)) { windScore = 15; windStatus = 'Acceptabel'; }
+        else if (wind > 25 && wind <= 35) { windScore = 10; windStatus = 'Te winderig'; }
+        else { windScore = 5; windStatus = 'Zeer moeilijk'; }
+        factors.push({ icon: '💨', name: 'Wind', value: `${wind} km/h`, status: windStatus });
 
-        // Cloud cover factor (ideal: 50-80% overcast)
         const cloudCover = weather.clouds;
-        let cloudScore = 0;
-        let cloudStatus = '';
-        if (cloudCover >= 50 && cloudCover <= 80) {
-            cloudScore = 20;
-            cloudStatus = 'Ideaal bewolkt';
-        } else if (cloudCover >= 30 && cloudCover < 50 || cloudCover > 80 && cloudCover <= 95) {
-            cloudScore = 15;
-            cloudStatus = 'Goed';
-        } else if (cloudCover < 30) {
-            cloudScore = 10;
-            cloudStatus = 'Te zonnig';
-        } else {
-            cloudScore = 8;
-            cloudStatus = 'Te bewolkt';
-        }
-        
-        factors.push({
-            icon: '☁️',
-            name: 'Bewolking',
-            value: `${cloudCover}%`,
-            status: cloudStatus
-        });
+        let cloudScore, cloudStatus;
+        if (cloudCover >= 50 && cloudCover <= 80) { cloudScore = 20; cloudStatus = 'Ideaal bewolkt'; }
+        else if ((cloudCover >= 30 && cloudCover < 50) || (cloudCover > 80 && cloudCover <= 95)) { cloudScore = 15; cloudStatus = 'Goed'; }
+        else if (cloudCover < 30) { cloudScore = 10; cloudStatus = 'Te zonnig'; }
+        else { cloudScore = 8; cloudStatus = 'Te bewolkt'; }
+        factors.push({ icon: '☁️', name: 'Bewolking', value: `${cloudCover}%`, status: cloudStatus });
 
-        // Precipitation factor (light rain can be good)
         const rain = weather.precipitation;
-        let rainScore = 0;
-        let rainStatus = '';
-        if (rain === 0) {
-            rainScore = 15;
-            rainStatus = 'Droog weer';
-        } else if (rain > 0 && rain <= 2) {
-            rainScore = 20;
-            rainStatus = 'Lichte regen - goed!';
-        } else if (rain > 2 && rain <= 5) {
-            rainScore = 10;
-            rainStatus = 'Matige regen';
-        } else {
-            rainScore = 5;
-            rainStatus = 'Teveel regen';
-        }
-        
-        factors.push({
-            icon: '🌧️',
-            name: 'Neerslag',
-            value: rain > 0 ? `${rain} mm` : 'Geen',
-            status: rainStatus
-        });
+        let rainScore, rainStatus;
+        if (rain === 0) { rainScore = 15; rainStatus = 'Droog weer'; }
+        else if (rain > 0 && rain <= 2) { rainScore = 20; rainStatus = 'Lichte regen - goed!'; }
+        else if (rain > 2 && rain <= 5) { rainScore = 10; rainStatus = 'Matige regen'; }
+        else { rainScore = 5; rainStatus = 'Teveel regen'; }
+        factors.push({ icon: '🌧️', name: 'Neerslag', value: rain > 0 ? `${rain} mm` : 'Geen', status: rainStatus });
 
-        // Humidity factor
         const humid = weather.humidity;
-        let humidScore = 0;
-        let humidStatus = '';
-        if (humid >= 60 && humid <= 80) {
-            humidScore = 10;
-            humidStatus = 'Ideaal vochtig';
-        } else if (humid >= 50 && humid < 60 || humid > 80 && humid <= 90) {
-            humidScore = 8;
-            humidStatus = 'Acceptabel';
-        } else {
-            humidScore = 5;
-            humidStatus = humid < 50 ? 'Te droog' : 'Te vochtig';
-        }
-        
-        factors.push({
-            icon: '💧',
-            name: 'Luchtvochtigheid',
-            value: `${humid}%`,
-            status: humidStatus
-        });
+        let humidScore, humidStatus;
+        if (humid >= 60 && humid <= 80) { humidScore = 10; humidStatus = 'Ideaal vochtig'; }
+        else if ((humid >= 50 && humid < 60) || (humid > 80 && humid <= 90)) { humidScore = 8; humidStatus = 'Acceptabel'; }
+        else { humidScore = 5; humidStatus = humid < 50 ? 'Te droog' : 'Te vochtig'; }
+        factors.push({ icon: '💧', name: 'Luchtvochtigheid', value: `${humid}%`, status: humidStatus });
 
         score = tempScore + windScore + cloudScore + rainScore + humidScore;
-        
-        let rating = '';
-        let description = '';
-        if (score >= 80) {
-            rating = 'Uitstekend';
-            description = 'Perfect weer om te gaan vissen! Alle omstandigheden zijn ideaal.';
-        } else if (score >= 60) {
-            rating = 'Goed';
-            description = 'Goede omstandigheden voor het vissen. Succes verwacht!';
-        } else if (score >= 40) {
-            rating = 'Matig';
-            description = 'Redelijke omstandigheden. Met de juiste techniek nog steeds kansrijk.';
-        } else {
-            rating = 'Slecht';
-            description = 'Moeilijke omstandigheden voor het vissen. Overweeg een andere dag.';
-        }
 
-        return {
-            score: score,
-            rating: rating,
-            description: description,
-            factors: factors
-        };
+        let rating, description;
+        if (score >= 80) { rating = 'Uitstekend'; description = 'Perfect weer om te gaan vissen!'; }
+        else if (score >= 60) { rating = 'Goed'; description = 'Goede omstandigheden voor het vissen.'; }
+        else if (score >= 40) { rating = 'Matig'; description = 'Redelijke omstandigheden. Nog steeds kansrijk.'; }
+        else { rating = 'Slecht'; description = 'Moeilijke omstandigheden. Overweeg een andere dag.'; }
+
+        return { score, rating, description, factors };
     }
 
     displayFishingConditions(fishingData) {
-        const fishingDataElement = document.getElementById('fishing-data');
-        if (!fishingDataElement) return;
+        const element = document.getElementById('fishing-data');
+        if (!element) return;
 
-        let scoreColor = '';
-        if (fishingData.score >= 80) scoreColor = '#00b894';
-        else if (fishingData.score >= 60) scoreColor = '#74b9ff';
-        else if (fishingData.score >= 40) scoreColor = '#fdcb6e';
-        else scoreColor = '#e17055';
+        const scoreColor = fishingData.score >= 80 ? '#00b894'
+            : fishingData.score >= 60 ? '#74b9ff'
+            : fishingData.score >= 40 ? '#fdcb6e'
+            : '#e17055';
 
-        fishingDataElement.innerHTML = `
+        element.innerHTML = `
             <div class="fishing-overview">
                 <div class="fishing-score" style="background: linear-gradient(135deg, ${scoreColor}, ${scoreColor}aa);">
                     <div class="score-value">${fishingData.score}</div>
@@ -811,500 +953,482 @@ class WeatherApp {
                     <div class="score-description">${fishingData.description}</div>
                 </div>
             </div>
-            
             <div class="fishing-factors">
-                ${fishingData.factors.map(factor => `
+                ${fishingData.factors.map(f => `
                     <div class="fishing-factor">
-                        <div class="factor-icon">${factor.icon}</div>
+                        <div class="factor-icon">${f.icon}</div>
                         <div class="factor-info">
-                            <h4>${factor.name}</h4>
-                            <p class="factor-value">${factor.value}</p>
-                            <p class="factor-status">${factor.status}</p>
+                            <h4>${f.name}</h4>
+                            <p class="factor-value">${f.value}</p>
+                            <p class="factor-status">${f.status}</p>
                         </div>
                     </div>
                 `).join('')}
             </div>
-            
-            <div style="margin-top: 25px; padding: 20px; background: rgba(116, 185, 255, 0.1); border-radius: 12px; border-left: 4px solid #74b9ff;">
-                <h4 style="margin: 0 0 10px 0; color: var(--text-primary);">🎯 Vis Tips voor Vandaag</h4>
-                <ul style="margin: 0; padding-left: 20px; color: var(--text-secondary); line-height: 1.6;">
-                    ${this.getFishingTips(fishingData).map(tip => `<li>${tip}</li>`).join('')}
-                </ul>
-            </div>
         `;
     }
 
-    getFishingTips(fishingData) {
-        const tips = [];
-        const temp = parseInt(document.getElementById('current-temp')?.textContent || '15');
-        const wind = parseInt(document.getElementById('wind')?.textContent?.replace(' km/h', '') || '10');
-        
-        // Temperature-based tips
-        if (temp < 10) {
-            tips.push('Gebruik langzaam bewegende aas bij koude temperaturen');
-            tips.push('Vis dieper waar het water warmer is');
-        } else if (temp > 25) {
-            tips.push('Vroeg in de ochtend of laat in de avond vissen');
-            tips.push('Zoek schaduwrijke plekken op');
-        } else {
-            tips.push('Ideale temperatuur - probeer verschillende dieptes');
-        }
-
-        // Wind-based tips
-        if (wind < 5) {
-            tips.push('Bij weinig wind: probeer oppervlakte lokken');
-        } else if (wind > 20) {
-            tips.push('Gebruik zwaardere gewichten vanwege de wind');
-            tips.push('Zoek luwe plekken achter obstakels');
-        } else {
-            tips.push('Perfecte wind - probeer de lijzijde van het water');
-        }
-
-        // Weather-based tips
-        const rain = parseFloat(document.getElementById('precipitation')?.textContent?.replace(' mm', '') || '0');
-        if (rain > 0 && rain <= 2) {
-            tips.push('Lichte regen activeert vissen - goede kans!');
-        } else if (rain > 2) {
-            tips.push('Zoek beschutting en vis dicht bij oevers');
-        }
-
-        // Ensure we have at least 3 tips
-        if (tips.length < 3) {
-            tips.push('Houd uw aas in beweging voor betere resultaten');
-            tips.push('Let op vogels - zij wijzen vaak naar vis');
-            tips.push('Wees geduldig en wissel van techniek als het niet werkt');
-        }
-
-        return tips.slice(0, 4); // Maximum 4 tips
-    }
-
     displayFishingForecast() {
-        // Generate forecast for upcoming days based on 7-day weather data
-        const forecastElement = document.getElementById('fishing-forecast-data');
-        if (!forecastElement) return;
+        const element = document.getElementById('fishing-forecast-data');
+        if (!element) return;
+        if (!this.forecast7d) {
+            element.innerHTML = '<p class="no-alerts">Nog geen voorspelling.</p>';
+            return;
+        }
 
-        // Mock forecast data - in real app would use actual forecast data
-        const days = [
-            { name: 'Morgen', temp: 18, wind: 12, rain: 0, clouds: 60 },
-            { name: 'Overmorgen', temp: 22, wind: 8, rain: 1, clouds: 40 },
-            { name: 'Woensdag', temp: 16, wind: 15, rain: 3, clouds: 80 },
-            { name: 'Donderdag', temp: 20, wind: 6, rain: 0, clouds: 30 },
-            { name: 'Vrijdag', temp: 24, wind: 18, rain: 0, clouds: 20 }
-        ];
-
-        const forecastHTML = days.map(day => {
+        element.innerHTML = this.forecast7d.map(day => {
             const conditions = this.calculateFishingConditions({
-                temperature: day.temp,
-                windSpeed: day.wind,
-                clouds: day.clouds,
+                temperature: day.temperature.max,
+                windSpeed: day.wind.speed,
+                clouds: this._cloudFromCode(this._codeFromIcon(day.weather.icon)),
                 humidity: 65,
                 precipitation: day.rain
             });
 
-            let ratingClass = '';
-            if (conditions.score >= 80) ratingClass = 'excellent';
-            else if (conditions.score >= 60) ratingClass = 'good';
-            else if (conditions.score >= 40) ratingClass = 'fair';
-            else ratingClass = 'poor';
+            const ratingClass = conditions.score >= 80 ? 'excellent'
+                : conditions.score >= 60 ? 'good'
+                : conditions.score >= 40 ? 'fair' : 'poor';
+
+            const date = new Date(day.datetime);
+            const dayName = date.toLocaleDateString('nl-NL', { weekday: 'long', day: 'numeric', month: 'short' });
 
             return `
                 <div class="fishing-forecast-day ${ratingClass}">
                     <div class="fishing-day-info">
-                        <div class="fishing-day-name">${day.name}</div>
+                        <div class="fishing-day-name">${this.capitalizeFirst(dayName)}</div>
                         <div class="fishing-score-badge ${ratingClass}">${conditions.score}</div>
                         <div class="fishing-conditions-summary">
-                            ${day.wind} km/h wind, ${day.clouds}% bewolkt
-                            ${day.rain > 0 ? `, ${day.rain}mm regen` : ''}
+                            ${day.wind.speed} km/h wind, ${this._cloudFromCode(this._codeFromIcon(day.weather.icon))}% bewolkt
+                            ${day.rain > 0 ? `, ${day.rain.toFixed(1)}mm neerslag` : ''}
                         </div>
                     </div>
                     <div class="fishing-weather-summary">
-                        <div class="fishing-temp">${day.temp}°C</div>
+                        <div class="fishing-temp">${day.temperature.max}°C</div>
                         <div class="fishing-weather-desc">${conditions.rating}</div>
                     </div>
                 </div>
             `;
         }).join('');
-
-        forecastElement.innerHTML = forecastHTML;
     }
 
+    _codeFromIcon(icon) {
+        const map = { '01': 0, '02': 2, '03': 3, '04': 3, '50': 45, '10': 61, '13': 71, '09': 81, '11': 95 };
+        const prefix = (icon || '02d').slice(0, 2);
+        return map[prefix] !== undefined ? map[prefix] : 2;
+    }
 
-    // Get user's location (with permission)
-    async getUserLocation() {
+    // ========================================================================
+    // Fire risk (Bosbranden)
+    // ========================================================================
+    _fireLevelText(css) {
+        return this.translate(`fire_level_${css}`) || this.translate('fire_level_matig');
+    }
+
+    _fireDescription(css) {
+        return this.translate(`fire_desc_${css}`) || this.translate('fire_desc_matig');
+    }
+
+    async loadFireRisk() {
+        const element = document.getElementById('fire-data');
+        if (!element) return;
+        element.innerHTML = `<p class="no-alerts">${this.translate('fire_loading')}</p>`;
+        const { lat, lon } = this._coords();
+        const q = (lat && lon) ? `?lat=${lat}&lon=${lon}` : '';
+
+        try {
+            const data = await this._fetchJSON(`/fire-risk${q}`);
+            const cur = data.current;
+            const levelText = this._fireLevelText(cur.css);
+            const desc = this._fireDescription(cur.css);
+
+            element.innerHTML = `
+                <div class="fire-overview">
+                    <div class="fire-gauge ${cur.css}">
+                        <div class="fire-level">${levelText}</div>
+                        <div class="fire-desc">${desc}</div>
+                    </div>
+                </div>
+                <div class="fishing-factors">
+                    <div class="fishing-factor"><div class="factor-icon">🌡️</div>
+                        <div class="factor-info"><h4>Temperatuur</h4><p class="factor-value">${cur.temperature}°C</p></div></div>
+                    <div class="fishing-factor"><div class="factor-icon">💧</div>
+                        <div class="factor-info"><h4>Luchtvochtigheid</h4><p class="factor-value">${cur.humidity}%</p></div></div>
+                    <div class="fishing-factor"><div class="factor-icon">💨</div>
+                        <div class="factor-info"><h4>Wind</h4><p class="factor-value">${cur.wind_speed} km/h</p></div></div>
+                    <div class="fishing-factor"><div class="factor-icon">🌧️</div>
+                        <div class="factor-info"><h4>Neerslag</h4><p class="factor-value">${cur.precipitation} mm</p></div></div>
+                    <div class="fishing-factor"><div class="factor-icon">🧯</div>
+                        <div class="factor-info"><h4>${this.translate('fire_angstrom')}</h4><p class="factor-value">${cur.angstrom_index}</p></div></div>
+                </div>
+                ${cur.smoke_from_wildfires ? `
+                <div class="fire-smoke-warning">
+                    ${this.translate('fire_smoke')}: ${cur.smoke_from_wildfires.toFixed(1)} μg/m³
+                </div>` : ''}
+            `;
+
+            this.renderFireForecast(data.forecast || []);
+        } catch (error) {
+            console.error('Fire risk error:', error);
+            element.innerHTML = `<p class="no-alerts">⚠️ ${this.translate('error_message')}</p>`;
+        }
+    }
+
+    renderFireForecast(forecast) {
+        const element = document.getElementById('fire-forecast-data');
+        if (!element) return;
+        if (!forecast.length) {
+            element.innerHTML = `<p class="no-alerts">${this.translate('no_alerts')}</p>`;
+            return;
+        }
+        element.innerHTML = forecast.map(day => {
+            const date = new Date(`${day.date}T12:00:00`);
+            const dayName = date.toLocaleDateString('nl-NL', { weekday: 'long', day: 'numeric', month: 'short' });
+            return `
+                <div class="fire-day ${day.css}">
+                    <div class="fire-day-name">${this.capitalizeFirst(dayName)}</div>
+                    <div class="fire-day-level">${this._fireLevelText(day.css)}</div>
+                    <div class="fire-day-meta">
+                        ${day.max_temp}°C · ${day.humidity}% vocht · ${day.max_wind} km/h wind
+                        ${day.precipitation_sum > 0 ? ` · ${day.precipitation_sum.toFixed(1)}mm neerslag` : ''}
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    // ========================================================================
+    // Air quality (Luchtkwaliteit)
+    // ========================================================================
+    _aqiLevelText(css) {
+        return this.translate(`aqi_${css}`) || this.translate('aqi_moderate');
+    }
+
+    async loadAirQuality() {
+        const element = document.getElementById('air-data');
+        if (!element) return;
+        element.innerHTML = `<p class="no-alerts">${this.translate('air_loading')}</p>`;
+        const { lat, lon } = this._coords();
+        const q = (lat && lon) ? `?lat=${lat}&lon=${lon}` : '';
+
+        try {
+            const data = await this._fetchJSON(`/air-quality${q}`);
+            const aqi = data.aqi;
+            const scaleLabel = aqi.scale === 'us' ? this.translate('aqi_scale_us') : this.translate('aqi_scale_european');
+
+            const pollutants = [
+                { key: 'pm2_5', label: 'PM2.5', unit: 'μg/m³' },
+                { key: 'pm10', label: 'PM10', unit: 'μg/m³' },
+                { key: 'ozone', label: 'Ozon (O₃)', unit: 'μg/m³' },
+                { key: 'nitrogen_dioxide', label: 'NO₂', unit: 'μg/m³' },
+                { key: 'sulphur_dioxide', label: 'SO₂', unit: 'μg/m³' },
+                { key: 'carbon_monoxide', label: 'CO', unit: 'μg/m³' }
+            ];
+
+            element.innerHTML = `
+                <div class="aqi-overview">
+                    <div class="aqi-card ${aqi.css}">
+                        <div class="aqi-value">${aqi.value}</div>
+                        <div class="aqi-label">${this._aqiLevelText(aqi.css)}</div>
+                        <div class="aqi-scale">${scaleLabel}</div>
+                    </div>
+                    <div class="aqi-extra">
+                        ${data.uv_index != null ? `<div class="aqi-extra-item">☀️ UV-index: <strong>${data.uv_index}</strong></div>` : ''}
+                        ${data.pm10_wildfires != null ? `<div class="aqi-extra-item">🔥 ${this.translate('fire_smoke')}: <strong>${data.pm10_wildfires.toFixed(1)} μg/m³</strong></div>` : ''}
+                    </div>
+                </div>
+                <h4 class="aqi-subtitle">${this.translate('pollutants')}</h4>
+                <div class="aqi-pollutants">
+                    ${pollutants.map(p => {
+                        const val = data.pollutants[p.key];
+                        return `
+                            <div class="aqi-pollutant">
+                                <span class="aqi-pollutant-name">${p.label}</span>
+                                <span class="aqi-pollutant-value">${val != null ? `${val} ${p.unit}` : '--'}</span>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            `;
+        } catch (error) {
+            console.error('Air quality error:', error);
+            element.innerHTML = `<p class="no-alerts">⚠️ ${this.translate('error_message')}</p>`;
+        }
+    }
+
+    // ========================================================================
+    // Geolocation
+    // ========================================================================
+    getUserLocation() {
         return new Promise((resolve, reject) => {
             if (!navigator.geolocation) {
                 reject(new Error('Geolocatie wordt niet ondersteund door deze browser'));
                 return;
             }
-
             navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    resolve({
-                        lat: position.coords.latitude,
-                        lon: position.coords.longitude
-                    });
-                },
+                (position) => resolve({
+                    lat: position.coords.latitude,
+                    lon: position.coords.longitude
+                }),
                 (error) => {
-                    let errorMessage = 'Kon locatie niet bepalen';
-                    
-                    switch(error.code) {
-                        case error.PERMISSION_DENIED:
-                            errorMessage = 'Locatietoegang geweigerd. Geef toestemming voor locatie in uw browser.';
-                            break;
-                        case error.POSITION_UNAVAILABLE:
-                            errorMessage = 'Locatie niet beschikbaar. Controleer uw GPS-verbinding.';
-                            break;
-                        case error.TIMEOUT:
-                            errorMessage = 'Time-out bij bepalen van locatie. Probeer het opnieuw.';
-                            break;
-                        default:
-                            errorMessage = 'Onbekende fout bij bepalen van locatie: ' + error.message;
-                            break;
-                    }
-                    
-                    reject(new Error(errorMessage));
+                    const messages = {
+                        [error.PERMISSION_DENIED]: 'Locatietoegang geweigerd.',
+                        [error.POSITION_UNAVAILABLE]: 'Locatie niet beschikbaar.',
+                        [error.TIMEOUT]: 'Time-out bij bepalen van locatie.'
+                    };
+                    reject(new Error(messages[error.code] || 'Onbekende fout bij locatiebepaling.'));
                 },
-                {
-                    enableHighAccuracy: true,
-                    timeout: 10000,
-                    maximumAge: 300000 // 5 minutes
-                }
+                { enableHighAccuracy: true, timeout: 10000, maximumAge: 300000 }
             );
         });
     }
 }
 
-// Global functions for modal
+// ============================================================================
+// Global helpers used from templates
+// ============================================================================
 function closeErrorModal() {
-    if (window.weatherApp) {
-        window.weatherApp.closeErrorModal();
-    }
+    if (window.weatherApp) window.weatherApp.closeErrorModal();
 }
 
 function refreshWeatherData() {
-    if (window.weatherApp) {
-        window.weatherApp.refreshWeatherData();
-    }
+    if (window.weatherApp) window.weatherApp.refreshWeatherData();
 }
 
-// Initialize app when DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
-    window.weatherApp = new WeatherApp();
-    
-    // Add geolocation button if supported
-    if (navigator.geolocation) {
-        const header = document.querySelector('header p');
-        const locationBtn = document.createElement('button');
-        locationBtn.innerHTML = window.weatherApp ? window.weatherApp.translate('use_location') : '📍 Gebruik mijn locatie';
-        locationBtn.className = 'location-btn';
-        locationBtn.style.cssText = `
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            padding: 8px 16px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 0.9em;
-            margin-top: 10px;
-            transition: all 0.3s ease;
-        `;
-        
-        locationBtn.addEventListener('click', async () => {
-            try {
-                locationBtn.disabled = true;
-                locationBtn.innerHTML = window.weatherApp ? window.weatherApp.translate('determining_location') : '📍 Locatie bepalen...';
-                
-                const location = await window.weatherApp.getUserLocation();
-                
-                // Store GPS coordinates in the app instance
-                window.weatherApp.userLocation = location;
-                
-                // Load weather data with GPS coordinates
-                window.weatherApp.loadWeatherData(true, location.lat, location.lon);
-                
-            } catch (error) {
-                console.error('Geolocation error:', error);
-                window.weatherApp.showError(error.message);
-            } finally {
-                locationBtn.disabled = false;
-                locationBtn.innerHTML = window.weatherApp ? window.weatherApp.translate('use_location') : '📍 Gebruik mijn locatie';
-            }
-        });
-        
-        locationBtn.addEventListener('mouseenter', () => {
-            locationBtn.style.background = 'rgba(255, 255, 255, 0.3)';
-            locationBtn.style.borderColor = 'rgba(255, 255, 255, 0.5)';
-        });
-        
-        locationBtn.addEventListener('mouseleave', () => {
-            locationBtn.style.background = 'rgba(255, 255, 255, 0.2)';
-            locationBtn.style.borderColor = 'rgba(255, 255, 255, 0.3)';
-        });
-        
-        header.appendChild(locationBtn);
-    }
-});
-
-// Service Worker registration for offline functionality (future enhancement)
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        // navigator.registerServiceWorker('/sw.js')
-        // Service worker implementation would go here for offline support
-    });
-}
-
-// Performance monitoring
-window.addEventListener('load', () => {
-    const loadTime = performance.now();
-    console.log(`Weather app loaded in ${Math.round(loadTime)}ms`);
-    
-    // Check if load time exceeds requirement (2 seconds)
-    if (loadTime > 2000) {
-        console.warn('Load time exceeds 2 second requirement');
-    }
-});
-
-// Games functionality
+// ============================================================================
+// Games
+// ============================================================================
 let currentGame = 'menu';
+const activeLoops = {};
 
-function showGame(gameType) {
-    // Hide all game containers
-    document.querySelectorAll('.game-container').forEach(container => {
-        container.style.display = 'none';
+function stopLoop(key) {
+    if (activeLoops[key] !== undefined) {
+        cancelAnimationFrame(activeLoops[key]);
+        delete activeLoops[key];
+    }
+}
+
+function stopAllGames() {
+    Object.keys(activeLoops).forEach(stopLoop);
+    ['flappy', 'snake', 'pong', 'breakout'].forEach(key => {
+        const state = gameStates[key];
+        if (state) state.running = false;
     });
-    
-    // Show selected game or menu
-    if (gameType === 'menu') {
-        currentGame = 'menu';
+    pongGame.keys = {};
+    breakoutGame.keys = {};
+}
+
+const gameStates = {};
+
+// Unified keyboard handling (bound once, routed per active game).
+function handleGlobalKeyDown(e) {
+    if (currentGame === '2048') { handle2048Key(e); return; }
+    if (currentGame === 'flappy') {
+        if (e.key === ' ' || e.key === 'ArrowUp') { e.preventDefault(); flappyJump(); }
         return;
     }
-    
-    const gameContainer = document.getElementById(`game-${gameType}`);
-    if (gameContainer) {
-        gameContainer.style.display = 'block';
-        currentGame = gameType;
-        
-        // Initialize the specific game
-        if (gameType === '2048' && !document.getElementById('grid-2048').hasChildNodes()) {
-            initGame2048();
-        } else if (gameType === 'guess') {
-            newGuessGame();
-        } else if (gameType === 'snake') {
-            // Snake game will be initialized when start button is clicked
-        } else if (gameType === 'pong') {
-            // Pong game will be initialized when start button is clicked
-        } else if (gameType === 'breakout') {
-            // Breakout game will be initialized when start button is clicked
-        }
+    if (currentGame === 'snake') { handleSnakeKey(e); return; }
+    if (currentGame === 'pong') { pongGame.keys[e.key] = true; return; }
+    if (currentGame === 'breakout') { breakoutGame.keys[e.key] = true; return; }
+}
+
+function handleGlobalKeyUp(e) {
+    pongGame.keys[e.key] = false;
+    breakoutGame.keys[e.key] = false;
+}
+
+document.addEventListener('keydown', handleGlobalKeyDown);
+document.addEventListener('keyup', handleGlobalKeyUp);
+
+function showGame(gameType) {
+    document.querySelectorAll('.game-container').forEach(c => c.style.display = 'none');
+    currentGame = gameType;
+    if (gameType === 'menu') return;
+
+    const container = document.getElementById(`game-${gameType}`);
+    if (!container) return;
+    container.style.display = 'block';
+
+    if (gameType === '2048') {
+        if (!document.getElementById('grid-2048').hasChildNodes()) initGame2048();
+        else render2048();
+    } else if (gameType === 'guess') {
+        newGuessGame();
+    } else if (gameType === 'memory') {
+        startMemoryGame();
     }
 }
 
-// 2048 Game Implementation
-let game2048 = {
-    grid: [],
-    score: 0,
-    size: 4
-};
+// ---------------------------------------------------------------------------
+// High scores (localStorage)
+// ---------------------------------------------------------------------------
+function loadHighScore(game) {
+    return parseInt(localStorage.getItem(`weer-highscore-${game}`) || '0', 10);
+}
+
+function updateHighScore(game, score) {
+    const prev = loadHighScore(game);
+    if (score > prev) {
+        localStorage.setItem(`weer-highscore-${game}`, String(score));
+    }
+    const el = document.getElementById(`highscore-${game}`);
+    if (el) el.textContent = String(Math.max(prev, score));
+}
+
+function initHighScore(game) {
+    const el = document.getElementById(`highscore-${game}`);
+    if (el) el.textContent = String(loadHighScore(game));
+}
+
+// ---------------------------------------------------------------------------
+// 2048
+// ---------------------------------------------------------------------------
+const game2048 = { grid: [], score: 0, size: 4, over: false, won: false };
 
 function initGame2048() {
-    const gridContainer = document.getElementById('grid-2048');
-    gridContainer.innerHTML = '';
-    
-    // Create grid cells
+    const container = document.getElementById('grid-2048');
+    container.innerHTML = '';
     for (let i = 0; i < 16; i++) {
         const cell = document.createElement('div');
         cell.className = 'grid-cell';
         cell.dataset.index = i;
-        gridContainer.appendChild(cell);
+        container.appendChild(cell);
     }
-    
+    initHighScore('2048');
     newGame2048();
-    
-    // Add keyboard listeners
-    document.addEventListener('keydown', handle2048KeyPress);
+    bind2048Touch();
+}
+
+function bind2048Touch() {
+    const grid = document.getElementById('grid-2048');
+    if (!grid || grid.dataset.touchBound) return;
+    grid.dataset.touchBound = 'true';
+    let startX = 0, startY = 0;
+    grid.addEventListener('touchstart', (e) => {
+        const t = e.touches[0];
+        startX = t.clientX;
+        startY = t.clientY;
+    }, { passive: true });
+    grid.addEventListener('touchend', (e) => {
+        if (currentGame !== '2048' || game2048.over) return;
+        const t = e.changedTouches[0];
+        const dx = t.clientX - startX;
+        const dy = t.clientY - startY;
+        if (Math.max(Math.abs(dx), Math.abs(dy)) < 30) return;
+        if (Math.abs(dx) > Math.abs(dy)) {
+            move2048(dx > 0 ? 'right' : 'left');
+        } else {
+            move2048(dy > 0 ? 'down' : 'up');
+        }
+    }, { passive: true });
 }
 
 function newGame2048() {
     game2048.grid = Array(16).fill(0);
     game2048.score = 0;
+    game2048.over = false;
+    game2048.won = false;
+    addRandomTile2048();
+    addRandomTile2048();
+    document.getElementById('gameover-2048').style.display = 'none';
     updateScore2048();
-    addRandomTile2048();
-    addRandomTile2048();
     render2048();
 }
 
 function addRandomTile2048() {
-    const emptyCells = [];
-    for (let i = 0; i < 16; i++) {
-        if (game2048.grid[i] === 0) {
-            emptyCells.push(i);
-        }
-    }
-    
-    if (emptyCells.length > 0) {
-        const randomIndex = emptyCells[Math.floor(Math.random() * emptyCells.length)];
-        game2048.grid[randomIndex] = Math.random() < 0.9 ? 2 : 4;
-    }
+    const empty = [];
+    game2048.grid.forEach((v, i) => { if (v === 0) empty.push(i); });
+    if (!empty.length) return;
+    const idx = empty[Math.floor(Math.random() * empty.length)];
+    game2048.grid[idx] = Math.random() < 0.9 ? 2 : 4;
 }
 
 function render2048() {
-    const cells = document.querySelectorAll('#grid-2048 .grid-cell');
-    cells.forEach((cell, index) => {
+    document.querySelectorAll('#grid-2048 .grid-cell').forEach((cell, index) => {
         const value = game2048.grid[index];
         cell.textContent = value === 0 ? '' : value;
         cell.className = `grid-cell ${value === 0 ? '' : `tile-${value}`}`;
     });
+    document.getElementById('score-2048').textContent = game2048.score;
 }
 
 function updateScore2048() {
     document.getElementById('score-2048').textContent = game2048.score;
 }
 
-// Track game move in database
-async function trackGameMove(direction, score) {
-    try {
-        const formData = new FormData();
-        formData.append('direction', direction);
-        formData.append('score', score);
-        
-        await fetch('/api/track/move', {
-            method: 'POST',
-            body: formData
+function hasMoves2048() {
+    const g = game2048.grid;
+    for (let i = 0; i < 16; i++) {
+        if (g[i] === 0) return true;
+        if (i % 4 !== 3 && g[i] === g[i + 1]) return true;
+        if (i < 12 && g[i] === g[i + 4]) return true;
+    }
+    return false;
+}
+
+function end2048(won) {
+    game2048.over = true;
+    updateHighScore('2048', game2048.score);
+    const overlay = document.getElementById('gameover-2048');
+    const title = overlay.querySelector('h4');
+    const translate = (k) => (window.weatherApp ? window.weatherApp.translate(k) : k);
+    title.textContent = won ? translate('you_win') : translate('game_over');
+    overlay.style.display = 'flex';
+}
+
+function move2048(direction) {
+    if (game2048.over || currentGame !== '2048') return;
+
+    const original = [...game2048.grid];
+    const rows = [0, 1, 2, 3];
+
+    const transform = (indices) => {
+        let moved = false;
+        indices.forEach(row => {
+            const arr = row.map(c => game2048.grid[c]);
+            const newArr = slideAndMerge(arr);
+            newArr.forEach((val, k) => {
+                if (game2048.grid[row[k]] !== val) moved = true;
+                game2048.grid[row[k]] = val;
+            });
         });
-    } catch (error) {
-        console.error('Error tracking move:', error);
+        return moved;
+    };
+
+    let moved = false;
+    if (direction === 'left') moved = transform(rows.map(r => [r * 4, r * 4 + 1, r * 4 + 2, r * 4 + 3]));
+    if (direction === 'right') moved = transform(rows.map(r => [r * 4 + 3, r * 4 + 2, r * 4 + 1, r * 4]));
+    if (direction === 'up') moved = transform(rows.map(c => [c, c + 4, c + 8, c + 12]));
+    if (direction === 'down') moved = transform(rows.map(c => [c + 12, c + 8, c + 4, c]));
+
+    if (!moved) return;
+
+    addRandomTile2048();
+    render2048();
+    updateScore2048();
+    trackGameMove(direction, game2048.score);
+
+    if (game2048.grid.includes(2048) && !game2048.won) {
+        game2048.won = true;
+        end2048(true);
+        return;
+    }
+    if (!hasMoves2048()) {
+        end2048(false);
     }
 }
 
-function handle2048KeyPress(e) {
-    if (currentGame !== '2048') return;
-    
-    let moved = false;
-    let direction = '';
-    const originalGrid = [...game2048.grid];
-    
-    switch(e.key) {
-        case 'ArrowUp':
-            e.preventDefault();
-            moved = moveUp2048();
-            direction = 'up';
-            break;
-        case 'ArrowDown':
-            e.preventDefault();
-            moved = moveDown2048();
-            direction = 'down';
-            break;
-        case 'ArrowLeft':
-            e.preventDefault();
-            moved = moveLeft2048();
-            direction = 'left';
-            break;
-        case 'ArrowRight':
-            e.preventDefault();
-            moved = moveRight2048();
-            direction = 'right';
-            break;
-    }
-    
-    if (moved) {
-        addRandomTile2048();
-        render2048();
-        updateScore2048();
-        
-        // Track the move in the database
-        trackGameMove(direction, game2048.score);
-    }
-}
-
-function moveLeft2048() {
-    let moved = false;
-    for (let row = 0; row < 4; row++) {
-        const rowArray = [];
-        for (let col = 0; col < 4; col++) {
-            rowArray.push(game2048.grid[row * 4 + col]);
-        }
-        
-        const newRow = slideAndMerge(rowArray);
-        for (let col = 0; col < 4; col++) {
-            const newValue = newRow[col];
-            const oldValue = game2048.grid[row * 4 + col];
-            if (newValue !== oldValue) {
-                moved = true;
-            }
-            game2048.grid[row * 4 + col] = newValue;
-        }
-    }
-    return moved;
-}
-
-function moveRight2048() {
-    let moved = false;
-    for (let row = 0; row < 4; row++) {
-        const rowArray = [];
-        for (let col = 3; col >= 0; col--) {
-            rowArray.push(game2048.grid[row * 4 + col]);
-        }
-        
-        const newRow = slideAndMerge(rowArray);
-        for (let col = 0; col < 4; col++) {
-            const newValue = newRow[col];
-            const oldValue = game2048.grid[row * 4 + (3 - col)];
-            if (newValue !== oldValue) {
-                moved = true;
-            }
-            game2048.grid[row * 4 + (3 - col)] = newValue;
-        }
-    }
-    return moved;
-}
-
-function moveUp2048() {
-    let moved = false;
-    for (let col = 0; col < 4; col++) {
-        const colArray = [];
-        for (let row = 0; row < 4; row++) {
-            colArray.push(game2048.grid[row * 4 + col]);
-        }
-        
-        const newCol = slideAndMerge(colArray);
-        for (let row = 0; row < 4; row++) {
-            const newValue = newCol[row];
-            const oldValue = game2048.grid[row * 4 + col];
-            if (newValue !== oldValue) {
-                moved = true;
-            }
-            game2048.grid[row * 4 + col] = newValue;
-        }
-    }
-    return moved;
-}
-
-function moveDown2048() {
-    let moved = false;
-    for (let col = 0; col < 4; col++) {
-        const colArray = [];
-        for (let row = 3; row >= 0; row--) {
-            colArray.push(game2048.grid[row * 4 + col]);
-        }
-        
-        const newCol = slideAndMerge(colArray);
-        for (let row = 0; row < 4; row++) {
-            const newValue = newCol[row];
-            const oldValue = game2048.grid[(3 - row) * 4 + col];
-            if (newValue !== oldValue) {
-                moved = true;
-            }
-            game2048.grid[(3 - row) * 4 + col] = newValue;
-        }
-    }
-    return moved;
+function handle2048Key(e) {
+    const map = {
+        ArrowUp: 'up', ArrowDown: 'down', ArrowLeft: 'left', ArrowRight: 'right'
+    };
+    const dir = map[e.key];
+    if (!dir) return;
+    e.preventDefault();
+    move2048(dir);
 }
 
 function slideAndMerge(array) {
-    // Remove zeros
-    const filtered = array.filter(val => val !== 0);
-    
-    // Merge adjacent equal numbers
+    const filtered = array.filter(v => v !== 0);
     for (let i = 0; i < filtered.length - 1; i++) {
         if (filtered[i] === filtered[i + 1]) {
             filtered[i] *= 2;
@@ -1312,595 +1436,618 @@ function slideAndMerge(array) {
             filtered[i + 1] = 0;
         }
     }
-    
-    // Remove zeros again and fill to length 4
-    const result = filtered.filter(val => val !== 0);
-    while (result.length < 4) {
-        result.push(0);
-    }
-    
+    const result = filtered.filter(v => v !== 0);
+    while (result.length < 4) result.push(0);
     return result;
 }
 
-// Flappy Bird Game Implementation
-let flappyGame = {
-    bird: { x: 50, y: 150, velocity: 0 },
-    pipes: [],
-    score: 0,
-    gameRunning: false,
-    canvas: null,
-    ctx: null
-};
-
-function startFlappyGame() {
-    const canvas = document.getElementById('flappy-canvas');
-    const ctx = canvas.getContext('2d');
-    
-    flappyGame.canvas = canvas;
-    flappyGame.ctx = ctx;
-    flappyGame.bird = { x: 50, y: 150, velocity: 0 };
-    flappyGame.pipes = [];
-    flappyGame.score = 0;
-    flappyGame.gameRunning = true;
-    
-    document.getElementById('score-flappy').textContent = '0';
-    
-    // Add event listeners
-    canvas.addEventListener('click', flappyJump);
-    document.addEventListener('keydown', (e) => {
-        if (e.key === ' ' && currentGame === 'flappy') {
-            e.preventDefault();
-            flappyJump();
-        }
-    });
-    
-    // Start game loop
-    flappyGameLoop();
-}
-
-function flappyJump() {
-    if (flappyGame.gameRunning) {
-        flappyGame.bird.velocity = -8;
+async function trackGameMove(direction, score) {
+    try {
+        const formData = new FormData();
+        formData.append('direction', direction);
+        formData.append('score', score);
+        await fetch('/api/track/move', { method: 'POST', body: formData });
+    } catch (error) {
+        console.error('Error tracking move:', error);
     }
 }
 
-function flappyGameLoop() {
-    if (!flappyGame.gameRunning) return;
-    
-    // Clear canvas
-    flappyGame.ctx.fillStyle = '#87CEEB';
-    flappyGame.ctx.fillRect(0, 0, 400, 300);
-    
-    // Update bird
-    flappyGame.bird.velocity += 0.5; // gravity
+// ---------------------------------------------------------------------------
+// Flappy Bird
+// ---------------------------------------------------------------------------
+const flappyGame = {
+    bird: { x: 50, y: 150, velocity: 0 },
+    pipes: [], score: 0, running: false, canvas: null, ctx: null
+};
+gameStates.flappy = flappyGame;
+
+function startFlappyGame() {
+    stopLoop('flappy');
+    const canvas = document.getElementById('flappy-canvas');
+    flappyGame.canvas = canvas;
+    flappyGame.ctx = canvas.getContext('2d');
+    flappyGame.bird = { x: 50, y: 150, velocity: 0 };
+    flappyGame.pipes = [];
+    flappyGame.score = 0;
+    flappyGame.running = true;
+    document.getElementById('score-flappy').textContent = '0';
+    initHighScore('flappy');
+
+    canvas.addEventListener('click', flappyJump);
+    activeLoops.flappy = requestAnimationFrame(flappyLoop);
+}
+
+function flappyJump() {
+    if (flappyGame.running) flappyGame.bird.velocity = -8;
+}
+
+function flappyLoop() {
+    if (!flappyGame.running) return;
+    const ctx = flappyGame.ctx;
+    ctx.fillStyle = '#87CEEB';
+    ctx.fillRect(0, 0, 400, 300);
+
+    flappyGame.bird.velocity += 0.5;
     flappyGame.bird.y += flappyGame.bird.velocity;
-    
-    // Check ground/ceiling collision
+
     if (flappyGame.bird.y < 0 || flappyGame.bird.y > 280) {
         endFlappyGame();
         return;
     }
-    
-    // Add pipes
+
     if (flappyGame.pipes.length === 0 || flappyGame.pipes[flappyGame.pipes.length - 1].x < 200) {
         const pipeHeight = Math.random() * 150 + 50;
-        flappyGame.pipes.push({
-            x: 400,
-            topHeight: pipeHeight,
-            bottomY: pipeHeight + 80,
-            scored: false
-        });
+        flappyGame.pipes.push({ x: 400, topHeight: pipeHeight, bottomY: pipeHeight + 80, scored: false });
     }
-    
-    // Update and draw pipes
-    flappyGame.pipes.forEach((pipe, index) => {
+
+    flappyGame.pipes = flappyGame.pipes.filter(pipe => pipe.x > -30);
+    for (const pipe of flappyGame.pipes) {
         pipe.x -= 3;
-        
-        // Draw top pipe
-        flappyGame.ctx.fillStyle = '#228B22';
-        flappyGame.ctx.fillRect(pipe.x, 0, 30, pipe.topHeight);
-        
-        // Draw bottom pipe
-        flappyGame.ctx.fillRect(pipe.x, pipe.bottomY, 30, 300 - pipe.bottomY);
-        
-        // Check collision
+        ctx.fillStyle = '#228B22';
+        ctx.fillRect(pipe.x, 0, 30, pipe.topHeight);
+        ctx.fillRect(pipe.x, pipe.bottomY, 30, 300 - pipe.bottomY);
+
         if (flappyGame.bird.x + 20 > pipe.x && flappyGame.bird.x < pipe.x + 30) {
             if (flappyGame.bird.y < pipe.topHeight || flappyGame.bird.y + 20 > pipe.bottomY) {
                 endFlappyGame();
                 return;
             }
         }
-        
-        // Score
         if (!pipe.scored && pipe.x + 30 < flappyGame.bird.x) {
             pipe.scored = true;
             flappyGame.score++;
             document.getElementById('score-flappy').textContent = flappyGame.score;
         }
-        
-        // Remove off-screen pipes
-        if (pipe.x < -30) {
-            flappyGame.pipes.splice(index, 1);
-        }
-    });
-    
-    // Draw bird
-    flappyGame.ctx.fillStyle = '#FFD700';
-    flappyGame.ctx.fillRect(flappyGame.bird.x, flappyGame.bird.y, 20, 20);
-    
-    requestAnimationFrame(flappyGameLoop);
+    }
+
+    ctx.fillStyle = '#FFD700';
+    ctx.fillRect(flappyGame.bird.x, flappyGame.bird.y, 20, 20);
+
+    activeLoops.flappy = requestAnimationFrame(flappyLoop);
 }
 
 function endFlappyGame() {
-    flappyGame.gameRunning = false;
-    alert(`Game Over! Final Score: ${flappyGame.score}`);
+    flappyGame.running = false;
+    stopLoop('flappy');
+    updateHighScore('flappy', flappyGame.score);
+    const ctx = flappyGame.ctx;
+    ctx.fillStyle = 'rgba(0,0,0,0.55)';
+    ctx.fillRect(0, 100, 400, 100);
+    ctx.fillStyle = '#fff';
+    ctx.font = '24px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('Game Over!', 200, 145);
+    ctx.fillText(`Score: ${flappyGame.score}`, 200, 180);
 }
 
-// Guess the Number Game Implementation
-let guessGame = {
-    targetNumber: 0,
-    attempts: 0,
-    maxNumber: 100
-};
+// ---------------------------------------------------------------------------
+// Guess the Number
+// ---------------------------------------------------------------------------
+const guessGame = { targetNumber: 0, attempts: 0, maxNumber: 100 };
 
 function newGuessGame() {
     guessGame.targetNumber = Math.floor(Math.random() * guessGame.maxNumber) + 1;
     guessGame.attempts = 0;
+    const input = document.getElementById('guess-input');
     document.getElementById('attempts-count').textContent = '0';
-    document.getElementById('guess-input').value = '';
     document.getElementById('guess-feedback').innerHTML = '';
-    document.getElementById('guess-input').focus();
-    
-    // Add enter key listener
-    document.getElementById('guess-input').addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-            makeGuess();
-        }
-    });
+    input.value = '';
+    input.disabled = false;
+    input.focus();
 }
 
 function makeGuess() {
     const input = document.getElementById('guess-input');
     const feedback = document.getElementById('guess-feedback');
-    const guess = parseInt(input.value);
-    
+    const guess = parseInt(input.value, 10);
+
     if (isNaN(guess) || guess < 1 || guess > 100) {
-        feedback.innerHTML = '<p style="color: red;">Please enter a number between 1 and 100</p>';
+        feedback.innerHTML = `<p style="color: red;">${window.weatherApp ? window.weatherApp.translate('guess_invalid') : ''}</p>`;
         return;
     }
-    
+
     guessGame.attempts++;
     document.getElementById('attempts-count').textContent = guessGame.attempts;
-    
+
     if (guess === guessGame.targetNumber) {
-        feedback.innerHTML = `<p style="color: green;">🎉 Congratulations! You guessed it in ${guessGame.attempts} attempts!</p>`;
+        feedback.innerHTML = `<p style="color: green;">${window.weatherApp ? window.weatherApp.translate('guess_correct') : '🎉'}<b> ${guessGame.attempts}</b> ${window.weatherApp ? window.weatherApp.translate('guess_attempts') : 'attempts!'}</p>`;
         input.disabled = true;
     } else if (guess < guessGame.targetNumber) {
-        feedback.innerHTML = '<p style="color: blue;">📈 Too low! Try a higher number.</p>';
+        feedback.innerHTML = `<p style="color: blue;">${window.weatherApp ? window.weatherApp.translate('too_low') : ''}</p>`;
     } else {
-        feedback.innerHTML = '<p style="color: orange;">📉 Too high! Try a lower number.</p>';
+        feedback.innerHTML = `<p style="color: orange;">${window.weatherApp ? window.weatherApp.translate('too_high') : ''}</p>`;
     }
-    
     input.value = '';
     input.focus();
 }
 
-// Snake Game Implementation
-let snakeGame = {
-    canvas: null,
-    ctx: null,
-    snake: [],
-    food: {},
-    direction: 'right',
-    score: 0,
-    gameRunning: false,
-    gridSize: 20
+// ---------------------------------------------------------------------------
+// Snake
+// ---------------------------------------------------------------------------
+const snakeGame = {
+    canvas: null, ctx: null, snake: [], food: {}, direction: 'right',
+    score: 0, running: false, gridSize: 20, lastTick: 0, tickMs: 150
 };
+gameStates.snake = snakeGame;
 
 function startSnakeGame() {
+    stopLoop('snake');
     const canvas = document.getElementById('snake-canvas');
-    const ctx = canvas.getContext('2d');
-    
     snakeGame.canvas = canvas;
-    snakeGame.ctx = ctx;
-    snakeGame.snake = [{x: 200, y: 200}];
+    snakeGame.ctx = canvas.getContext('2d');
+    snakeGame.snake = [{ x: 200, y: 200 }];
     snakeGame.food = generateFood();
     snakeGame.direction = 'right';
     snakeGame.score = 0;
-    snakeGame.gameRunning = true;
-    
+    snakeGame.tickMs = 150;
+    snakeGame.lastTick = performance.now();
+    snakeGame.running = true;
     document.getElementById('score-snake').textContent = '0';
-    
-    // Add event listeners
-    document.addEventListener('keydown', handleSnakeKeyPress);
-    
-    // Start game loop
-    snakeGameLoop();
+    initHighScore('snake');
+    activeLoops.snake = requestAnimationFrame(snakeLoop);
 }
 
 function generateFood() {
     const canvas = snakeGame.canvas;
-    const gridSize = snakeGame.gridSize;
+    const g = snakeGame.gridSize;
     return {
-        x: Math.floor(Math.random() * (canvas.width / gridSize)) * gridSize,
-        y: Math.floor(Math.random() * (canvas.height / gridSize)) * gridSize
+        x: Math.floor(Math.random() * (canvas.width / g)) * g,
+        y: Math.floor(Math.random() * (canvas.height / g)) * g
     };
 }
 
-function handleSnakeKeyPress(e) {
-    if (currentGame !== 'snake' || !snakeGame.gameRunning) return;
-    
-    switch(e.key) {
-        case 'ArrowUp':
-            if (snakeGame.direction !== 'down') snakeGame.direction = 'up';
-            break;
-        case 'ArrowDown':
-            if (snakeGame.direction !== 'up') snakeGame.direction = 'down';
-            break;
-        case 'ArrowLeft':
-            if (snakeGame.direction !== 'right') snakeGame.direction = 'left';
-            break;
-        case 'ArrowRight':
-            if (snakeGame.direction !== 'left') snakeGame.direction = 'right';
-            break;
+function handleSnakeKey(e) {
+    if (!snakeGame.running) return;
+    const map = {
+        ArrowUp: ['up', 'down'], ArrowDown: ['down', 'up'],
+        ArrowLeft: ['left', 'right'], ArrowRight: ['right', 'left']
+    };
+    if (map[e.key]) {
+        e.preventDefault();
+        if (snakeGame.direction !== map[e.key][1]) snakeGame.direction = map[e.key][0];
     }
 }
 
-function snakeGameLoop() {
-    if (!snakeGame.gameRunning) return;
-    
-    // Clear canvas
-    snakeGame.ctx.fillStyle = '#2c3e50';
-    snakeGame.ctx.fillRect(0, 0, snakeGame.canvas.width, snakeGame.canvas.height);
-    
-    // Move snake
-    const head = {...snakeGame.snake[0]};
-    switch(snakeGame.direction) {
-        case 'up': head.y -= snakeGame.gridSize; break;
-        case 'down': head.y += snakeGame.gridSize; break;
-        case 'left': head.x -= snakeGame.gridSize; break;
-        case 'right': head.x += snakeGame.gridSize; break;
+function snakeLoop(timestamp) {
+    if (!snakeGame.running) return;
+    if (timestamp - snakeGame.lastTick >= snakeGame.tickMs) {
+        snakeGame.lastTick = timestamp;
+        if (!stepSnake()) return;
     }
-    
-    // Check wall collision
-    if (head.x < 0 || head.x >= snakeGame.canvas.width || 
-        head.y < 0 || head.y >= snakeGame.canvas.height) {
+    drawSnake();
+    activeLoops.snake = requestAnimationFrame(snakeLoop);
+}
+
+function stepSnake() {
+    const ctx = snakeGame.ctx;
+    const head = { ...snakeGame.snake[0] };
+    if (snakeGame.direction === 'up') head.y -= snakeGame.gridSize;
+    if (snakeGame.direction === 'down') head.y += snakeGame.gridSize;
+    if (snakeGame.direction === 'left') head.x -= snakeGame.gridSize;
+    if (snakeGame.direction === 'right') head.x += snakeGame.gridSize;
+
+    if (head.x < 0 || head.x >= snakeGame.canvas.width || head.y < 0 || head.y >= snakeGame.canvas.height) {
         endSnakeGame();
-        return;
+        return false;
     }
-    
-    // Check self collision
-    for (let segment of snakeGame.snake) {
-        if (head.x === segment.x && head.y === segment.y) {
+    for (const seg of snakeGame.snake) {
+        if (head.x === seg.x && head.y === seg.y) {
             endSnakeGame();
-            return;
+            return false;
         }
     }
-    
+
     snakeGame.snake.unshift(head);
-    
-    // Check food collision
     if (head.x === snakeGame.food.x && head.y === snakeGame.food.y) {
         snakeGame.score += 10;
         document.getElementById('score-snake').textContent = snakeGame.score;
         snakeGame.food = generateFood();
+        snakeGame.tickMs = Math.max(60, snakeGame.tickMs - 5);
     } else {
         snakeGame.snake.pop();
     }
-    
-    // Draw snake
-    snakeGame.ctx.fillStyle = '#27ae60';
-    for (let segment of snakeGame.snake) {
-        snakeGame.ctx.fillRect(segment.x, segment.y, snakeGame.gridSize, snakeGame.gridSize);
-    }
-    
-    // Draw food
-    snakeGame.ctx.fillStyle = '#e74c3c';
-    snakeGame.ctx.fillRect(snakeGame.food.x, snakeGame.food.y, snakeGame.gridSize, snakeGame.gridSize);
-    
-    setTimeout(snakeGameLoop, 150);
+    return true;
+}
+
+function drawSnake() {
+    const ctx = snakeGame.ctx;
+    ctx.fillStyle = '#2c3e50';
+    ctx.fillRect(0, 0, snakeGame.canvas.width, snakeGame.canvas.height);
+    ctx.fillStyle = '#27ae60';
+    snakeGame.snake.forEach(seg => ctx.fillRect(seg.x, seg.y, snakeGame.gridSize, snakeGame.gridSize));
+    ctx.fillStyle = '#e74c3c';
+    ctx.fillRect(snakeGame.food.x, snakeGame.food.y, snakeGame.gridSize, snakeGame.gridSize);
 }
 
 function endSnakeGame() {
-    snakeGame.gameRunning = false;
-    snakeGame.ctx.fillStyle = '#f01212ff';
-    snakeGame.ctx.font = '24px Arial';
-    snakeGame.ctx.textAlign = 'center';
-    snakeGame.ctx.fillText('Game Over!', snakeGame.canvas.width/2, snakeGame.canvas.height/2);
-    snakeGame.ctx.fillText(`Score: ${snakeGame.score}`, snakeGame.canvas.width/2, snakeGame.canvas.height/2 + 30);
+    snakeGame.running = false;
+    stopLoop('snake');
+    updateHighScore('snake', snakeGame.score);
+    const ctx = snakeGame.ctx;
+    ctx.fillStyle = 'rgba(0,0,0,0.6)';
+    ctx.fillRect(0, 0, snakeGame.canvas.width, snakeGame.canvas.height);
+    ctx.fillStyle = '#fff';
+    ctx.font = '26px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('Game Over!', snakeGame.canvas.width / 2, snakeGame.canvas.height / 2 - 10);
+    ctx.fillText(`Score: ${snakeGame.score}`, snakeGame.canvas.width / 2, snakeGame.canvas.height / 2 + 30);
 }
 
-// Pong Game Implementation
-let pongGame = {
-    canvas: null,
-    ctx: null,
-    paddleHeight: 60,
-    paddleWidth: 10,
-    ballRadius: 8,
-    leftPaddle: { y: 0 },
-    rightPaddle: { y: 0 },
+// ---------------------------------------------------------------------------
+// Pong
+// ---------------------------------------------------------------------------
+const pongGame = {
+    canvas: null, ctx: null, paddleHeight: 60, paddleWidth: 10, ballRadius: 8,
+    leftPaddle: { y: 0 }, rightPaddle: { y: 0 },
     ball: { x: 0, y: 0, dx: 0, dy: 0 },
-    leftScore: 0,
-    rightScore: 0,
-    gameRunning: false,
-    keys: {}
+    leftScore: 0, rightScore: 0, running: false, keys: {}, winScore: 10
 };
+gameStates.pong = pongGame;
 
 function startPongGame() {
+    stopLoop('pong');
     const canvas = document.getElementById('pong-canvas');
-    const ctx = canvas.getContext('2d');
-    
     pongGame.canvas = canvas;
-    pongGame.ctx = ctx;
+    pongGame.ctx = canvas.getContext('2d');
     pongGame.leftPaddle.y = canvas.height / 2 - pongGame.paddleHeight / 2;
     pongGame.rightPaddle.y = canvas.height / 2 - pongGame.paddleHeight / 2;
-    pongGame.ball.x = canvas.width / 2;
-    pongGame.ball.y = canvas.height / 2;
-    pongGame.ball.dx = 3;
-    pongGame.ball.dy = 2;
+    pongGame.ball = { x: canvas.width / 2, y: canvas.height / 2, dx: 3, dy: 2 };
     pongGame.leftScore = 0;
     pongGame.rightScore = 0;
-    pongGame.gameRunning = true;
-    
+    pongGame.running = true;
+    pongGame.keys = {};
     document.getElementById('score-pong').textContent = '0 - 0';
-    
-    // Add event listeners
-    document.addEventListener('keydown', handlePongKeyDown);
-    document.addEventListener('keyup', handlePongKeyUp);
-    
-    // Start game loop
-    pongGameLoop();
+    activeLoops.pong = requestAnimationFrame(pongLoop);
 }
 
-function handlePongKeyDown(e) {
-    if (currentGame !== 'pong') return;
-    pongGame.keys[e.key] = true;
-}
-
-function handlePongKeyUp(e) {
-    if (currentGame !== 'pong') return;
-    pongGame.keys[e.key] = false;
-}
-
-function pongGameLoop() {
-    if (!pongGame.gameRunning) return;
-    
-    // Clear canvas
-    pongGame.ctx.fillStyle = '#000';
-    pongGame.ctx.fillRect(0, 0, pongGame.canvas.width, pongGame.canvas.height);
-    
-    // Move left paddle (W/S keys)
-    if (pongGame.keys['w'] && pongGame.leftPaddle.y > 0) {
-        pongGame.leftPaddle.y -= 5;
-    }
-    if (pongGame.keys['s'] && pongGame.leftPaddle.y < pongGame.canvas.height - pongGame.paddleHeight) {
-        pongGame.leftPaddle.y += 5;
-    }
-    
-    // Simple AI for right paddle
-    if (pongGame.ball.y < pongGame.rightPaddle.y + pongGame.paddleHeight / 2) {
-        pongGame.rightPaddle.y -= 3;
-    } else {
-        pongGame.rightPaddle.y += 3;
-    }
-    
-    // Move ball
-    pongGame.ball.x += pongGame.ball.dx;
-    pongGame.ball.y += pongGame.ball.dy;
-    
-    // Ball collision with top/bottom
-    if (pongGame.ball.y <= pongGame.ballRadius || pongGame.ball.y >= pongGame.canvas.height - pongGame.ballRadius) {
-        pongGame.ball.dy = -pongGame.ball.dy;
-    }
-    
-    // Ball collision with left paddle
-    if (pongGame.ball.x <= pongGame.paddleWidth + pongGame.ballRadius &&
-        pongGame.ball.y >= pongGame.leftPaddle.y &&
-        pongGame.ball.y <= pongGame.leftPaddle.y + pongGame.paddleHeight) {
-        pongGame.ball.dx = -pongGame.ball.dx;
-    }
-    
-    // Ball collision with right paddle
-    if (pongGame.ball.x >= pongGame.canvas.width - pongGame.paddleWidth - pongGame.ballRadius &&
-        pongGame.ball.y >= pongGame.rightPaddle.y &&
-        pongGame.ball.y <= pongGame.rightPaddle.y + pongGame.paddleHeight) {
-        pongGame.ball.dx = -pongGame.ball.dx;
-    }
-    
-    // Score
-    if (pongGame.ball.x < 0) {
-        pongGame.rightScore++;
-        resetBall();
-    } else if (pongGame.ball.x > pongGame.canvas.width) {
-        pongGame.leftScore++;
-        resetBall();
-    }
-    
-    // Draw paddles
-    pongGame.ctx.fillStyle = '#fff';
-    pongGame.ctx.fillRect(0, pongGame.leftPaddle.y, pongGame.paddleWidth, pongGame.paddleHeight);
-    pongGame.ctx.fillRect(pongGame.canvas.width - pongGame.paddleWidth, pongGame.rightPaddle.y, pongGame.paddleWidth, pongGame.paddleHeight);
-    
-    // Draw ball
-    pongGame.ctx.beginPath();
-    pongGame.ctx.arc(pongGame.ball.x, pongGame.ball.y, pongGame.ballRadius, 0, Math.PI * 2);
-    pongGame.ctx.fill();
-    
-    // Draw center line
-    pongGame.ctx.setLineDash([5, 5]);
-    pongGame.ctx.beginPath();
-    pongGame.ctx.moveTo(pongGame.canvas.width / 2, 0);
-    pongGame.ctx.lineTo(pongGame.canvas.width / 2, pongGame.canvas.height);
-    pongGame.ctx.stroke();
-    
-    // Update score
-    document.getElementById('score-pong').textContent = `${pongGame.leftScore} - ${pongGame.rightScore}`;
-    
-    requestAnimationFrame(pongGameLoop);
-}
-
-function resetBall() {
+function resetPongBall() {
     pongGame.ball.x = pongGame.canvas.width / 2;
     pongGame.ball.y = pongGame.canvas.height / 2;
     pongGame.ball.dx = -pongGame.ball.dx;
 }
 
-// Breakout Game Implementation
-let breakoutGame = {
-    canvas: null,
-    ctx: null,
+function pongLoop() {
+    if (!pongGame.running) return;
+    const ctx = pongGame.ctx;
+    const w = pongGame.canvas.width;
+    const h = pongGame.canvas.height;
+
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0, 0, w, h);
+
+    if (pongGame.keys['w'] && pongGame.leftPaddle.y > 0) pongGame.leftPaddle.y -= 5;
+    if (pongGame.keys['s'] && pongGame.leftPaddle.y < h - pongGame.paddleHeight) pongGame.leftPaddle.y += 5;
+    if (pongGame.keys['ArrowUp'] && pongGame.rightPaddle.y > 0) pongGame.rightPaddle.y -= 5;
+    if (pongGame.keys['ArrowDown'] && pongGame.rightPaddle.y < h - pongGame.paddleHeight) pongGame.rightPaddle.y += 5;
+
+    pongGame.ball.x += pongGame.ball.dx;
+    pongGame.ball.y += pongGame.ball.dy;
+
+    if (pongGame.ball.y <= pongGame.ballRadius || pongGame.ball.y >= h - pongGame.ballRadius) {
+        pongGame.ball.dy = -pongGame.ball.dy;
+    }
+
+    if (pongGame.ball.x <= pongGame.paddleWidth + pongGame.ballRadius &&
+        pongGame.ball.y >= pongGame.leftPaddle.y && pongGame.ball.y <= pongGame.leftPaddle.y + pongGame.paddleHeight) {
+        pongGame.ball.dx = Math.abs(pongGame.ball.dx);
+    }
+    if (pongGame.ball.x >= w - pongGame.paddleWidth - pongGame.ballRadius &&
+        pongGame.ball.y >= pongGame.rightPaddle.y && pongGame.ball.y <= pongGame.rightPaddle.y + pongGame.paddleHeight) {
+        pongGame.ball.dx = -Math.abs(pongGame.ball.dx);
+    }
+
+    if (pongGame.ball.x < 0) { pongGame.rightScore++; resetPongBall(); }
+    if (pongGame.ball.x > w) { pongGame.leftScore++; resetPongBall(); }
+
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0, pongGame.leftPaddle.y, pongGame.paddleWidth, pongGame.paddleHeight);
+    ctx.fillRect(w - pongGame.paddleWidth, pongGame.rightPaddle.y, pongGame.paddleWidth, pongGame.paddleHeight);
+
+    ctx.beginPath();
+    ctx.arc(pongGame.ball.x, pongGame.ball.y, pongGame.ballRadius, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.setLineDash([5, 5]);
+    ctx.beginPath();
+    ctx.moveTo(w / 2, 0);
+    ctx.lineTo(w / 2, h);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    document.getElementById('score-pong').textContent = `${pongGame.leftScore} - ${pongGame.rightScore}`;
+
+    if (pongGame.leftScore >= pongGame.winScore || pongGame.rightScore >= pongGame.winScore) {
+        endPongGame();
+        return;
+    }
+    activeLoops.pong = requestAnimationFrame(pongLoop);
+}
+
+function endPongGame() {
+    pongGame.running = false;
+    stopLoop('pong');
+    const ctx = pongGame.ctx;
+    ctx.fillStyle = 'rgba(0,0,0,0.6)';
+    ctx.fillRect(0, 0, pongGame.canvas.width, pongGame.canvas.height);
+    ctx.fillStyle = '#fff';
+    ctx.font = '24px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('Game Over!', pongGame.canvas.width / 2, pongGame.canvas.height / 2);
+    ctx.fillText(`${pongGame.leftScore} - ${pongGame.rightScore}`, pongGame.canvas.width / 2, pongGame.canvas.height / 2 + 30);
+}
+
+// ---------------------------------------------------------------------------
+// Breakout
+// ---------------------------------------------------------------------------
+const breakoutGame = {
+    canvas: null, ctx: null,
     paddle: { x: 0, y: 0, width: 80, height: 10 },
     ball: { x: 0, y: 0, dx: 0, dy: 0, radius: 8 },
-    bricks: [],
-    score: 0,
-    gameRunning: false,
-    keys: {}
+    bricks: [], score: 0, lives: 3, running: false, keys: {}
 };
+gameStates.breakout = breakoutGame;
 
 function startBreakoutGame() {
+    stopLoop('breakout');
     const canvas = document.getElementById('breakout-canvas');
-    const ctx = canvas.getContext('2d');
-    
     breakoutGame.canvas = canvas;
-    breakoutGame.ctx = ctx;
+    breakoutGame.ctx = canvas.getContext('2d');
     breakoutGame.paddle.x = canvas.width / 2 - breakoutGame.paddle.width / 2;
     breakoutGame.paddle.y = canvas.height - 20;
-    breakoutGame.ball.x = canvas.width / 2;
-    breakoutGame.ball.y = canvas.height - 40;
-    breakoutGame.ball.dx = 3;
-    breakoutGame.ball.dy = -3;
+    breakoutGame.ball = { x: canvas.width / 2, y: canvas.height - 40, dx: 3, dy: -3, radius: 8 };
     breakoutGame.score = 0;
-    breakoutGame.gameRunning = true;
-    
-    // Initialize bricks
+    breakoutGame.lives = 3;
+    breakoutGame.running = true;
+    breakoutGame.keys = {};
     breakoutGame.bricks = [];
-    const brickRows = 5;
-    const brickCols = 8;
-    const brickWidth = 50;
-    const brickHeight = 20;
-    
+    const brickRows = 5, brickCols = 8, brickWidth = 50, brickHeight = 20;
     for (let row = 0; row < brickRows; row++) {
         for (let col = 0; col < brickCols; col++) {
             breakoutGame.bricks.push({
                 x: col * (brickWidth + 5) + 30,
                 y: row * (brickHeight + 5) + 50,
-                width: brickWidth,
-                height: brickHeight,
+                width: brickWidth, height: brickHeight,
                 visible: true
             });
         }
     }
-    
     document.getElementById('score-breakout').textContent = '0';
-    
-    // Add event listeners
-    document.addEventListener('keydown', handleBreakoutKeyDown);
-    document.addEventListener('keyup', handleBreakoutKeyUp);
-    
-    // Start game loop
-    breakoutGameLoop();
+    initHighScore('breakout');
+    breakoutGame.canvas.addEventListener('mousemove', handleBreakoutMouse);
+    activeLoops.breakout = requestAnimationFrame(breakoutLoop);
 }
 
-function handleBreakoutKeyDown(e) {
-    if (currentGame !== 'breakout') return;
-    breakoutGame.keys[e.key] = true;
+function handleBreakoutMouse(e) {
+    if (!breakoutGame.running) return;
+    const rect = breakoutGame.canvas.getBoundingClientRect();
+    const scaleX = breakoutGame.canvas.width / rect.width;
+    breakoutGame.paddle.x = (e.clientX - rect.left) * scaleX - breakoutGame.paddle.width / 2;
+    const maxX = breakoutGame.canvas.width - breakoutGame.paddle.width;
+    if (breakoutGame.paddle.x < 0) breakoutGame.paddle.x = 0;
+    if (breakoutGame.paddle.x > maxX) breakoutGame.paddle.x = maxX;
 }
 
-function handleBreakoutKeyUp(e) {
-    if (currentGame !== 'breakout') return;
-    breakoutGame.keys[e.key] = false;
-}
+function breakoutLoop() {
+    if (!breakoutGame.running) return;
+    const ctx = breakoutGame.ctx;
+    const w = breakoutGame.canvas.width;
+    const h = breakoutGame.canvas.height;
 
-function breakoutGameLoop() {
-    if (!breakoutGame.gameRunning) return;
-    
-    // Clear canvas
-    breakoutGame.ctx.fillStyle = '#2c3e50';
-    breakoutGame.ctx.fillRect(0, 0, breakoutGame.canvas.width, breakoutGame.canvas.height);
-    
-    // Move paddle
-    if (breakoutGame.keys['ArrowLeft'] && breakoutGame.paddle.x > 0) {
-        breakoutGame.paddle.x -= 7;
-    }
-    if (breakoutGame.keys['ArrowRight'] && breakoutGame.paddle.x < breakoutGame.canvas.width - breakoutGame.paddle.width) {
-        breakoutGame.paddle.x += 7;
-    }
-    
-    // Move ball
+    ctx.fillStyle = '#2c3e50';
+    ctx.fillRect(0, 0, w, h);
+
+    if (breakoutGame.keys['ArrowLeft'] && breakoutGame.paddle.x > 0) breakoutGame.paddle.x -= 7;
+    if (breakoutGame.keys['ArrowRight'] && breakoutGame.paddle.x < w - breakoutGame.paddle.width) breakoutGame.paddle.x += 7;
+
     breakoutGame.ball.x += breakoutGame.ball.dx;
     breakoutGame.ball.y += breakoutGame.ball.dy;
-    
-    // Ball collision with walls
-    if (breakoutGame.ball.x <= breakoutGame.ball.radius || breakoutGame.ball.x >= breakoutGame.canvas.width - breakoutGame.ball.radius) {
+
+    if (breakoutGame.ball.x <= breakoutGame.ball.radius || breakoutGame.ball.x >= w - breakoutGame.ball.radius) {
         breakoutGame.ball.dx = -breakoutGame.ball.dx;
     }
     if (breakoutGame.ball.y <= breakoutGame.ball.radius) {
         breakoutGame.ball.dy = -breakoutGame.ball.dy;
     }
-    
-    // Ball collision with paddle
+
     if (breakoutGame.ball.y >= breakoutGame.paddle.y - breakoutGame.ball.radius &&
         breakoutGame.ball.x >= breakoutGame.paddle.x &&
         breakoutGame.ball.x <= breakoutGame.paddle.x + breakoutGame.paddle.width) {
-        breakoutGame.ball.dy = -breakoutGame.ball.dy;
+        breakoutGame.ball.dy = -Math.abs(breakoutGame.ball.dy);
     }
-    
-    // Ball collision with bricks
-    for (let brick of breakoutGame.bricks) {
+
+    for (const brick of breakoutGame.bricks) {
         if (brick.visible &&
-            breakoutGame.ball.x >= brick.x &&
-            breakoutGame.ball.x <= brick.x + brick.width &&
-            breakoutGame.ball.y >= brick.y &&
-            breakoutGame.ball.y <= brick.y + brick.height) {
+            breakoutGame.ball.x >= brick.x && breakoutGame.ball.x <= brick.x + brick.width &&
+            breakoutGame.ball.y >= brick.y && breakoutGame.ball.y <= brick.y + brick.height) {
             brick.visible = false;
             breakoutGame.ball.dy = -breakoutGame.ball.dy;
             breakoutGame.score += 10;
             document.getElementById('score-breakout').textContent = breakoutGame.score;
         }
     }
-    
-    // Check win condition
-    if (breakoutGame.bricks.every(brick => !brick.visible)) {
+
+    if (breakoutGame.bricks.every(b => !b.visible)) {
         endBreakoutGame(true);
         return;
     }
-    
-    // Check lose condition
-    if (breakoutGame.ball.y > breakoutGame.canvas.height) {
-        endBreakoutGame(false);
-        return;
+
+    if (breakoutGame.ball.y > h) {
+        breakoutGame.lives--;
+        if (breakoutGame.lives <= 0) {
+            endBreakoutGame(false);
+            return;
+        }
+        breakoutGame.ball = { x: w / 2, y: h - 40, dx: 3, dy: -3, radius: 8 };
     }
-    
-    // Draw paddle
-    breakoutGame.ctx.fillStyle = '#74b9ff';
-    breakoutGame.ctx.fillRect(breakoutGame.paddle.x, breakoutGame.paddle.y, breakoutGame.paddle.width, breakoutGame.paddle.height);
-    
-    // Draw ball
-    breakoutGame.ctx.fillStyle = '#fff';
-    breakoutGame.ctx.beginPath();
-    breakoutGame.ctx.arc(breakoutGame.ball.x, breakoutGame.ball.y, breakoutGame.ball.radius, 0, Math.PI * 2);
-    breakoutGame.ctx.fill();
-    
-    // Draw bricks
-    for (let brick of breakoutGame.bricks) {
+
+    ctx.fillStyle = '#74b9ff';
+    ctx.fillRect(breakoutGame.paddle.x, breakoutGame.paddle.y, breakoutGame.paddle.width, breakoutGame.paddle.height);
+
+    ctx.fillStyle = '#fff';
+    ctx.beginPath();
+    ctx.arc(breakoutGame.ball.x, breakoutGame.ball.y, breakoutGame.ball.radius, 0, Math.PI * 2);
+    ctx.fill();
+
+    for (const brick of breakoutGame.bricks) {
         if (brick.visible) {
-            breakoutGame.ctx.fillStyle = '#e74c3c';
-            breakoutGame.ctx.fillRect(brick.x, brick.y, brick.width, brick.height);
+            ctx.fillStyle = '#e74c3c';
+            ctx.fillRect(brick.x, brick.y, brick.width, brick.height);
         }
     }
-    
-    requestAnimationFrame(breakoutGameLoop);
+
+    ctx.fillStyle = '#fff';
+    ctx.font = '14px Arial';
+    ctx.textAlign = 'left';
+    ctx.fillText(`Lives: ${'❤️'.repeat(Math.max(0, breakoutGame.lives))}`, 10, 20);
+
+    activeLoops.breakout = requestAnimationFrame(breakoutLoop);
 }
 
 function endBreakoutGame(won) {
-    breakoutGame.gameRunning = false;
-    breakoutGame.ctx.fillStyle = '#fff';
-    breakoutGame.ctx.font = '24px Arial';
-    breakoutGame.ctx.textAlign = 'center';
-    if (won) {
-        breakoutGame.ctx.fillText('You Win!', breakoutGame.canvas.width/2, breakoutGame.canvas.height/2);
-    } else {
-        breakoutGame.ctx.fillText('Game Over!', breakoutGame.canvas.width/2, breakoutGame.canvas.height/2);
-    }
-    breakoutGame.ctx.fillText(`Score: ${breakoutGame.score}`, breakoutGame.canvas.width/2, breakoutGame.canvas.height/2 + 30);
+    breakoutGame.running = false;
+    stopLoop('breakout');
+    updateHighScore('breakout', breakoutGame.score);
+    const ctx = breakoutGame.ctx;
+    ctx.fillStyle = 'rgba(0,0,0,0.6)';
+    ctx.fillRect(0, 0, breakoutGame.canvas.width, breakoutGame.canvas.height);
+    ctx.fillStyle = '#fff';
+    ctx.font = '24px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText(won ? 'You Win!' : 'Game Over!', breakoutGame.canvas.width / 2, breakoutGame.canvas.height / 2);
+    ctx.fillText(`Score: ${breakoutGame.score}`, breakoutGame.canvas.width / 2, breakoutGame.canvas.height / 2 + 30);
 }
+
+// ---------------------------------------------------------------------------
+// Memory
+// ---------------------------------------------------------------------------
+const memoryGame = {
+    cards: [], flipped: [], matched: 0, moves: 0, lock: false, running: false
+};
+
+const MEMORY_EMOJIS = ['🌤️', '🌧️', '❄️', '⛈️', '🌪️', '🌈', '☀️', '🌊'];
+
+function startMemoryGame() {
+    const grid = document.getElementById('memory-grid');
+    const emojis = [...MEMORY_EMOJIS, ...MEMORY_EMOJIS];
+    // Shuffle
+    for (let i = emojis.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [emojis[i], emojis[j]] = [emojis[j], emojis[i]];
+    }
+    memoryGame.cards = emojis.map((emoji, index) => ({ emoji, index, matched: false }));
+    memoryGame.flipped = [];
+    memoryGame.matched = 0;
+    memoryGame.moves = 0;
+    memoryGame.lock = false;
+    memoryGame.running = true;
+
+    document.getElementById('moves-memory').textContent = '0';
+    document.getElementById('score-memory').textContent = '0';
+
+    grid.innerHTML = '';
+    memoryGame.cards.forEach(card => {
+        const el = document.createElement('div');
+        el.className = 'memory-card';
+        el.dataset.index = card.index;
+        el.addEventListener('click', () => flipMemoryCard(card.index, el));
+        grid.appendChild(el);
+    });
+}
+
+function flipMemoryCard(index, el) {
+    if (!memoryGame.running || memoryGame.lock) return;
+    const card = memoryGame.cards[index];
+    if (card.matched || el.classList.contains('flipped')) return;
+    if (memoryGame.flipped.length >= 2) return;
+
+    el.classList.add('flipped');
+    el.textContent = card.emoji;
+    memoryGame.flipped.push({ index, el });
+
+    if (memoryGame.flipped.length === 2) {
+        memoryGame.moves++;
+        document.getElementById('moves-memory').textContent = memoryGame.moves;
+        const [a, b] = memoryGame.flipped;
+        if (memoryGame.cards[a.index].emoji === memoryGame.cards[b.index].emoji) {
+            memoryGame.cards[a.index].matched = true;
+            memoryGame.cards[b.index].matched = true;
+            memoryGame.matched += 2;
+            document.getElementById('score-memory').textContent = memoryGame.matched * 10;
+            memoryGame.flipped = [];
+            if (memoryGame.matched === memoryGame.cards.length) {
+                memoryGame.running = false;
+                alert('🎉 ' + (window.weatherApp ? window.weatherApp.translate('you_win') : 'You won!'));
+            }
+        } else {
+            memoryGame.lock = true;
+            setTimeout(() => {
+                a.el.classList.remove('flipped');
+                a.el.textContent = '';
+                b.el.classList.remove('flipped');
+                b.el.textContent = '';
+                memoryGame.flipped = [];
+                memoryGame.lock = false;
+            }, 900);
+        }
+    }
+}
+
+// ============================================================================
+// Init
+// ============================================================================
+document.addEventListener('DOMContentLoaded', () => {
+    window.weatherApp = new WeatherApp();
+    initHighScore('2048');
+    initHighScore('flappy');
+    initHighScore('snake');
+    initHighScore('breakout');
+
+    // Geolocation button
+    if (navigator.geolocation) {
+        const subtitle = document.querySelector('header p');
+        if (subtitle) {
+            const locationBtn = document.createElement('button');
+            locationBtn.className = 'location-btn';
+            locationBtn.textContent = window.weatherApp.translate('use_location');
+
+            locationBtn.addEventListener('click', async () => {
+                try {
+                    locationBtn.disabled = true;
+                    locationBtn.textContent = window.weatherApp.translate('determining_location');
+                    const location = await window.weatherApp.getUserLocation();
+                    window.weatherApp.userLocation = location;
+                    await window.weatherApp.loadWeatherData(true, location.lat, location.lon);
+                    window.weatherApp.loadFireRisk();
+                    window.weatherApp.loadAirQuality();
+                } catch (error) {
+                    console.error('Geolocation error:', error);
+                    window.weatherApp.showError(error.message);
+                } finally {
+                    locationBtn.disabled = false;
+                    locationBtn.textContent = window.weatherApp.translate('use_location');
+                }
+            });
+            subtitle.appendChild(locationBtn);
+        }
+    }
+});
