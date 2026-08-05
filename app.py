@@ -1,5 +1,6 @@
 import logging
 import os
+import sys
 from datetime import datetime
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -28,6 +29,12 @@ from translations import SUPPORTED_LANGUAGES, get_weather_description
 # ---------------------------------------------------------------------------
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 logger = logging.getLogger("weer")
+
+try:
+    sys.stdout.reconfigure(encoding="utf-8")
+    sys.stderr.reconfigure(encoding="utf-8")
+except (AttributeError, ValueError):
+    pass
 
 load_dotenv()
 
@@ -104,7 +111,7 @@ MAJOR_CITIES: List[Tuple[Tuple[float, float], str]] = [
     ((53.5511, 9.9937), "Hamburg"),
     ((50.1109, 8.6821), "Frankfurt"),
     ((50.8503, 4.3517), "Brussel"),
-    ((48.8566, 2.3522), "Paris"),
+    ((48.8566, 2.3522), "Parijs"),
 ]
 
 
@@ -193,6 +200,15 @@ def _f(val: Optional[float], default: float = 0.0) -> float:
         return float(val)
     except (TypeError, ValueError):
         return default
+
+
+def _is_day_hour(datetime_str: str) -> bool:
+    """Bestimate day/night from an hourly timestamp (e.g. '2026-08-05T14:00')."""
+    try:
+        hour = int(datetime_str[11:13])
+    except (ValueError, IndexError, TypeError):
+        return True
+    return 6 <= hour < 20
 
 
 def _location_block(lat: float, lon: float, location_name: Optional[str]) -> Dict[str, Any]:
@@ -490,7 +506,7 @@ async def get_weather_forecast(
                 "speed": round(_safely("wind_speed_10m", idx)),
                 "direction": round(_safely("wind_direction_10m", idx)),
             },
-            "weather": _build_weather_description(code, True, lang),
+            "weather": _build_weather_description(code, _is_day_hour(times[idx]), lang),
             "clouds": round(_safely("cloud_cover", idx)),
             "rain": round(_safely("precipitation", idx), 1),
             "precipitation_probability": round(_safely("precipitation_probability", idx)),
@@ -538,7 +554,7 @@ async def get_weather_forecast(
 
 @app.get("/alerts")
 async def get_weather_alerts(
-    request: Request, lat: Optional[float] = None, lon: Optional[float] = None
+    request: Request, lat: Optional[float] = None, lon: Optional[float] = None, lang: str = "nl"
 ):
     user = get_current_user(request)
     if lat is None or lon is None:
@@ -549,7 +565,7 @@ async def get_weather_alerts(
     if data:
         cur = data.get("current", {})
         code = int(cur.get("weather_code", 0))
-        label = get_weather_description(code, "nl")
+        label = get_weather_description(code, lang)
         if code in (95, 96, 99):
             alerts.append({
                 "severity": "Waarschuwing",
@@ -859,6 +875,8 @@ if __name__ == "__main__":
     host = os.getenv("HOST", "0.0.0.0")
     port = int(os.getenv("PORT", "8000"))
     url = start_ngrok_tunnel(port)
+    if url:
+        print(f"\n🌍 Public URL: {url}\n")
     try:
         uvicorn.run(
             "app:app",

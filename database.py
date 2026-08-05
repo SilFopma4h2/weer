@@ -5,9 +5,17 @@ Database models and utilities for the Weather App user authentication system
 
 import sqlite3
 import os
+import sys
 from datetime import datetime
 from typing import Optional, Dict, Any
 import bcrypt
+
+
+try:
+    sys.stdout.reconfigure(encoding="utf-8")
+    sys.stderr.reconfigure(encoding="utf-8")
+except (AttributeError, ValueError):
+    pass
 
 
 DATABASE_PATH = os.getenv(
@@ -17,8 +25,10 @@ DATABASE_PATH = os.getenv(
 
 def get_db_connection():
     """Get a SQLite database connection"""
-    conn = sqlite3.connect(DATABASE_PATH)
+    conn = sqlite3.connect(DATABASE_PATH, timeout=30.0)
     conn.row_factory = sqlite3.Row  # Enable dict-like access to rows
+    conn.execute("PRAGMA busy_timeout = 30000")
+    conn.execute("PRAGMA journal_mode = WAL")
     return conn
 
 

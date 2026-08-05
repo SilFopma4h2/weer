@@ -1,0 +1,25 @@
+Analyseer en fix de bug waardoor de `/current` en `/forecast` endpoints een HTTP 422 (Unprocessable Entity) teruggeven.
+
+Fout uit de logs:
+
+GET /current?lat=51.98564600063055&lon=5.837250792813276?lang=nl HTTP/1.1 → 422 Unprocessable Entity
+GET /forecast?lat=51.98564600063055&lon=5.837250792813276?lang=nl HTTP/1.1 → 422 Unprocessable Entity
+
+De URL is verkeerd opgebouwd. `?lang=nl` wordt achter de `lon`-parameter geplakt, waardoor FastAPI `lon` probeert te parsen als:
+
+5.837250792813276?lang=nl
+
+Dit is geen geldige float.
+
+Vereisten:
+1. Zoek waar de frontend de requests voor `/current` en `/forecast` opbouwt.
+2. Vervang de tweede `?` door `&`, zodat de URL wordt:
+   `/current?lat=<lat>&lon=<lon>&lang=nl`
+   `/forecast?lat=<lat>&lon=<lon>&lang=nl`
+3. Controleer of alle andere API-calls met queryparameters correct worden opgebouwd.
+4. Zorg dat de wijziging geen bestaande functionaliteit breekt.
+5. Controleer of de backend daarna geen 422-fouten meer teruggeeft.
+
+Extra:
+- Zorg dat bij het starten van de server de ngrok-URL duidelijk en aanklikbaar in de terminal wordt weergegeven (bijvoorbeeld: `🌍 Public URL: https://xxxx.ngrok-free.app`), zodat deze direct geopend kan worden.
+- Pas alleen de noodzakelijke code aan en wijzig de bestaande projectstructuur niet.

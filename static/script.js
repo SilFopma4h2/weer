@@ -658,9 +658,9 @@ class WeatherApp {
 
         try {
             const [currentData, forecastData, alertsData] = await Promise.all([
-                this._fetchJSON(`/current${q}?lang=${lang}`),
-                this._fetchJSON(`/forecast${q}?lang=${lang}`),
-                this._fetchJSON(`/alerts${q}`)
+                this._fetchJSON(`/current${q}${q ? '&' : '?'}lang=${lang}`),
+                this._fetchJSON(`/forecast${q}${q ? '&' : '?'}lang=${lang}`),
+                this._fetchJSON(`/alerts${q}${q ? '&' : '?'}lang=${lang}`)
             ]);
 
             this.currentData = currentData;
