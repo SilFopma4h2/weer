@@ -61,7 +61,10 @@ CACHE_DURATION=600
 python app.py
 ```
 
-Of gebruik uvicorn direct:
+Dit start de server **en** maakt automatisch een publieke ngrok-tunnel aan (als
+`ENABLE_NGROK=true`). De ngrok-URL wordt in de console gelogd.
+
+Of gebruik uvicorn direct (zonder ngrok):
 ```bash
 uvicorn app:app --host 0.0.0.0 --port 8000 --reload
 ```
@@ -141,6 +144,33 @@ Retourneert 24-uurs en 7-dagen voorspelling in vergelijkbaar formaat.
 - No sensitive data in frontend
 
 ## 🚀 Deployment
+
+### Ngrok (publieke tunnel)
+```bash
+pip install -r requirements.txt
+ngrok config add-authtoken <je-token>   # eenmalig
+python app.py                            # start server + tunnel automatisch
+```
+Zet `ENABLE_NGROK=false` in `.env` om de tunnel uit te schakelen.
+
+### Vercel (serverless)
+De app wordt automatisch gedetecteerd door Vercel (FastAPI `app` in `app.py`):
+
+```bash
+# Optioneel: installeer de Vercel CLI
+npm i -g vercel
+
+# Lokaal testen zoals in productie
+vercel dev
+
+# Deployen
+vercel --prod
+```
+
+Of verbind je GitHub-repository in het Vercel-dashboard. Zie `vercel.json`
+en `DEPLOYMENT.md`. Let op: op Vercel is het bestandssysteem read-only; de
+SQLite-database wordt naar `/tmp/weather_app.db` geschreven en is dus niet
+permanent.
 
 ### Docker (optioneel)
 ```dockerfile

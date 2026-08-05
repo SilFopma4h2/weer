@@ -2,27 +2,57 @@
 
 ## Quick Start
 
-### 1. Production Deployment
+### 1. Local Development with automatic ngrok tunnel
 ```bash
-# Clone repository
 git clone <repository-url>
 cd weer
 
-# Install dependencies
 pip install -r requirements.txt
 
 # Configure environment (optional)
 cp .env.example .env
-# Edit .env to customize location settings if needed
 
+# Start the server; an ngrok tunnel is created automatically
+python app.py
+```
+
+The ngrok public URL is printed in the console. Disable it with `ENABLE_NGROK=false`.
+
+### 2. Production Deployment
+```bash
 # Start production server
 uvicorn app:app --host 0.0.0.0 --port 8000
 ```
 
-### 2. Demo Mode (for testing without API key)
+### 3. Demo Mode (for testing without API key)
 ```bash
 python demo.py
 ```
+
+## Vercel (Serverless)
+
+The app is auto-detected by Vercel because `app.py` exports a FastAPI `app`
+instance at a recognized entrypoint. No `builds`/`routes` config is required.
+
+### Deploy with the Vercel CLI
+```bash
+npm i -g vercel        # install CLI (Node.js)
+vercel dev             # run locally like production (uses app.py)
+vercel --prod          # deploy to production
+```
+
+### Deploy from GitHub
+1. Push the repository to GitHub.
+2. In the Vercel dashboard click "New Project" and import the repo.
+3. Vercel detects Python automatically; add env vars if needed and deploy.
+
+### Serverless notes
+- `requirements.txt` is used by Vercel to install dependencies.
+- `/static` is served from the CDN (FastAPI `StaticFiles` promotion).
+- The filesystem is read-only; the SQLite database lives at `/tmp/weather_app.db`
+  (per-instance, ephemeral). Set `DATABASE_PATH` if you need a different path.
+- See `vercel.json` for build configuration (`excludeFiles` keeps the bundle lean).
+- Session/auth data is stored in SQLite and is not shared between instances.
 
 ## Environment Configuration
 

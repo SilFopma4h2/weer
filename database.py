@@ -10,7 +10,9 @@ from typing import Optional, Dict, Any
 import bcrypt
 
 
-DATABASE_PATH = "weather_app.db"
+DATABASE_PATH = os.getenv(
+    "DATABASE_PATH", "/tmp/weather_app.db" if os.getenv("VERCEL") else "weather_app.db"
+)
 
 
 def get_db_connection():

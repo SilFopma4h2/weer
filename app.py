@@ -834,5 +834,43 @@ async def health_check():
     return {"status": "healthy", "timestamp": datetime.now().isoformat(), "cache_size": len(cache)}
 
 
+def start_ngrok_tunnel(port: int) -> Optional[str]:
+    """Start an ngrok tunnel to the local app. Returns the public URL or None."""
+    if os.getenv("ENABLE_NGROK", "true").lower() in ("0", "false", "no", "off"):
+        return None
+    try:
+        from pyngrok import ngrok
+    except ImportError:
+        logger.warning(
+            "pyngrok niet geïnstalleerd; ngrok wordt overgeslagen (pip install pyngrok)"
+        )
+        return None
+    try:
+        tunnel = ngrok.connect(port, bind_tls=True)
+        url = tunnel.public_url
+        logger.info("Ngrok tunnel actief: %s -> http://localhost:%s", url, port)
+        return url
+    except Exception as exc:
+        logger.warning("Ngrok starten mislukt: %s", exc)
+        return None
+
+
 if __name__ == "__main__":
-    uvicorn.run("app:app", host="0.0.0.0", port=8000, reload=True)
+    host = os.getenv("HOST", "0.0.0.0")
+    port = int(os.getenv("PORT", "8000"))
+    url = start_ngrok_tunnel(port)
+    try:
+        uvicorn.run(
+            "app:app",
+            host=host,
+            port=port,
+            reload=os.getenv("RELOAD", "true").lower() in ("1", "true", "yes"),
+        )
+    finally:
+        if url:
+            try:
+                from pyngrok import ngrok
+
+                ngrok.kill()
+            except Exception:
+                pass

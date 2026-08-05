@@ -1,0 +1,8 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "functions": {
+    "app.py": {
+      "excludeFiles": "{weather_app.db,test_auth.py,test_performance.py,demo.py,DEPLOYMENT.md,AUTHENTICATION.md,SECURITY.md,*.log}"
+    }
+  }
+}
