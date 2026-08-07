@@ -598,26 +598,26 @@ def _aq_index_to_level(value: float, use_us: bool = True) -> Dict[str, Any]:
     """Categorise an AQI value into a human readable band + colour."""
     if use_us:
         bands = [
-            (50, "Goed", "goed"),
-            (100, "Matig", "matig"),
-            (150, "Ongezond voor gevoelige groepen", "ongezond"),
-            (200, "Ongezond", "ongezond"),
-            (300, "Zeer ongezond", "gevaarlijk"),
-            (float("inf"), "Gevaarlijk", "gevaarlijk"),
+            (50, "Goed", "good"),
+            (100, "Matig", "moderate"),
+            (150, "Ongezond voor gevoelige groepen", "unhealthy"),
+            (200, "Ongezond", "unhealthy"),
+            (300, "Zeer ongezond", "hazardous"),
+            (float("inf"), "Gevaarlijk", "hazardous"),
         ]
     else:
         bands = [
-            (20, "Goed", "goed"),
-            (40, "Redelijk", "matig"),
-            (60, "Matig", "matig"),
-            (80, "Slecht", "ongezond"),
-            (100, "Zeer slecht", "ongezond"),
-            (float("inf"), "Extreem slecht", "gevaarlijk"),
+            (20, "Goed", "good"),
+            (40, "Redelijk", "moderate"),
+            (60, "Matig", "moderate"),
+            (80, "Slecht", "unhealthy"),
+            (100, "Zeer slecht", "unhealthy"),
+            (float("inf"), "Extreem slecht", "hazardous"),
         ]
     for limit, label, css in bands:
         if value <= limit:
             return {"level": label, "css": css}
-    return {"level": "Onbekend", "css": "matig"}
+    return {"level": "Onbekend", "css": "moderate"}
 
 
 @app.get("/air-quality")
