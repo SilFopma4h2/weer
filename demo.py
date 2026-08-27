@@ -138,7 +138,7 @@ def get_mock_forecast(language="nl"):
 @app.get("/", response_class=HTMLResponse)
 async def read_root(request: Request):
     """Serve the main page"""
-    return templates.TemplateResponse("index.html", {"request": request})
+    return templates.TemplateResponse(request, "index.html", {"request": request})
 
 @app.get("/current")
 async def get_current_weather(lat: Optional[float] = None, lon: Optional[float] = None, lang: str = "nl"):

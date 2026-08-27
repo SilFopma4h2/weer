@@ -234,10 +234,18 @@ async def _locate_and_track(request: Request) -> Tuple[float, float, Optional[st
 # ---------------------------------------------------------------------------
 # Page routes
 # ---------------------------------------------------------------------------
+def _user_to_template_context(user: Optional[dict]) -> Optional[dict]:
+    """Convert user dict to template-safe context (only hashable primitives)."""
+    if user is None:
+        return None
+    return {"email": user.get("email"), "location": user.get("location")}
+
+
 @app.get("/", response_class=HTMLResponse)
 async def read_root(request: Request):
+    user = get_current_user(request)
     return templates.TemplateResponse(
-        "index.html", {"request": request, "user": get_current_user(request)}
+        request, "index.html", {"request": request, "user": _user_to_template_context(user)}
     )
 
 
@@ -246,7 +254,7 @@ async def login_page(request: Request):
     user = get_current_user(request)
     if user:
         return RedirectResponse(url="/", status_code=status.HTTP_302_FOUND)
-    return templates.TemplateResponse("index.html", {"request": request, "show_login": True})
+    return templates.TemplateResponse(request, "index.html", {"request": request, "show_login": True})
 
 
 @app.get("/register", response_class=HTMLResponse)
@@ -254,7 +262,7 @@ async def register_page(request: Request):
     user = get_current_user(request)
     if user:
         return RedirectResponse(url="/", status_code=status.HTTP_302_FOUND)
-    return templates.TemplateResponse("index.html", {"request": request, "show_register": True})
+    return templates.TemplateResponse(request, "index.html", {"request": request, "show_register": True})
 
 
 @app.get("/settings", response_class=HTMLResponse)
@@ -263,7 +271,7 @@ async def settings_page(request: Request):
     if not user:
         return RedirectResponse(url="/login", status_code=status.HTTP_302_FOUND)
     return templates.TemplateResponse(
-        "index.html", {"request": request, "user": user, "show_settings": True}
+        request, "index.html", {"request": request, "user": _user_to_template_context(user), "show_settings": True}
     )
 
 
@@ -283,19 +291,19 @@ async def login(request: Request, email: str = Form(...), password: str = Form(.
     email = sanitize_input(email)
     if not validate_email(email):
         return templates.TemplateResponse(
-            "index.html", {"request": request, "show_login": True, "error": "Ongeldig e-mailadres"}
+            request, "index.html", {"request": request, "show_login": True, "error": "Ongeldig e-mailadres"}
         )
 
     user = UserManager.authenticate_user(email, password)
     if not user:
         return templates.TemplateResponse(
-            "index.html", {"request": request, "show_login": True, "error": "Ongeldig e-mailadres of wachtwoord"}
+            request, "index.html", {"request": request, "show_login": True, "error": "Ongeldig e-mailadres of wachtwoord"}
         )
 
     session_id = SessionManager.create_session(user["id"])
     if not session_id:
         return templates.TemplateResponse(
-            "index.html", {"request": request, "show_login": True, "error": "Sessie aanmaken mislukt. Probeer opnieuw."}
+            request, "index.html", {"request": request, "show_login": True, "error": "Sessie aanmaken mislukt. Probeer opnieuw."}
         )
 
     response = RedirectResponse(url="/", status_code=status.HTTP_302_FOUND)
@@ -316,29 +324,29 @@ async def register(
 
     if not validate_email(email):
         return templates.TemplateResponse(
-            "index.html", {"request": request, "show_register": True, "error": "Ongeldig e-mailadres"}
+            request, "index.html", {"request": request, "show_register": True, "error": "Ongeldig e-mailadres"}
         )
     if password != confirm_password:
         return templates.TemplateResponse(
-            "index.html", {"request": request, "show_register": True, "error": "Wachtwoorden komen niet overeen"}
+            request, "index.html", {"request": request, "show_register": True, "error": "Wachtwoorden komen niet overeen"}
         )
 
     valid, message = validate_password(password)
     if not valid:
         return templates.TemplateResponse(
-            "index.html", {"request": request, "show_register": True, "error": message}
+            request, "index.html", {"request": request, "show_register": True, "error": message}
         )
 
     user_id = UserManager.create_user(email, password, location or None)
     if not user_id:
         return templates.TemplateResponse(
-            "index.html", {"request": request, "show_register": True, "error": "E-mailadres bestaat al of registratie mislukt"}
+            request, "index.html", {"request": request, "show_register": True, "error": "E-mailadres bestaat al of registratie mislukt"}
         )
 
     session_id = SessionManager.create_session(user_id)
     if not session_id:
         return templates.TemplateResponse(
-            "index.html", {"request": request, "show_register": True, "error": "Registratie gelukt maar inloggen mislukt. Log handmatig in."}
+            request, "index.html", {"request": request, "show_register": True, "error": "Registratie gelukt maar inloggen mislukt. Log handmatig in."}
         )
 
     response = RedirectResponse(url="/", status_code=status.HTTP_302_FOUND)
@@ -365,13 +373,13 @@ async def update_settings(request: Request, location: str = Form(...)):
     location = sanitize_input(location)
     if UserManager.update_user_location(user["id"], location):
         return templates.TemplateResponse(
-            "index.html",
-            {"request": request, "user": {**user, "location": location},
+            request, "index.html",
+            {"request": request, "user": {**_user_to_template_context(user), "location": location},
              "show_settings": True, "success": "Locatie succesvol bijgewerkt!"},
         )
     return templates.TemplateResponse(
-        "index.html",
-        {"request": request, "user": user, "show_settings": True, "error": "Locatie bijwerken mislukt"},
+        request, "index.html",
+        {"request": request, "user": _user_to_template_context(user), "show_settings": True, "error": "Locatie bijwerken mislukt"},
     )
 
 
