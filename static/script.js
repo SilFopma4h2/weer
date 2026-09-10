@@ -1231,13 +1231,13 @@ class WeatherApp {
                 }),
                 (error) => {
                     const messages = {
-                        [error.PERMISSION_DENIED]: 'Locatietoegang geweigerd.',
+                        [error.PERMISSION_DENIED]: 'Locatietoegang geweigerd. Zorg dat je toestemming geeft voor locatie in je browser en dat de site via HTTPS wordt bezocht (of localhost).',
                         [error.POSITION_UNAVAILABLE]: 'Locatie niet beschikbaar.',
                         [error.TIMEOUT]: 'Time-out bij bepalen van locatie.'
                     };
                     reject(new Error(messages[error.code] || 'Onbekende fout bij locatiebepaling.'));
                 },
-                { enableHighAccuracy: true, timeout: 10000, maximumAge: 300000 }
+                { enableHighAccuracy: false, timeout: 10000, maximumAge: 300000 }
             );
         });
     }

@@ -275,6 +275,10 @@ async def settings_page(request: Request):
     )
 
 
+# Session configuration
+SESSION_COOKIE_SECURE = False  # Will be set True when ngrok is active
+
+
 def _set_session_cookie(response: RedirectResponse, session_id: str):
     response.set_cookie(
         key="session_id",
@@ -282,7 +286,7 @@ def _set_session_cookie(response: RedirectResponse, session_id: str):
         max_age=30 * 24 * 60 * 60,  # 30 days
         httponly=True,
         samesite="lax",
-        secure=False,  # set True behind a reverse proxy that terminates TLS
+        secure=SESSION_COOKIE_SECURE,
     )
 
 
@@ -860,6 +864,7 @@ async def health_check():
 
 def start_ngrok_tunnel(port: int) -> Optional[str]:
     """Start an ngrok tunnel to the local app. Returns the public URL or None."""
+    global SESSION_COOKIE_SECURE
     if os.getenv("ENABLE_NGROK", "true").lower() in ("0", "false", "no", "off"):
         return None
     try:
@@ -872,6 +877,8 @@ def start_ngrok_tunnel(port: int) -> Optional[str]:
     try:
         tunnel = ngrok.connect(port, bind_tls=True)
         url = tunnel.public_url
+        # Enable secure cookies when using ngrok (HTTPS)
+        SESSION_COOKIE_SECURE = True
         logger.info("Ngrok tunnel actief: %s -> http://localhost:%s", url, port)
         return url
     except Exception as exc:
