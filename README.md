@@ -21,6 +21,9 @@ Een moderne, responsieve weer-applicatie die actuele lokale weersinformatie toon
   - `GET /current`: Huidig weer
   - `GET /forecast`: 24u & 7d voorspelling
   - `GET /alerts`: Weerswaarschuwingen
+  - `GET /air-quality`: Luchtkwaliteit (AQI + verontreiniging)
+  - `GET /fire-risk`: Bosbrandrisico (Angström-index)
+  - `GET /locations`: Bekende steden (voor locatiekeuze in clients)
   - `GET /health`: Health check
 - **Data bron**: Open-Meteo API (gratis, geen API key vereist)
 - **Caching**: TTL cache (10 minuten)
@@ -32,6 +35,18 @@ Een moderne, responsieve weer-applicatie die actuele lokale weersinformatie toon
 - **Load time**: < 2 seconden
 - **Auto-refresh**: Elke 10 minuten
 - **Offline-ready**: Error handling en fallbacks
+
+## 📱 iOS-app (SwiftUI)
+
+Er is een native iPhone-app in [`ios/`](ios) die dezelfde backend gebruikt
+(Swift + SwiftUI, geen externe dependencies). Zie [`ios/README.md`](ios/README.md)
+voor de instructies.
+
+```bash
+python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
+ENABLE_NGROK=false .venv/bin/uvicorn app:app --host 0.0.0.0 --port 8000
+open ios/Weer.xcodeproj
+```
 
 ## 📋 Installatie & Setup
 

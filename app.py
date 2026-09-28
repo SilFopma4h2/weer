@@ -857,6 +857,22 @@ async def get_languages():
     return {"languages": SUPPORTED_LANGUAGES}
 
 
+@app.get("/locations")
+async def get_known_locations():
+    """The built-in city list, so clients (e.g. the iOS app) can offer a picker
+    without duplicating MAJOR_CITIES."""
+    cities = [
+        {"name": name, "lat": lat, "lon": lon}
+        for (lat, lon), name in MAJOR_CITIES
+    ]
+    seen = set()
+    unique = [c for c in cities if not (c["name"] in seen or seen.add(c["name"]))]
+    return {
+        "default": {"name": _matches_city(*(_resolve_coords(None))), "lat": DEFAULT_LAT, "lon": DEFAULT_LON},
+        "cities": unique,
+    }
+
+
 @app.get("/health")
 async def health_check():
     return {"status": "healthy", "timestamp": datetime.now().isoformat(), "cache_size": len(cache)}
