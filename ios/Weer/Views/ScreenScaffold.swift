@@ -2,7 +2,6 @@ import SwiftUI
 
 struct WeatherScaffold<Content: View>: View {
     let title: String
-    let systemImage: String
     @ViewBuilder var content: Content
 
     @Environment(WeatherViewModel.self) private var model
@@ -16,8 +15,7 @@ struct WeatherScaffold<Content: View>: View {
                 .toolbarBackground(Palette.surface, for: .navigationBar)
                 .toolbar {
                     ToolbarItem(placement: .topBarLeading) {
-                        Label(title, systemImage: systemImage)
-                            .labelStyle(.titleAndIcon)
+                        Text(title)
                             .font(.subheadline.weight(.semibold))
                             .foregroundStyle(Palette.brandStart)
                     }

@@ -11,15 +11,14 @@ struct RootView: View {
     var body: some View {
         TabView(selection: $selectedTab) {
             WeatherScaffold(
-                title: model.locationTitle,
-                systemImage: "sun.max"
+                title: model.locationTitle
             ) {
                 todayContent
             }
             .tabItem { Label(String(localized: "Today"), systemImage: "sun.max") }
             .tag(Tab.today)
 
-            WeatherScaffold(title: String(localized: "Fishing"), systemImage: "fish") {
+            WeatherScaffold(title: String(localized: "Fishing")) {
                 ScreenScroll {
                     FishingView(now: model.fishingNow, forecast: model.fishingForecast)
                 }
@@ -27,7 +26,7 @@ struct RootView: View {
             .tabItem { Label(String(localized: "Fishing"), systemImage: "fish") }
             .tag(Tab.fishing)
 
-            WeatherScaffold(title: String(localized: "Air quality"), systemImage: "aqi.medium") {
+            WeatherScaffold(title: String(localized: "Air quality")) {
                 ScreenScroll {
                     AirQualityView(airQuality: model.airQuality)
                 }
@@ -35,7 +34,7 @@ struct RootView: View {
             .tabItem { Label(String(localized: "Air"), systemImage: "aqi.medium") }
             .tag(Tab.air)
 
-            WeatherScaffold(title: String(localized: "Fire risk"), systemImage: "flame") {
+            WeatherScaffold(title: String(localized: "Fire risk")) {
                 ScreenScroll {
                     FireRiskView(fireRisk: model.fireRisk)
                 }
@@ -43,7 +42,7 @@ struct RootView: View {
             .tabItem { Label(String(localized: "Fire"), systemImage: "flame") }
             .tag(Tab.fire)
 
-            WeatherScaffold(title: String(localized: "Radar"), systemImage: "cloud.rain") {
+            WeatherScaffold(title: String(localized: "Radar")) {
                 RadarView(lat: coordinate.lat, lon: coordinate.lon)
                     .padding(16)
             }
