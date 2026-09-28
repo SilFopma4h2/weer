@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 struct LocationPickerView: View {
     @Bindable var model: WeatherViewModel
@@ -27,12 +28,22 @@ struct LocationPickerView: View {
                 }
                 if let message = model.locationErrorMessage {
                     Section {
-                        HStack(alignment: .top, spacing: 10) {
-                            Image(systemName: "location.slash")
-                                .foregroundStyle(Severity.moderate.foreground)
-                            Text(message)
-                                .font(.footnote)
-                                .foregroundStyle(.secondary)
+                        VStack(alignment: .leading, spacing: 10) {
+                            HStack(alignment: .top, spacing: 10) {
+                                Image(systemName: "location.slash")
+                                    .foregroundStyle(Severity.moderate.foreground)
+                                Text(message)
+                                    .font(.footnote)
+                                    .foregroundStyle(.secondary)
+                            }
+                            if model.locationNeedsSettings {
+                                Button(String(localized: "Open Settings")) {
+                                    if let url = URL(string: UIApplication.openSettingsURLString) {
+                                        UIApplication.shared.open(url)
+                                    }
+                                }
+                                .font(.footnote.weight(.semibold))
+                            }
                         }
                         .padding(.vertical, 2)
                     }

@@ -7,6 +7,14 @@ enum LocationError: LocalizedError {
     case unavailable
     case timedOut
 
+    /// True when the user has to change a system setting, so the UI can offer a way out.
+    var needsSettings: Bool {
+        switch self {
+        case .denied, .restricted: return true
+        case .unavailable, .timedOut: return false
+        }
+    }
+
     var errorDescription: String? {
         switch self {
         case .denied:
