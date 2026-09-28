@@ -38,11 +38,11 @@ Een moderne, responsieve weer-applicatie die actuele lokale weersinformatie toon
 
 ## 📱 iOS-app (SwiftUI)
 
-Er is een native iPhone-app in [`ios/`](ios) die dezelfde backend gebruikt
-(Swift + SwiftUI, geen externe dependencies). De app heeft vijf tabs: **Vandaag**,
+Er is een native iPhone-app in [`ios/`](ios) met vijf tabs: **Vandaag**,
 **Vissen**, **Luchtkwaliteit**, **Brandgevaar** en **Radar** (een ingebedde
-Wendy-kaart). Visserijscores worden volledig op het device berekend. Zie
-[`ios/README.md`](ios/README.md) voor de instructies.
+Windy-kaart). De app praat rechtstreeks met Open-Meteo en heeft dus **geen
+backend nodig** — hij draait volledig op een iPhone. Visserijscores worden op het
+device berekend. Zie [`ios/README.md`](ios/README.md) voor de instructies.
 
 ```bash
 python3 -m venv .venv && .venv/bin/pip install -r requirements.txt

@@ -1,41 +1,24 @@
 # Weer — iOS app
 
-Native iPhone app (Swift + SwiftUI) for this repository's existing FastAPI backend.
-No third-party dependencies, no CocoaPods, no SPM packages.
+Native iPhone app (Swift + SwiftUI). No third-party dependencies, no CocoaPods,
+no SPM packages.
+
+**The app talks straight to Open-Meteo.** It does not use this repository's
+FastAPI backend, so it runs on a real iPhone with no server and no laptop.
 
 ## Requirements
 
 - Xcode 15 or newer (developed and verified against Xcode 27, iOS SDK 27)
 - iOS 17.0+
-- The backend running locally
+- An internet connection
 
-## 1. Start the backend
-
-From the repository root:
-
-```bash
-python3 -m venv .venv
-.venv/bin/pip install -r requirements.txt
-ENABLE_NGROK=false .venv/bin/uvicorn app:app --host 0.0.0.0 --port 8000
-```
-
-Verify it responds:
-
-```bash
-curl http://localhost:8000/health
-# {"status":"healthy",...}
-```
-
-> The iOS Simulator shares the host network stack, so `localhost` from the app
-> reaches the backend on the host.
-
-## 2. Run the app
+## 1. Run the app
 
 ```bash
 open ios/Weer.xcodeproj
 ```
 
-Then select the `Weer` scheme and an iPhone simulator and press Run.
+Select the `Weer` scheme and an iPhone simulator and press Run.
 
 From the command line:
 
@@ -55,48 +38,49 @@ session only:
 export DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer
 ```
 
+## Running on a physical iPhone
+
+The app is fully self-contained, so a device install behaves the same as the
+simulator. To build for hardware, set a signing team in Xcode under
+*Signing & Capabilities* (a free Apple ID works for ad-hoc installs, but those
+expire after 7 days; TestFlight builds last 90 days per upload).
+
 ## Configuration
 
-There are **no API keys and no secrets** anywhere in this app or in the backend.
-The backend reads Open-Meteo, which is keyless. Nothing sensitive is committed.
+There are **no API keys and no secrets** anywhere in this app. Open-Meteo is
+keyless and needs no account. Nothing sensitive is committed.
 
-The only setting is the API base URL, kept out of the Swift source:
+No base URL is configurable any more: the endpoints are hardcoded in
+`OpenMeteoService` and all use HTTPS, so App Transport Security needs no
+exception.
 
-| Key | Where | Default |
-|---|---|---|
-| `WEER_API_BASE_URL` | `ios/Weer/Info.plist` | `http://localhost:8000` |
+**Language** is not a server concern any more. WMO weather codes are mapped to
+English text in `WeatherCodes.swift`; the reverse-geocoding lookup asks Nominatim
+for `en`. Localizing the app would mean adding an `en.lproj` strings table for the
+UI copy and a code-to-description table per language in `WeatherCodes`.
 
-It is read at runtime by `AppConfig.baseURL` (`ios/Weer/App/AppConfig.swift`), which
-falls back to `http://localhost:8000` if the key is missing or unparseable.
+## Data sources
 
-**To point the app at a deployed backend**, change `WEER_API_BASE_URL` in
-`ios/Weer/Info.plist`. A path prefix is supported and is preserved when requests
-are built, so `https://example.com/api` correctly calls `https://example.com/api/current`.
-
-`NSAllowsLocalNetworking` is enabled in `Info.plist` so plain-HTTP development
-against `localhost` is permitted by App Transport Security. A production HTTPS URL
-needs no exception at all.
-
-**Language** is derived from the device locale and passed to the backend as
-`?lang=`, so weather descriptions are localized server-side. Supported values are
-`nl`, `en`, `de`, `it`, `fr` (see `AppConfig.supportedLanguages`); the default is `nl`,
-matching the backend's default.
-
-## What the app uses from the backend
-
-All endpoints are read-only and need no authentication.
-
-| Endpoint | Used for |
+| Source | Used for |
 |---|---|
-| `GET /current` | temperature, feels-like, humidity, pressure, wind + gust, clouds, precipitation, visibility |
-| `GET /forecast` | `forecast_24h` (8 steps, 3-hourly) and `forecast_7d` (7 days) |
-| `GET /alerts` | severe-weather alert banner |
-| `GET /locations` | city list for the location picker (added for this app) |
+| `api.open-meteo.com/v1/forecast` | current conditions, 24h and 7d forecast, fire risk inputs |
+| `air-quality-api.open-meteo.com/v1/air-quality` | AQI, six pollutants, UV index, wildfire smoke |
+| `nominatim.openstreetmap.org/reverse` | place name for a device location |
 
-The five weather endpoints are fetched concurrently, mirroring the web client's
-`Promise.all`. The backend reverse-geocodes coordinates into `location.name`, so the
-app never geocodes on its own — it passes `lat`/`lon` and renders what comes back.
+Both Open-Meteo calls are issued concurrently. Air quality is optional: a failure
+there degrades that tab to a placeholder instead of breaking the app.
 
+The fire risk and alert rules, the AQI banding and the Angström index were ported
+from `app.py` into `OpenMeteoService` so the device computes them locally. The
+seven-day fire risk forecast was diffed against the backend's own output and
+matches value for value.
+
+### Reverse geocoding
+
+Nominatim's usage policy asks for an identifying User-Agent, which the app sends.
+Coordinates that match a built-in city skip the network lookup entirely.
+
+## Screens
 ## Screens
 
 A five-tab `TabView`, each tab wrapped in `WeatherScaffold` (navigation bar, location
@@ -121,13 +105,14 @@ contribute a banded score (max 25/25/20/20/10) for a total of 100.
 
 ```
 ios/Weer/
-├── App/           WeerApp.swift (entry point), AppConfig.swift (base URL, language)
-├── Models/        Codable types mirroring the JSON exactly + FishingConditions
-├── Services/      APIClient (URLSession, error mapping), WeatherService, LocationService (CoreLocation)
+├── App/           WeerApp.swift (entry point)
+├── Models/        Decodable value types the views consume + FishingConditions
+├── Services/      OpenMeteoService (all network + ported calculations), LocationService (CoreLocation)
 ├── ViewModels/    WeatherViewModel (@Observable, owns all loading/error state)
 ├── Views/         RootView (tab bar), ScreenScaffold, the four feature screens, LocationPickerView
 ├── Components/    Theme (palette/severity), DesignSystem (Card, GaugeCard, StatGrid), current card, forecast rows
-└── Support/       WeerDate (parsing of the backend's timezone-less timestamps)
+├── Assets.xcassets/ AppIcon
+└── Support/       WeerDate (timestamp parsing), WeatherCodes, KnownPlaces
 ```
 
 The Xcode project uses a folder-synchronized group, so new files added anywhere
@@ -142,10 +127,9 @@ without duplicated declarations. Severity tokens from the backend (`laag`, `mati
 `verhoogd`, `hoog`, `extreem`, `good`/`moderate`/`unhealthy`) map to colours via
 `Severity.init(token:)`.
 
-`/fire-risk` returns its `level` and `description` fields hardcoded in Dutch, and the
-web app translates them client-side from the `css` token. The app does the same through
-`FireLevel.label(token:)` / `FireLevel.detail(token:)`, so the tab reads in English
-while still honouring the same tokens.
+Fire risk levels arrive as a `css` token. `FireLevel.label(token:)` and
+`FireLevel.detail(token:)` turn it into display text, keeping the same tokens the
+web app uses.
 
 ## Notes and limitations
 
@@ -153,12 +137,18 @@ while still honouring the same tokens.
   `timezone=Europe/Amsterdam` and returns local wall-clock strings without an offset.
   The app displays those values directly rather than re-interpreting them, so a
   device in another timezone sees Amsterdam local time. This matches the web app.
-- **Location is not persisted.** Same as the web app, the selected location is
-  session-only; the app falls back to the backend default on next launch.
+- **Location is not persisted.** The selected location is session-only; the app
+  falls back to Amsterdam on next launch.
+- **CoreLocation "kCLErrorDomain error 0"** means no fix is available *yet*. It is
+  transient, so `LocationService` retries up to four times with a delay and has a
+  12 second overall timeout instead of surfacing the raw error. The authorization
+  prompt is also awaited before the first `requestLocation()` call, which is what
+  made the first attempt fail.
 - **The location permission prompt is only shown after you tap "Use my location"**,
   which is why the city list is the primary way to switch locations.
 - **The radar tab needs network access to windy.com** and renders inside a web view,
   so it is the only screen that depends on a third party.
-- **Not ported from the web app:** the seven mini-games.
-- **No login.** The weather endpoints never required it; the app's backend
-  interactions are the same anonymous ones the web frontend uses when signed out.
+- **Not ported from the web app:** the seven mini-games, and everything that needs a
+  database (accounts, location history, game score tracking). Those all live in the
+  FastAPI backend, which the app no longer talks to.
+- **Only English is implemented.** See the language note above.

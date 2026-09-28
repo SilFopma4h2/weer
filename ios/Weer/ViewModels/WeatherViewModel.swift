@@ -4,7 +4,7 @@ import Foundation
 @MainActor
 @Observable
 final class WeatherViewModel {
-    private let service: WeatherService
+    private let service: OpenMeteoService
     private let locationService: LocationService
 
     private(set) var current: CurrentWeather?
@@ -16,13 +16,13 @@ final class WeatherViewModel {
     private(set) var isLoading = false
     private(set) var isLocating = false
     private(set) var errorMessage: String?
-    private(set) var cities: [Place] = []
-    private(set) var defaultPlace: Place?
+    private(set) var cities: [Place] = KnownPlaces.cities
+    private(set) var defaultPlace: Place? = KnownPlaces.defaultPlace
 
-    private(set) var selectedPlace: Place?
+    private(set) var selectedPlace: Place? = KnownPlaces.defaultPlace
 
-    init(service: WeatherService? = nil, locationService: LocationService? = nil) {
-        self.service = service ?? WeatherService()
+    init(service: OpenMeteoService? = nil, locationService: LocationService? = nil) {
+        self.service = service ?? OpenMeteoService()
         self.locationService = locationService ?? LocationService()
     }
 
@@ -82,11 +82,9 @@ final class WeatherViewModel {
         defer { isLocating = false }
         do {
             let coordinate = try await locationService.requestCurrentCoordinate()
-            selectedPlace = Place(
-                name: String(localized: "My location"),
-                lat: coordinate.latitude,
-                lon: coordinate.longitude
-            )
+            let name = await service.placeName(lat: coordinate.latitude, lon: coordinate.longitude)
+            let place = Place(name: name, lat: coordinate.latitude, lon: coordinate.longitude)
+            selectedPlace = place
             await fetch(showSpinner: true)
         } catch {
             errorMessage = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
@@ -94,39 +92,22 @@ final class WeatherViewModel {
     }
 
     func loadCities() async {
-        if !cities.isEmpty { return }
-        do {
-            let known = try await service.knownLocations()
-            cities = known.cities
-            defaultPlace = Place(
-                name: known.default.name ?? String(localized: "Server default"),
-                lat: known.default.lat,
-                lon: known.default.lon
-            )
-        } catch {
-            cities = []
-        }
+        cities = KnownPlaces.cities
+        defaultPlace = KnownPlaces.defaultPlace
     }
 
     private func fetch(showSpinner: Bool) async {
         if showSpinner { isLoading = true }
         errorMessage = nil
+        let place = selectedPlace ?? KnownPlaces.defaultPlace
         do {
-            let data = try await service.dashboard(
-                lat: selectedPlace?.lat,
-                lon: selectedPlace?.lon
-            )
+            let data = try await service.dashboard(lat: place.lat, lon: place.lon)
             current = data.current
             forecast = data.forecast
-            alerts = data.alerts.alerts
+            alerts = data.alerts
             airQuality = data.airQuality
             fireRisk = data.fireRisk
             updatedStamp = WeerDate.updatedStamp(data.current.timestamp)
-            selectedPlace = Place(
-                name: data.current.location.name,
-                lat: data.current.location.lat,
-                lon: data.current.location.lon
-            )
         } catch is CancellationError {
             return
         } catch {

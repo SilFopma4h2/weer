@@ -24,24 +24,13 @@
 	<false/>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
-	<key>NSAppTransportSecurity</key>
-	<dict>
-		<key>NSAllowsLocalNetworking</key>
-		<true/>
-	</dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Weer uses your location to show the weather where you are right now. You can also pick a city manually.</string>
 	<key>UILaunchScreen</key>
 	<dict/>
-	<key>UIRequiredDeviceCapabilities</key>
-	<array>
-		<string>armv7</string>
-	</array>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
 	</array>
-	<key>WEER_API_BASE_URL</key>
-	<string>http://localhost:8000</string>
 </dict>
 </plist>
