@@ -52,7 +52,9 @@ final class LocationService: NSObject, CLLocationManagerDelegate {
 
     func requestCurrentCoordinate() async throws -> CLLocationCoordinate2D {
         var status = manager.authorizationStatus
-        if status == .notDetermined {
+        // The delegate callback also fires with .notDetermined right after the
+        // delegate is set, so keep waiting until the user actually decided.
+        while status == .notDetermined {
             status = await requestAuthorization()
         }
         switch status {

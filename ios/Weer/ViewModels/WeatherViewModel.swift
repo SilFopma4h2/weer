@@ -16,6 +16,7 @@ final class WeatherViewModel {
     private(set) var isLoading = false
     private(set) var isLocating = false
     private(set) var errorMessage: String?
+    private(set) var locationErrorMessage: String?
     private(set) var cities: [Place] = KnownPlaces.cities
     private(set) var defaultPlace: Place? = KnownPlaces.defaultPlace
 
@@ -77,8 +78,12 @@ final class WeatherViewModel {
         await fetch(showSpinner: true)
     }
 
-    func useDeviceLocation() async {
+    /// Returns false when a location could not be determined, so callers can keep
+    /// the user where they are and show why.
+    @discardableResult
+    func useDeviceLocation() async -> Bool {
         isLocating = true
+        locationErrorMessage = nil
         defer { isLocating = false }
         do {
             let coordinate = try await locationService.requestCurrentCoordinate()
@@ -86,8 +91,11 @@ final class WeatherViewModel {
             let place = Place(name: name, lat: coordinate.latitude, lon: coordinate.longitude)
             selectedPlace = place
             await fetch(showSpinner: true)
+            return true
         } catch {
-            errorMessage = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
+            locationErrorMessage = (error as? LocalizedError)?.errorDescription
+                ?? error.localizedDescription
+            return false
         }
     }
 

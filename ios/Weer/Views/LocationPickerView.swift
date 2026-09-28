@@ -12,13 +12,30 @@ struct LocationPickerView: View {
                 Section {
                     Button {
                         Task {
-                            await model.useDeviceLocation()
-                            close()
+                            if await model.useDeviceLocation() { close() }
                         }
                     } label: {
-                        Label(String(localized: "Use my location"), systemImage: "location.fill")
+                        HStack {
+                            Label(String(localized: "Use my location"), systemImage: "location.fill")
+                            Spacer()
+                            if model.isLocating {
+                                ProgressView()
+                            }
+                        }
                     }
                     .disabled(model.isLocating)
+                }
+                if let message = model.locationErrorMessage {
+                    Section {
+                        HStack(alignment: .top, spacing: 10) {
+                            Image(systemName: "location.slash")
+                                .foregroundStyle(Severity.moderate.foreground)
+                            Text(message)
+                                .font(.footnote)
+                                .foregroundStyle(.secondary)
+                        }
+                        .padding(.vertical, 2)
+                    }
                 }
                 Section {
                     if let defaultPlace = model.defaultPlace {
