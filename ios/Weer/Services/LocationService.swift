@@ -37,9 +37,9 @@ final class LocationService: NSObject, CLLocationManagerDelegate {
     private var timeoutTask: Task<Void, Never>?
     private var retryTask: Task<Void, Never>?
 
-    private let maximumAttempts = 4
-    private let retryDelay: Duration = .milliseconds(700)
-    private let overallTimeout: Duration = .seconds(12)
+    private let maximumAttempts = 2
+    private let retryDelay: Duration = .milliseconds(300)
+    private let overallTimeout: Duration = .seconds(5)
     private var attempt = 0
 
     override init() {
