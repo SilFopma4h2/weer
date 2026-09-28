@@ -18,6 +18,20 @@ enum WeatherSymbol {
     }
 
     static func isNight(_ icon: String) -> Bool { icon.hasSuffix("n") }
+
+    static func cloudCoverEstimate(for icon: String) -> Int {
+        switch String(icon.prefix(2)) {
+        case "01": return 5
+        case "02": return 45
+        case "03": return 85
+        case "50": return 95
+        case "10": return 80
+        case "13": return 90
+        case "09": return 75
+        case "11": return 80
+        default: return 45
+        }
+    }
 }
 
 struct WeatherSymbolView: View {

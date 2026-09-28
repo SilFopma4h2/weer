@@ -93,25 +93,59 @@ All endpoints are read-only and need no authentication.
 | `GET /alerts` | severe-weather alert banner |
 | `GET /locations` | city list for the location picker (added for this app) |
 
-The three weather endpoints are fetched concurrently, mirroring the web client's
+The five weather endpoints are fetched concurrently, mirroring the web client's
 `Promise.all`. The backend reverse-geocodes coordinates into `location.name`, so the
 app never geocodes on its own — it passes `lat`/`lon` and renders what comes back.
+
+## Screens
+
+A five-tab `TabView`, each tab wrapped in `WeatherScaffold` (navigation bar, location
+button, pull-to-refresh via `ScreenScroll`):
+
+| Tab | Source | Notes |
+| --- | --- | --- |
+| Today | `/current`, `/forecast`, `/alerts` | Hero card, detail grid, 24h strip, 7-day list, alert banner |
+| Fishing | client-side `FishingCalculator` | Score gauge, five factor rows, 7-day outlook |
+| Air | `/air-quality` | AQI gauge, UV index, wildfire smoke, six pollutants |
+| Fire | `/fire-risk` | Angström gauge, current factors, 7-day levels |
+| Radar | Windy embed in a `WKWebView` | Centred on the selected coordinates |
+
+`/air-quality` and `/fire-risk` are fetched with `try?`, so a failure in either one
+degrades that tab to a "not available right now" card instead of breaking the whole app.
+
+Fishing conditions are computed on-device with the algorithm ported from
+`static/script.js`: temperature, wind, cloud cover, precipitation and humidity each
+contribute a banded score (max 25/25/20/20/10) for a total of 100.
 
 ## Structure
 
 ```
 ios/Weer/
 ├── App/           WeerApp.swift (entry point), AppConfig.swift (base URL, language)
-├── Models/        Codable types mirroring the JSON exactly
+├── Models/        Codable types mirroring the JSON exactly + FishingConditions
 ├── Services/      APIClient (URLSession, error mapping), WeatherService, LocationService (CoreLocation)
 ├── ViewModels/    WeatherViewModel (@Observable, owns all loading/error state)
-├── Views/         WeatherView (main screen), LocationPickerView
-├── Components/    Card/detail tiles, current card, forecast rows, alert banner, state views
+├── Views/         RootView (tab bar), ScreenScaffold, the four feature screens, LocationPickerView
+├── Components/    Theme (palette/severity), DesignSystem (Card, GaugeCard, StatGrid), current card, forecast rows
 └── Support/       WeerDate (parsing of the backend's timezone-less timestamps)
 ```
 
 The Xcode project uses a folder-synchronized group, so new files added anywhere
 under `ios/Weer/` are compiled automatically — no need to edit `project.pbxproj`.
+
+## Design
+
+`Theme.swift` holds a single adaptive palette built on
+`Color.adaptive(light:dark:)` (a `UIColor` dynamic provider keyed off
+`userInterfaceStyle`), so every colour resolves correctly in light and dark mode
+without duplicated declarations. Severity tokens from the backend (`laag`, `matig`,
+`verhoogd`, `hoog`, `extreem`, `good`/`moderate`/`unhealthy`) map to colours via
+`Severity.init(token:)`.
+
+`/fire-risk` returns its `level` and `description` fields hardcoded in Dutch, and the
+web app translates them client-side from the `css` token. The app does the same through
+`FireLevel.label(token:)` / `FireLevel.detail(token:)`, so the tab reads in English
+while still honouring the same tokens.
 
 ## Notes and limitations
 
@@ -123,9 +157,8 @@ under `ios/Weer/` are compiled automatically — no need to edit `project.pbxpro
   session-only; the app falls back to the backend default on next launch.
 - **The location permission prompt is only shown after you tap "Use my location"**,
   which is why the city list is the primary way to switch locations.
-- **Not ported from the web app:** the seven mini-games, rain radar (Windy embed),
-  fishing conditions, air quality, and fire risk. `/air-quality` and `/fire-risk`
-  work and are documented in the root README, but they are separate features rather
-  than core weather, so they are out of scope for this MVP.
+- **The radar tab needs network access to windy.com** and renders inside a web view,
+  so it is the only screen that depends on a third party.
+- **Not ported from the web app:** the seven mini-games.
 - **No login.** The weather endpoints never required it; the app's backend
   interactions are the same anonymous ones the web frontend uses when signed out.

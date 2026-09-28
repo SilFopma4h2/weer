@@ -4,6 +4,8 @@ struct DashboardData {
     let current: CurrentWeather
     let forecast: ForecastResponse
     let alerts: AlertsResponse
+    let airQuality: AirQuality?
+    let fireRisk: FireRisk?
 }
 
 struct WeatherService {
@@ -29,7 +31,15 @@ struct WeatherService {
         async let current = client.get("/current", queryItems: items, as: CurrentWeather.self)
         async let forecast = client.get("/forecast", queryItems: items, as: ForecastResponse.self)
         async let alerts = client.get("/alerts", queryItems: items, as: AlertsResponse.self)
-        return try await DashboardData(current: current, forecast: forecast, alerts: alerts)
+        async let airQuality: AirQuality? = try? client.get("/air-quality", queryItems: items, as: AirQuality.self)
+        async let fireRisk: FireRisk? = try? client.get("/fire-risk", queryItems: items, as: FireRisk.self)
+        return try await DashboardData(
+            current: current,
+            forecast: forecast,
+            alerts: alerts,
+            airQuality: airQuality,
+            fireRisk: fireRisk
+        )
     }
 
     func knownLocations() async throws -> KnownLocations {

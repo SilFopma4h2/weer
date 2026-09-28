@@ -57,6 +57,15 @@ enum WeerDate {
         return formatter("EEE d MMM").string(from: date)
     }
 
+    static func dayColumn(_ value: String) -> String {
+        guard let date = day(value) else { return value }
+        if serverCalendar.isDateInToday(date) { return String(localized: "Today") }
+        if serverCalendar.isDateInTomorrow(date) { return String(localized: "Tomorrow") }
+        let horizon = serverCalendar.date(byAdding: .day, value: 6, to: Date()) ?? Date()
+        if date <= horizon { return formatter("EEE").string(from: date) }
+        return formatter("d MMM").string(from: date)
+    }
+
     static func updatedStamp(_ value: String) -> String {
         guard let date = parseStamp(value) else { return value }
         return String(localized: "Updated") + " " + formatter("HH:mm").string(from: date)

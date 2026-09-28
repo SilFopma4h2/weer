@@ -4,7 +4,7 @@ import SwiftUI
 struct WeerApp: App {
     var body: some Scene {
         WindowGroup {
-            WeatherView()
+            RootView()
         }
     }
 }

@@ -10,6 +10,8 @@ final class WeatherViewModel {
     private(set) var current: CurrentWeather?
     private(set) var forecast: ForecastResponse?
     private(set) var alerts: [WeatherAlert] = []
+    private(set) var airQuality: AirQuality?
+    private(set) var fireRisk: FireRisk?
     private(set) var updatedStamp: String?
     private(set) var isLoading = false
     private(set) var isLocating = false
@@ -29,6 +31,33 @@ final class WeatherViewModel {
     }
 
     var hasContent: Bool { current != nil }
+
+    var fishingNow: FishingConditions? {
+        guard let current else { return nil }
+        return FishingCalculator.conditions(
+            temperature: current.temperature.current,
+            windSpeed: current.wind.speed,
+            cloudCover: current.clouds,
+            precipitation: current.precipitation,
+            humidity: current.humidity
+        )
+    }
+
+    var fishingForecast: [(day: DailyForecast, conditions: FishingConditions)] {
+        guard let forecast else { return [] }
+        return forecast.forecast7d.map { day in
+            (
+                day,
+                FishingCalculator.conditions(
+                    temperature: day.temperature.max,
+                    windSpeed: day.wind.speed,
+                    cloudCover: WeatherSymbol.cloudCoverEstimate(for: day.weather.icon),
+                    precipitation: day.rain,
+                    humidity: 65
+                )
+            )
+        }
+    }
 
     func load() async {
         await fetch(showSpinner: current == nil)
@@ -53,7 +82,11 @@ final class WeatherViewModel {
         defer { isLocating = false }
         do {
             let coordinate = try await locationService.requestCurrentCoordinate()
-            selectedPlace = Place(name: String(localized: "My location"), lat: coordinate.latitude, lon: coordinate.longitude)
+            selectedPlace = Place(
+                name: String(localized: "My location"),
+                lat: coordinate.latitude,
+                lon: coordinate.longitude
+            )
             await fetch(showSpinner: true)
         } catch {
             errorMessage = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
@@ -86,8 +119,14 @@ final class WeatherViewModel {
             current = data.current
             forecast = data.forecast
             alerts = data.alerts.alerts
+            airQuality = data.airQuality
+            fireRisk = data.fireRisk
             updatedStamp = WeerDate.updatedStamp(data.current.timestamp)
-            selectedPlace = Place(name: data.current.location.name, lat: data.current.location.lat, lon: data.current.location.lon)
+            selectedPlace = Place(
+                name: data.current.location.name,
+                lat: data.current.location.lat,
+                lon: data.current.location.lon
+            )
         } catch is CancellationError {
             return
         } catch {
