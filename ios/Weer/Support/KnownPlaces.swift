@@ -11,6 +11,7 @@ enum KnownPlaces {
         Place(name: "Rotterdam", lat: 51.9225, lon: 4.4792),
         Place(name: "Den Haag", lat: 52.1601, lon: 4.497),
         Place(name: "Eindhoven", lat: 51.4416, lon: 5.4697),
+        Place(name: "Oosterbeek", lat: 51.9814, lon: 5.5336),
         Place(name: "London", lat: 51.5074, lon: -0.1278),
         Place(name: "Paris", lat: 48.8566, lon: 2.3522),
         Place(name: "Berlin", lat: 52.52, lon: 13.405),
